@@ -53,6 +53,11 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
     return new Promise((resolve, reject) => {
       onToken = (r) => {
         if (r.error) { reject(new Error(r.error)); return; }
+        // Case « accès aux fichiers » laissée décochée dans la fenêtre Google.
+        if (!window.google.accounts.oauth2.hasGrantedAllScopes(r, SCOPE)) {
+          reject(new Error('accès au Drive non accordé : reconnecte-toi et coche la case des fichiers'));
+          return;
+        }
         token = r.access_token;
         tokenExp = Date.now() + Number(r.expires_in || 3600) * 1000;
         resolve(token);
@@ -65,7 +70,18 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
   async function drive(url, opts = {}) {
     const r = await fetch(url, { ...opts, headers: { Authorization: `Bearer ${token}`, ...(opts.headers || {}) } });
     if (r.status === 401) { token = null; throw new Error('jeton expiré'); }
-    if (!r.ok) throw new Error(`Google Drive a répondu ${r.status}`);
+    if (!r.ok) {
+      // On traduit les refus les plus courants (403) en consigne claire.
+      const body = await r.text().catch(() => '');
+      if (/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/.test(body)) {
+        throw new Error('API Google Drive non activée dans le projet Google Cloud');
+      }
+      if (/insufficientPermissions|ACCESS_TOKEN_SCOPE_INSUFFICIENT|insufficient/i.test(body)) {
+        token = null;
+        throw new Error('accès au Drive non accordé : reconnecte-toi et coche la case des fichiers');
+      }
+      throw new Error(`Google Drive a répondu ${r.status}`);
+    }
     return r;
   }
 
