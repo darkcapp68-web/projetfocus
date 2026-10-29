@@ -64,6 +64,7 @@ Il faut seulement Python (déjà installé chez toi).
 2. Ouvre http://localhost:8417 dans Chrome ou Edge.
 3. Vérifie, dans l'ordre :
    - Le fond a une couleur qui correspond au moment de la journée (le nom est écrit en bas).
+     Paramètres → Couleurs → « Voir la journée en accéléré » fait défiler les 24 h en 30 s.
    - Tourne le cadran : les graduations apparaissent, le temps change minute par minute.
    - Règle un focus de **1 minute** et une pause de **1 minute**, puis Démarrer.
    - Après 1 minute : petit son, fond coloré qui respire, une action du coach, et si une

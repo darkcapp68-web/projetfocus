@@ -78,7 +78,38 @@ const rgbToHex = (c) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2
 const toMin = (hm) => { const [h, m] = hm.split(':').map(Number); return ((h * 60 + (m || 0)) % 1440 + 1440) % 1440; };
 const BLEND_MIN = 90; // chaque couleur glisse vers la suivante pendant les 90 min qui la précèdent
 
-function dayAt(date = new Date()) {
+// Démo : la journée entière défile en 30 secondes (Paramètres → Couleurs).
+const DEMO_MS = 30000;
+let demo = null; // { t0, base } pendant la démo
+
+const colorClock = () => (demo
+  ? new Date(demo.base + ((performance.now() - demo.t0) / DEMO_MS) * 86400000)
+  : new Date());
+
+function startDayDemo() {
+  const base = new Date();
+  base.setHours(0, 0, 0, 0);
+  demo = { t0: performance.now(), base: base.getTime() };
+  closeSettings();
+  body.classList.add('demo');
+  document.documentElement.classList.add('demo-on');
+  const step = () => {
+    if (!demo) return;
+    if (performance.now() - demo.t0 >= DEMO_MS) { stopDayDemo(); return; }
+    render(false);
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function stopDayDemo() {
+  demo = null;
+  body.classList.remove('demo');
+  document.documentElement.classList.remove('demo-on');
+  render(true);
+}
+
+function dayAt(date = colorClock()) {
   const pts = S.dayColors.map((p) => ({ ...p, m: toMin(p.hour) })).sort((a, b) => a.m - b.m);
   const now = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
   let i = pts.length - 1;
@@ -1093,6 +1124,10 @@ $('#btn-sync').addEventListener('click', () => {
   if (sync.connected) sync.disconnect(); else sync.connect();
 });
 $('#btn-sync-now').addEventListener('click', () => sync.syncNow());
+
+$('#btn-day-demo').addEventListener('click', startDayDemo);
+// Un toucher pendant la démo l'arrête (sauf dans la première demi-seconde).
+window.addEventListener('pointerdown', () => { if (demo && performance.now() - demo.t0 > 500) stopDayDemo(); });
 window.addEventListener('online', () => sync.wake());
 
 /* =========================================================
@@ -1138,7 +1173,7 @@ function render(force) {
   };
   for (const [c, on] of Object.entries(classes)) body.classList.toggle(c, on);
 
-  const bg = p === 'break' ? T.breakColor || S.breakColor : S.dayGradient ? day.color : S.fixedColor;
+  const bg = demo ? day.color : p === 'break' ? T.breakColor || S.breakColor : S.dayGradient ? day.color : S.fixedColor;
   if (bg !== lastBg) {
     lastBg = bg;
     document.documentElement.style.setProperty('--bg', bg);
@@ -1172,6 +1207,10 @@ function render(force) {
   else if (p === 'focus') info += ` · focus · ${count}`;
   else if (p === 'break') info += ` · ${T.isLong ? 'pause longue' : 'pause'} · ${count}`;
   else info += ' · série terminée';
+  if (demo) {
+    const d = colorClock();
+    info = `démo · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} · ${day.name} · touche pour arrêter`;
+  }
   setText(els.info, info);
 
   const title = p === 'idle' ? 'projetfocus' : p === 'done' ? 'Série terminée · projetfocus' : `${fmt(rem)} · ${sub} · projetfocus`;

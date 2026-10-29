@@ -362,3 +362,7 @@ body.phase-break #sel-station, body.phase-break #btn-music { display: none; }
 #sync-status[data-kind="ok"] { opacity: 0.8; }
 #sync-status[data-kind="warn"] { color: #ffd479; opacity: 0.95; }
 #settings input[data-k="syncClientId"] { font-size: 12px; }
+
+/* ---------- Démo de la journée en accéléré ---------- */
+html.demo-on, body.demo { transition-duration: 0.2s; }
+body.demo #info { opacity: 0.9; visibility: visible; }
