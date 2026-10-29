@@ -121,10 +121,9 @@ body.dial-liquide #liquid, body.dial-orbites #orbits { display: inline; }
 body.dial-liquide #arc, body.dial-liquide #knob { display: none; }
 body.dial-liquide #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
 /* Le liquide inverse la couleur du fond (orangé → bleu clair, indigo → jaune pâle…). */
-#liquid { mix-blend-mode: difference; }
-#liquid path { fill: #fff; }
-#liquid .w1 { opacity: 0.55; }
-#liquid .w2 { opacity: 0.45; }
+#liquid path { fill: var(--liquid, #fff); transition: fill 2s ease; }
+#liquid .w1 { opacity: 0.85; }
+#liquid .w2 { opacity: 0.55; }
 #liquid-level { transition: transform 1.2s ease; }
 body.adjusting #liquid-level { transition: none; }
 #liquid .wave { animation: dial-wave 6s ease-in-out infinite alternate; }

@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 16h09';
+const APP_VERSION = '29/10/2026 · 16h10';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1294,6 +1294,8 @@ function render(force) {
   if (bg !== lastBg) {
     lastBg = bg;
     document.documentElement.style.setProperty('--bg', bg);
+    // Niveau liquide : la couleur inverse du fond.
+    document.documentElement.style.setProperty('--liquid', rgbToHex(hexToRgb(bg).map((v) => 255 - v)));
     $('meta[name="theme-color"]').setAttribute('content', bg);
   }
 
