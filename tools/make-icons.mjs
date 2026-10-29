@@ -1,7 +1,7 @@
 // Génère les icônes PNG de l'appli (sans dépendance) : node tools/make-icons.mjs
 // Le dessin reprend le cadran : cercle fin, arc blanc et point au bout.
 
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
 const BG = [0x1c, 0x1a, 0x4d];
@@ -73,3 +73,13 @@ writeFileSync('icons/icon-512.png', png(512, dialPixel(1.25)));
 writeFileSync('icons/icon-maskable-512.png', png(512, dialPixel(1)));
 writeFileSync('icons/apple-touch-icon.png', png(180, dialPixel(1.1)));
 console.log('Icônes générées dans icons/');
+
+// Appli Android (dossier android/) : icône de lancement et image de l'écran de démarrage.
+const RES = 'android/app/src/main/res';
+for (const [dir, size] of [['mdpi', 48], ['hdpi', 72], ['xhdpi', 96], ['xxhdpi', 144], ['xxxhdpi', 192]]) {
+  mkdirSync(`${RES}/mipmap-${dir}`, { recursive: true });
+  writeFileSync(`${RES}/mipmap-${dir}/ic_launcher.png`, png(size, dialPixel(1.25)));
+}
+mkdirSync(`${RES}/drawable-nodpi`, { recursive: true });
+writeFileSync(`${RES}/drawable-nodpi/splash.png`, png(384, dialPixel(1)));
+console.log('Icônes Android générées dans android/');

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Même indigo que le site (manifest.webmanifest). -->
+    <color name="fond">#1C1A4D</color>
+</resources>

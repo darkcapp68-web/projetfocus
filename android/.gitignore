@@ -1,0 +1,12 @@
+.gradle/
+build/
+app/build/
+.idea/
+.kotlin/
+*.iml
+local.properties
+captures/
+# La clé de signature ne doit jamais partir dans le dépôt (il sera public).
+*.jks
+*.keystore
+keystore.properties

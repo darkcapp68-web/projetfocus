@@ -133,6 +133,11 @@ Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf 
 Au premier démarrage d'un focus, le navigateur demande l'autorisation d'afficher des
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
 
+
+**Appli Android (APK)** : le dossier [android/](android/README.md) est un projet Android Studio
+(comme Frigo ou Bulles) qui fabrique un APK « coquille » ouvrant le site publié, en plein
+écran, avec son icône. Le site reste la seule chose à maintenir ; tout est expliqué dans
+[android/README.md](android/README.md).
 ---
 
 ## Synchroniser avec Google Drive (mêmes réglages partout)
@@ -268,4 +273,5 @@ Aucun outil à installer : HTML, CSS et JavaScript, sans étape de build.
 | `js/defaults.js` | valeurs par défaut, messages, actions du coach, radios, liste des morceaux |
 | `music/` | les 9 morceaux lofi CC0 (voir CREDITS.md) |
 | `sw.js` | mode hors ligne |
-| `tools/make-icons.mjs` | regénère les icônes : `node tools/make-icons.mjs` |
+| `tools/make-icons.mjs` | regénère les icônes (site et Android) : `node tools/make-icons.mjs` |
+| `android/` | projet Android Studio de l'APK (voir android/README.md) |
