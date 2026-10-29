@@ -57,9 +57,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Respiration guidée** (l'écran « respire »), par défaut **cohérence cardiaque 5 s / 5 s**
   (6 respirations par minute ; une pause de 5 min = une séance « 365 »). Autres rythmes :
   apaisante 4/6, carrée 4-4-4-4, 4-7-8, ou simple pulsation (sans consignes).
-  Inspire : voile qui va vers la **teinte d'inspiration** (bleu ciel) ; retiens : passe à la
-  **teinte de retenue** (doré) puis ne bouge plus ; expire : va vers la **teinte d'expiration**
-  (sombre). « inspire / retiens / expire » écrit sous le temps (réglable). Intensité réglable.
+  Avec « une couleur par étape » (par défaut), l'écran prend **exactement les couleurs
+  choisies** dans Paramètres → Pause (pas un voile mélangé à la couleur de pause) : inspire →
+  **bleu ciel**, retiens → **doré** puis ne bouge plus, expire → **noir**. La première
+  inspiration part de la couleur de pause. Sur une teinte claire, texte et cadran passent en
+  sombre (à mi-chemin de l'étape). « inspire / retiens / expire » écrit sous le temps
+  (réglable). Sans couleurs : voile sombre dont l'intensité est réglable.
   La respiration s'arrête quand la pause est finie.
 - **Une action du coach** à la fois (liste modifiable), deux autres proposées au toucher.
 - **Maintenir 3 s** pour reprendre avant la fin (geste volontaire). Bouton **Arrêter** au

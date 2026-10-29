@@ -53,7 +53,8 @@ premier pour reprendre le travail).
    - pour enlever la barre d'adresse : créer le dépôt **`TON-COMPTE.github.io`** avec
      `.well-known/assetlinks.json` (je prépare le fichier avec l'empreinte SHA-256).
 4. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
-   - teintes de la respiration (bleu ciel / doré / sombre) : visibles mais pas trop ?
+   - couleurs de la respiration, maintenant affichées telles quelles (bleu ciel / doré /
+     noir) : à garder ? la retenue après l'expiration (carrée) repasse au doré : gênant ?
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
    - radios classiques : lesquelles garder ;

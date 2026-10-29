@@ -385,8 +385,9 @@ function showCoach() {
    ========================================================= */
 
 // Inspire : l'écran s'éclaircit ; retiens : rien ne bouge ; expire : il s'assombrit.
+// Avec « une couleur par étape », l'écran prend vraiment la couleur choisie dans les Paramètres.
 const pulseEl = $('#pulse'), breathEl = $('#breath');
-let breathOn = false, breathTimer = 0;
+let breathOn = false, breathTimer = 0, inkTimer = 0;
 
 function breathSteps() {
   const b = BREATHS.find((x) => x.id === S.breathPattern) || BREATHS[0];
@@ -401,6 +402,14 @@ function setPulse(opacity, seconds, color = '#000000') {
   pulseEl.style.opacity = opacity;
 }
 
+// Sur une teinte claire (bleu ciel, doré…), le texte et le cadran passent en sombre.
+function breathInk(color) {
+  const st = document.documentElement.style;
+  const light = color && rgbToOklab(hexToRgb(color))[0] > 0.75;
+  st.setProperty('--fg', light ? '#1b1f24' : S.textColor);
+  st.setProperty('--dial', light ? '#1b1f24' : S.dialColor);
+}
+
 function breathStep(k) {
   if (!breathOn) return;
   const steps = breathSteps();
@@ -408,9 +417,12 @@ function breathStep(k) {
   const dark = S.pulseIntensity / 100;
   if (kind && S.breathColors) {
     // Une teinte par étape : inspire, retiens, expire.
-    if (kind === 'inspire') setPulse(dark, sec, S.breathInspireColor);
-    else if (kind === 'retiens') setPulse(dark, Math.min(1.5, sec), S.breathHoldColor);
-    else setPulse(dark, sec, S.breathExpireColor);
+    const color = kind === 'inspire' ? S.breathInspireColor : kind === 'retiens' ? S.breathHoldColor : S.breathExpireColor;
+    const glide = kind === 'retiens' ? Math.min(1.5, sec) : sec;
+    setPulse(1, glide, color);
+    // Le texte change de teinte à mi-chemin, quand le fond a assez changé.
+    clearTimeout(inkTimer);
+    inkTimer = setTimeout(() => breathInk(color), glide * 500);
   } else if (kind === 'inspire' || (!kind && k % 2 === 0)) setPulse(0, sec);
   else if (kind === 'expire' || !kind) setPulse(dark, sec);
   breathEl.textContent = kind;
@@ -420,8 +432,11 @@ function breathStep(k) {
 
 function breathStart() {
   breathOn = true;
-  // On part « poumons vides » : écran sombre (ou teinte de l'expiration).
-  setPulse(S.pulseIntensity / 100, 0, S.breathColors ? S.breathExpireColor : '#000000');
+  // On part « poumons vides » : écran sombre ; en couleurs, la première inspiration
+  // glisse de la couleur de pause vers la teinte d'inspiration.
+  if (S.breathColors) setPulse(0, 0, S.breathInspireColor);
+  else setPulse(S.pulseIntensity / 100, 0);
+  void pulseEl.offsetWidth; // pose ce départ tout de suite, sans transition
   breathTimer = setTimeout(() => breathStep(0), 50); // laisse l'écran sombre s'afficher d'abord
 }
 
@@ -429,6 +444,8 @@ function breathStop() {
   breathOn = false;
   clearTimeout(breathTimer);
   setPulse(0, 1);
+  clearTimeout(inkTimer);
+  breathInk(null);
   breathEl.classList.remove('on');
 }
 
