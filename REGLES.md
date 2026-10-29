@@ -138,7 +138,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 8).
+  enregistrés (version actuelle : 9).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
   des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans

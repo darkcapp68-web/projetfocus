@@ -121,7 +121,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 8,
+  version: 9,
 
   // Temps
   focusMin: 25,
@@ -266,7 +266,7 @@ export const DEFAULTS = {
   // Affichage
   timeFormat: 'mmss', // 'mmss' | 'min'
   showInfo: true,
-  controlsDelay: 4,
+  controlsDelay: 10, // secondes avant que les contrôles s'effacent
   keepAwake: true,
 
   // Synchronisation Google Drive (voir README) : identifiant de l'appli chez Google

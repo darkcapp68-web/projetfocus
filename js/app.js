@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 15h55';
+const APP_VERSION = '29/10/2026 · 16h03';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -63,6 +63,8 @@ function sanitize(s) {
   }
   // Version 8 : l'ID client Google est fourni par l'appli (plus rien à coller).
   if (s.version < 8) { if (!s.syncClientId) s.syncClientId = DEFAULTS.syncClientId; s.version = 8; }
+  // Version 9 : les contrôles restent 10 s au lieu de 4 (trop court au doigt).
+  if (s.version < 9) { if (s.controlsDelay === 4) s.controlsDelay = 10; s.version = 9; }
   return s;
 }
 
