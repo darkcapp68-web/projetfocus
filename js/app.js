@@ -9,7 +9,6 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const body = document.body;
 
 const LS_SETTINGS = 'projetfocus.settings';
-const LS_STATE = 'projetfocus.state';
 
 /* =========================================================
    Paramètres (localStorage)
@@ -164,20 +163,6 @@ const T = {
   coach: [], // actions proposées pour cette pause (la première est affichée)
   editing: 'focus', // ce que règle le cadran au repos
 };
-
-function saveState() {
-  const { editing, ...st } = T;
-  try { localStorage.setItem(LS_STATE, JSON.stringify(st)); } catch { /* rien */ }
-}
-
-function restoreState() {
-  try {
-    const st = JSON.parse(localStorage.getItem(LS_STATE));
-    if (!st || !['focus', 'break'].includes(st.phase)) return;
-    const stale = st.pausedRemaining == null && Date.now() - st.endAt > 2 * 3600e3;
-    if (!stale) Object.assign(T, st);
-  } catch { /* rien */ }
-}
 
 const remaining = () => {
   if (T.phase === 'idle') return (T.editing === 'focus' ? S.focusMin : S.breakMin) * 60;
@@ -376,8 +361,7 @@ function renderCoach() {
     b.title = 'Plutôt ça';
     b.addEventListener('click', () => {
       T.coach.splice(i, 1);
-      T.coach.unshift(txt);
-      saveState(); renderCoach(); showCoach();
+      T.coach.unshift(txt); renderCoach(); showCoach();
     });
     li.appendChild(b);
     coachList.appendChild(li);
@@ -544,7 +528,6 @@ function renderPlayer() {
     b.addEventListener('click', () => audio.nextTrack());
     np.appendChild(b);
   } else if (on && st) np.textContent = st.desc;
-  else if (!audioTouched && hadSound()) np.textContent = 'Touche l’écran pour relancer ta musique.';
   if (on && 'mediaSession' in navigator && window.MediaMetadata) {
     const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
@@ -590,31 +573,6 @@ function saveAudio() {
         : { playing: audio.musicOn, track: audio.track?.file || null, time: audio.track ? Math.floor(audio.music.currentTime) : 0 }),
     }));
   } catch { /* stockage indisponible */ }
-}
-
-// Le navigateur n'autorise le son qu'après un geste : on relance au premier toucher.
-function resumeSavedAudio(e) {
-  if (audioTouched) return;
-  audioTouched = true;
-  if (e?.target?.closest?.('#player')) return; // le lecteur s'en occupe lui-même
-  audio.ensure();
-  if (savedAudio.playing && selStation.value !== 'none') playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
-  // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
-  if (onBreak()) pauseAudio();
-  if (noiseOn && selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
-}
-
-const hadSound = () => savedAudio.playing || (noiseOn && selNoise.value !== 'none') || onBreak();
-
-// Au chargement : on tente de relancer le son tout de suite. Le navigateur ne l'autorise
-// que s'il fait confiance au site (souvent écouté, appli installée) ; sinon on attend
-// le premier toucher, et le lecteur l'indique.
-async function autoResumeOnLoad() {
-  if (!hadSound()) return;
-  const ctx = audio.ensure();
-  if (ctx && ctx.state !== 'running') await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 400))]);
-  if (ctx?.state === 'running' && !audioTouched) resumeSavedAudio(null);
-  renderPlayer();
 }
 
 $('#btn-music').addEventListener('click', () => {
@@ -750,7 +708,6 @@ function startFocus(afterBreak) {
   audio.leaveBreak(S.musicVolWork / 100);
   applyAudioLevels();
   startMessages();
-  saveState();
   render(true);
 }
 
@@ -772,7 +729,6 @@ function startBreak(fromTimer) {
     notify(T.isLong ? 'Pause longue' : 'C’est l’heure de la pause', T.coach[0] || 'Lève-toi un moment.');
   }
   renderCoach(); showCoach();
-  saveState();
   render(true);
 }
 
@@ -786,7 +742,6 @@ function breakTimeUp() {
   T.resumeAt = S.autoChain ? Date.now() + S.autoChainDelay * 1000 : 0;
   if (S.autoChain) notify('On reprend', `Nouveau focus dans ${S.autoChainDelay} s.`);
   else notify('La pause est finie', 'Reviens quand tu veux.');
-  saveState();
   showCoach();
   render(true);
 }
@@ -807,7 +762,6 @@ function finishSeries() {
   audio.leaveBreak(S.musicVolWork / 100);
   applyAudioLevels();
   showText('Belle série. Prends soin de toi.');
-  saveState();
   render(true);
 }
 
@@ -823,7 +777,6 @@ function resetAll() {
   audio.stopAll(); // « Arrêter » coupe tout ; « Démarrer » relancera musique et bruit
   applyAudioLevels();
   showText('');
-  saveState();
   render(true);
 }
 
@@ -835,7 +788,6 @@ function togglePauseFocus() {
     T.endAt = Date.now() + T.pausedRemaining * 1000;
     T.pausedRemaining = null;
   }
-  saveState();
   render(true);
 }
 
@@ -846,6 +798,7 @@ function togglePauseFocus() {
 $('#btn-start').addEventListener('click', () => {
   audio.ensure();
   if (T.phase === 'idle' || T.phase === 'done') {
+    audioTouched = true;
     askNotifyPermission();
     T.cycle = 1;
     autoStartAudio();
@@ -937,13 +890,11 @@ window.addEventListener('pointermove', (e) => {
 });
 window.addEventListener('pointerdown', (e) => {
   poke();
-  resumeSavedAudio(e);
   sync.gesture();
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
 }, true);
 window.addEventListener('keydown', (e) => {
   poke();
-  resumeSavedAudio(e);
   if (settingsOpen) { if (e.key === 'Escape') closeSettings(); return; }
   const free = e.target === body || e.target === dial;
   if (e.key === ' ' && free && (T.phase === 'idle' || T.phase === 'focus' || T.phase === 'done')) {
@@ -1255,7 +1206,6 @@ function render(force) {
 
 // Tout est gardé avant que la page se ferme, passe en arrière-plan ou s'endorme.
 function saveEverything() {
-  saveState();
   saveSettings(false);
   saveAudio();
 }
@@ -1308,13 +1258,14 @@ fillSelect(selNoise, NOISES, savedAudio.noise ?? S.defaultNoise);
 renderNoiseSwitch();
 const firstStation = savedAudio.station ?? S.defaultRadio;
 selStation.value = [...selStation.options].some((o) => o.value === firstStation) ? firstStation : 'none';
-restoreState();
+// Recharger la page repart de zéro : minuteur arrêté, aucun son ; seuls les réglages
+// (et les choix de musique / bruit) sont relus. L'ancienne sauvegarde du minuteur est effacée.
+try { localStorage.removeItem('projetfocus.state'); } catch { /* rien */ }
 applySettings();
 sync.start();
 if (T.phase === 'focus') startMessages();
 if (T.phase === 'break') { renderCoach(); showCoach(); }
 renderPlayer();
-autoResumeOnLoad();
 render(true);
 poke();
 setInterval(tick, 250);

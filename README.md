@@ -34,12 +34,11 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
    À la fin de la pause : **3 « ding »**, puis le focus repart tout seul après 5 secondes, et ta
    musique reprend là où elle s'était arrêtée. « Fait, je reprends » permet de ne pas attendre.
 
-L'appli se souvient de tout, même si tu fermes ou recharges la page : la phase et le temps
-restant, la couleur de la pause, la musique choisie (avec le morceau et la seconde exacte de la
-playlist) et le bruit de fond. Après un rechargement, l'appli relance le son tout de suite
-quand le navigateur l'autorise (site souvent écouté, appli installée) ; sinon le lecteur
-affiche « Touche l'écran pour relancer ta musique » et elle repart au premier toucher. Choisir une musique dans le menu la lance
-tout de suite.
+Recharger ou rouvrir la page repart de zéro, comme à la première ouverture : minuteur arrêté,
+aucun son. Tes réglages sont relus (durées, couleurs, volumes, musique et bruit choisis…) et
+**Démarrer** relance le minuteur, la musique et le bruit de fond. Pendant une série, en revanche,
+l'appli retient ta musique d'une phase à l'autre : la playlist reprend au même morceau après
+chaque pause. Choisir une musique dans le menu la lance tout de suite.
 
 Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent). Les réglages sont rangés en 8 sections repliables (Temps, Pause, Volumes et sons, Musiques, Messages, Couleurs, Affichage, Sauvegarde) : une seule s'ouvre à la fois.
 Dans Paramètres → Musiques → « Musiques du menu », décoche les radios et playlists qui ne te
