@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 16h22';
+const APP_VERSION = '29/10/2026 · 17h01';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -65,6 +65,8 @@ function sanitize(s) {
   if (s.version < 8) { if (!s.syncClientId) s.syncClientId = DEFAULTS.syncClientId; s.version = 8; }
   // Version 9 : les contrôles restent 10 s au lieu de 4 (trop court au doigt).
   if (s.version < 9) { if (s.controlsDelay === 4) s.controlsDelay = 10; s.version = 9; }
+  // Version 10 : les styles « liquide » et « orbites » deviennent le mode « rêveur ».
+  if (s.version < 10) { if (s.dialStyle !== 'standard') s.dialStyle = 'reveur'; s.version = 10; }
   return s;
 }
 
@@ -228,6 +230,90 @@ function drawDial(sec) {
   knob.style.opacity = min <= 0 ? 0 : 1;
   // Niveau liquide : plein à 60 min, vide à 0 (le cercle va de y = 25 à y = 275).
   if (liquidLevel) liquidLevel.style.transform = `translateY(${275 - (min / 60) * 250}px)`;
+}
+
+/* ---------- Mode rêveur : système solaire (focus) et vague (pause) ---------- */
+
+// Orbites en ellipses inclinées ; une planète passe devant le soleil sur la moitié basse
+// de son orbite (plus près de nous, un peu plus grosse), derrière sur la moitié haute.
+// Couleurs approchant les vraies ; périodes ralenties pour rester calme.
+const PLANETS = [
+  { r: 32, size: 1.8, color: '#a8a39d', period: 14 },  // Mercure
+  { r: 44, size: 2.8, color: '#e8cf9c', period: 24 },  // Vénus
+  { r: 57, size: 3.0, color: '#4a8fd8', period: 36 },  // Terre
+  { r: 69, size: 2.3, color: '#c8532a', period: 60 },  // Mars
+  { r: 88, size: 6.2, color: '#d9b38c', period: 140 }, // Jupiter
+  { r: 105, size: 5.2, color: '#e6c97f', period: 230, ring: true }, // Saturne
+  { r: 120, size: 3.8, color: '#9fe0e6', period: 420 }, // Uranus
+  { r: 133, size: 3.6, color: '#4466d8', period: 700 }, // Neptune
+];
+const TILT = -14 * Math.PI / 180, FLAT = 0.32;
+const solarBack = $('#solar-back'), solarFront = $('#solar-front');
+let solarOn = false;
+
+(function buildSolar() {
+  if (!solarBack) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  const deg = TILT * 180 / Math.PI;
+  PLANETS.forEach((pl, i) => {
+    const o = document.createElementNS(ns, 'ellipse');
+    o.setAttribute('cx', 150); o.setAttribute('cy', 150);
+    o.setAttribute('rx', pl.r); o.setAttribute('ry', pl.r * FLAT);
+    o.setAttribute('transform', `rotate(${deg} 150 150)`);
+    $('#solar-orbits').appendChild(o);
+    const g = document.createElementNS(ns, 'g');
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('r', pl.size); c.setAttribute('fill', pl.color);
+    g.appendChild(c);
+    if (pl.ring) {
+      const ring = document.createElementNS(ns, 'ellipse');
+      ring.setAttribute('rx', pl.size * 2.2); ring.setAttribute('ry', pl.size * 0.7);
+      ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', pl.color);
+      ring.setAttribute('stroke-width', 1.2); ring.setAttribute('opacity', 0.85);
+      ring.setAttribute('transform', `rotate(${deg})`);
+      g.appendChild(ring);
+    }
+    pl.el = g;
+    pl.phase = i * 1.7; // départs étalés
+    solarBack.appendChild(g);
+  });
+})();
+
+function drawSolar() {
+  if (!solarOn) return;
+  const t = Date.now() / 1000;
+  const cosT = Math.cos(TILT), sinT = Math.sin(TILT);
+  for (const pl of PLANETS) {
+    const a = pl.phase + (t / pl.period) * 2 * Math.PI;
+    const ex = pl.r * Math.cos(a), ey = pl.r * FLAT * Math.sin(a);
+    const x = 150 + ex * cosT - ey * sinT, y = 150 + ex * sinT + ey * cosT;
+    const front = Math.sin(a) > 0;
+    const k = 1 + 0.22 * Math.sin(a); // plus gros au premier plan
+    pl.el.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k.toFixed(3)})`);
+    const want = front ? solarFront : solarBack;
+    if (pl.el.parentNode !== want) want.appendChild(pl.el);
+  }
+  // Comète : part du bord au début du focus et atteint le soleil à la fin.
+  const p = T.phase === 'focus' && T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0;
+  const d = 142 - p * 130, ang = (-40 + p * 70) * Math.PI / 180;
+  const hx = 150 + d * Math.cos(ang), hy = 150 + d * Math.sin(ang);
+  const ux = (hx - 150) / d, uy = (hy - 150) / d; // la queue pointe à l'opposé du soleil
+  const len = 16 + 22 * p, w = 2.2;
+  $('#comet-head').setAttribute('cx', hx.toFixed(2)); $('#comet-head').setAttribute('cy', hy.toFixed(2));
+  $('#comet-tail').setAttribute('d', `M ${hx - uy * w} ${hy + ux * w} L ${hx + ux * len} ${hy + uy * len} L ${hx + uy * w} ${hy - ux * w} Z`);
+  requestAnimationFrame(drawSolar);
+}
+
+// Scène du cadran selon le mode et la phase (au repos : celle de ce qu'on règle).
+function setScene() {
+  const dream = S.dialStyle === 'reveur' && !demo;
+  const p = T.phase;
+  const solar = dream && (p === 'focus' || (p === 'idle' && T.editing !== 'break'));
+  const liquid = dream && (p === 'break' || (p === 'idle' && T.editing === 'break'));
+  body.classList.toggle('scene-solar', solar);
+  body.classList.toggle('scene-liquid', liquid);
+  if (solar && !solarOn) { solarOn = true; requestAnimationFrame(drawSolar); }
+  else if (!solar) solarOn = false;
 }
 
 let dragging = false, dragPrev = 0;
@@ -1266,7 +1352,7 @@ function applySettings() {
   const st = document.documentElement.style;
   st.setProperty('--fg', S.textColor);
   st.setProperty('--dial', S.dialColor);
-  for (const s of ['standard', 'liquide', 'orbites']) body.classList.toggle('dial-' + s, S.dialStyle === s);
+  body.classList.toggle('dial-reveur', S.dialStyle === 'reveur');
   if (breathOn) breathStop(); // nouveau rythme : render() la relance
   audio.resumeLive = S.radioResume !== 'continuer';
   applyAudioLevels(300);
@@ -1287,6 +1373,7 @@ function render(force) {
     'edit-break': T.editing === 'break', 'fmt-min': S.timeFormat === 'min', 'no-info': !S.showInfo,
   };
   for (const [c, on] of Object.entries(classes)) body.classList.toggle(c, on);
+  setScene();
 
   const wantBreath = p === 'break' && S.pulseOn && !T.breakEnded && !demo;
   if (wantBreath !== breathOn) { if (wantBreath) breathStart(); else breathStop(); }

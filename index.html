@@ -37,7 +37,7 @@
            aria-valuemin="1" aria-valuemax="60" aria-valuenow="25">
         <defs><clipPath id="dial-clip"><circle cx="150" cy="150" r="125.5"/></clipPath></defs>
         <circle class="track" cx="150" cy="150" r="128"/>
-        <!-- Style « niveau liquide » : le cadran se vide comme un verre -->
+        <!-- Mode rêveur, pause : le cadran se vide comme un verre -->
         <g id="liquid" clip-path="url(#dial-clip)">
           <g id="liquid-level">
             <g class="wave">
@@ -46,12 +46,21 @@
             </g>
           </g>
         </g>
-        <!-- Style « orbites » : de petites lunes tournent lentement -->
-        <g id="orbits">
-          <circle class="orbit" cx="150" cy="150" r="108"/>
-          <circle class="orbit" cx="150" cy="150" r="84"/>
-          <g class="moon m1"><circle cx="150" cy="42" r="4"/></g>
-          <g class="moon m2"><circle cx="150" cy="66" r="2.5"/><circle cx="150" cy="234" r="2"/></g>
+        <!-- Mode rêveur, focus : un petit système solaire ; la comète atteint le soleil à la fin -->
+        <g id="solar">
+          <defs>
+            <radialGradient id="sun-glow">
+              <stop offset="0" stop-color="#fff3c4"/>
+              <stop offset="0.3" stop-color="#ffd27a" stop-opacity="0.9"/>
+              <stop offset="1" stop-color="#ffb347" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <g id="solar-orbits"></g>
+          <g id="solar-back"></g>
+          <circle cx="150" cy="150" r="30" fill="url(#sun-glow)"/>
+          <circle cx="150" cy="150" r="9" fill="#ffe7a3"/>
+          <g id="solar-front"></g>
+          <g id="comet"><path id="comet-tail" fill="rgba(255,255,255,0.45)"/><circle id="comet-head" r="2.6"/></g>
         </g>
         <g id="ticks"></g>
         <circle id="arc" cx="150" cy="150" r="128" transform="rotate(-90 150 150)"/>
@@ -202,7 +211,7 @@
       <label>Couleur fixe (si le dégradé est coupé)<input type="color" data-k="fixedColor"></label>
       <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
       <label>Couleur de la pause (si pas au hasard)<input type="color" data-k="breakColor"></label>
-      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Standard</option><option value="liquide">Niveau liquide</option><option value="orbites">Orbites</option></select></label>
+      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option></select></label>
       <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
       <label>Couleur du texte<input type="color" data-k="textColor"></label>
       <details class="more">

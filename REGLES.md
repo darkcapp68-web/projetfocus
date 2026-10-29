@@ -33,10 +33,13 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
   l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
-  « Standard » (par défaut), « Niveau liquide » (pas d'arc : le cadran se vide comme un verre,
-  plein à 60 min, liquide clair qui ondule) ou « Orbites » (arc fin, deux orbites où tournent
-  lentement de petites lunes). Choisis parmi une maquette de 10 pistes. Les vagues et les lunes
-  bougent même si l'appareil demande de réduire les animations (souhait de l'utilisateur). Sous le cadran : bascule
+  « **Normal** » (par défaut, l'arc et les chiffres) ou « **Rêveur** » : pendant le focus, un
+  petit **système solaire** (soleil au centre, 8 planètes aux couleurs proches des vraies sur
+  des orbites en ellipses inclinées, qui passent devant ou derrière le soleil) et une
+  **comète** qui part du bord et atteint le soleil à la fin du focus ; pendant la pause, la
+  **vague** (le cadran se vide comme un verre, couleur inverse du fond). En rêveur, ni temps
+  ni nom de phase pendant que le temps passe ; au repos la scène de ce qu'on règle, avec les
+  chiffres. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le
@@ -142,7 +145,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 9).
+  enregistrés (version actuelle : 10).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
   des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans

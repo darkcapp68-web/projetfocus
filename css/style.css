@@ -115,12 +115,16 @@ body.phase-idle.adjusting #dial { cursor: grabbing; }
 #knob { fill: var(--dial); transition: opacity 0.4s; }
 body.adjusting #arc, body.adjusting #knob { transition: none; }
 
-/* Styles du cadran (Paramètres → Couleurs) */
-#liquid, #orbits { display: none; }
-body.dial-liquide #liquid, body.dial-orbites #orbits { display: inline; }
-body.dial-liquide #arc, body.dial-liquide #knob { display: none; }
-body.dial-liquide #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
-/* Le liquide inverse la couleur du fond (orangé → bleu clair, indigo → jaune pâle…). */
+/* Mode rêveur (Paramètres → Couleurs) : système solaire en focus, vague en pause,
+   sans chiffres pendant que le temps passe (ils restent au repos, pour régler). */
+#liquid, #solar { display: none; }
+body.scene-liquid #liquid, body.scene-solar #solar { display: inline; }
+body.scene-liquid #arc, body.scene-liquid #knob, body.scene-solar #arc, body.scene-solar #knob { display: none; }
+body.scene-liquid #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
+body.scene-solar #dial .track { fill: rgba(0, 0, 0, 0.14); stroke-width: 1; stroke: rgba(255, 255, 255, 0.12); }
+body.dial-reveur.phase-focus #time, body.dial-reveur.phase-break #time,
+body.dial-reveur.phase-focus #sub, body.dial-reveur.phase-break #sub { visibility: hidden; }
+/* La vague prend la couleur inverse du fond (orangé → bleu clair, indigo → jaune pâle…). */
 #liquid path { fill: var(--liquid, #fff); transition: fill 2s ease; }
 #liquid .w1 { opacity: 0.85; }
 #liquid .w2 { opacity: 0.55; }
@@ -128,15 +132,8 @@ body.dial-liquide #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
 body.adjusting #liquid-level { transition: none; }
 #liquid .wave { animation: dial-wave 6s ease-in-out infinite alternate; }
 @keyframes dial-wave { to { transform: translateX(-140px); } }
-body.dial-orbites #dial .track { fill: transparent; stroke-width: 1; stroke: rgba(255, 255, 255, 0.14); }
-body.dial-orbites #arc { stroke-width: 2.5; }
-body.dial-orbites #knob { r: 4px; }
-#orbits .orbit { fill: none; stroke: var(--dial); stroke-width: 1; opacity: 0.12; }
-#orbits .moon circle { fill: var(--dial); }
-#orbits .moon { transform-origin: 150px 150px; }
-#orbits .m1 { animation: dial-spin 20s linear infinite; }
-#orbits .m2 { opacity: 0.7; animation: dial-spin 90s linear infinite reverse; }
-@keyframes dial-spin { to { transform: rotate(360deg); } }
+#solar-orbits ellipse { fill: none; stroke: rgba(255, 255, 255, 0.13); stroke-width: 0.8; }
+#comet-head { fill: #fff; }
 
 /* Graduations : seulement pendant le réglage */
 #ticks { opacity: 0; transition: opacity 0.5s ease; }

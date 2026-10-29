@@ -121,7 +121,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 9,
+  version: 10,
 
   // Temps
   focusMin: 25,
@@ -152,7 +152,7 @@ export const DEFAULTS = {
   breakColor: '#b3261e', // utilisée si la couleur au hasard est coupée
   dialColor: '#ffffff',
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
-  dialStyle: 'standard', // standard, liquide (le cadran se vide comme un verre) ou orbites
+  dialStyle: 'standard', // standard (« Normal ») ou reveur (système solaire en focus, vague en pause)
   textColor: '#ffffff',
 
   // Pause
