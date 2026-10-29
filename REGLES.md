@@ -238,3 +238,4 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `tools/make-icons.mjs` | icônes du site et de l'APK |
 | `tools/qrcode.py` | QR code de n'importe quel texte ou adresse : `python tools/qrcode.py "texte" [fichier.png\|.svg]` (segno installé tout seul dans `tools/.pylib`, ignoré par git) |
 | `tools/detourer-damier.py` | retire le faux fond en damier qu'une IA dessine parfois à la place de la transparence : `python tools/detourer-damier.py image [sortie.webp]` (garde les lueurs en semi-transparence) |
+| `tools/demarrer-projetfocus.cmd` | lance le serveur local (port 8417, fenêtre réduite « ne pas fermer ») s'il ne tourne pas, puis ouvre l'appli dans une fenêtre Chrome à part ; raccourci « projetfocus » sur le bureau de l'utilisateur, icône `tools/projetfocus.ico` |
