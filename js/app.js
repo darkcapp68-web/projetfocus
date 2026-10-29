@@ -1255,6 +1255,11 @@ function render(force) {
   else if (p === 'focus') sub = T.pausedRemaining != null ? 'en pause' : 'focus';
   else if (p === 'break' && T.resumeAt) sub = `reprise dans ${Math.max(0, Math.ceil((T.resumeAt - Date.now()) / 1000))} s`;
   else if (p === 'break') sub = T.isLong ? 'pause longue' : 'pause';
+  if (p === 'break' && breathOn && !T.resumeAt) {
+    // Le rythme choisi, en court : « pause · cohérence cardiaque », « pause · 4-7-8 »…
+    const b = BREATHS.find((x) => x.id === S.breathPattern) || BREATHS[0];
+    sub += ' · ' + b.name.split(' (')[0].toLowerCase();
+  }
   setText(els.sub, sub);
 
   if (force || p === 'idle') {
