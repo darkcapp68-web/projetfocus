@@ -336,6 +336,18 @@ export class AudioEngine {
 
     this.music.addEventListener('playing', () => { this.skips = 0; this._setMusicState('playing'); });
     this.music.addEventListener('ended', () => this.nextTrack());
+    // Une radio mise en pause (notification Android, entrée en pause…) reprendrait là où elle
+    // s'était arrêtée, en retard sur le direct : après plus de 5 s, on la recharge en direct.
+    this._pausedAt = 0;
+    this.music.addEventListener('pause', () => { this._pausedAt = Date.now(); });
+    this.music.addEventListener('play', () => {
+      const late = this._pausedAt && Date.now() - this._pausedAt > 5000;
+      this._pausedAt = 0;
+      if (late && this.station && this.station.kind !== 'tracks' && this.station.url) {
+        this.music.src = this.station.url;
+        this.music.play().catch(() => {});
+      }
+    });
     if ('mediaSession' in navigator) {
       try { navigator.mediaSession.setActionHandler('nexttrack', () => this.nextTrack()); } catch { /* non géré */ }
     }
@@ -394,6 +406,7 @@ export class AudioEngine {
       this.music.src = station.url;
     }
     this.music.volume = this.musicLevel;
+    this._pausedAt = 0; // nouvelle source : déjà en direct
     this._setMusicState('loading');
     // Une erreur de chargement passe par l'événement 'error' (serveurs de secours).
     return this.music.play().catch((e) => { if (e.name === 'NotAllowedError') this._setMusicState('error'); });
@@ -480,7 +493,7 @@ export class AudioEngine {
   }
 
   // Relance la musique du focus : la playlist reprend au morceau et à la seconde près,
-  // une radio repart en direct.
+  // une radio repart en direct (voir l'écouteur 'play' du constructeur).
   _restoreFocus(level, m = this.memo) {
     this.music.volume = 0;
     if (this.station === m.station && this.musicState !== 'stopped') {

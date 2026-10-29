@@ -122,7 +122,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   musique de pause et **son propre menu** ; le menu et le ▶ du focus sont masqués. Un seul
   curseur de volume (celui du lecteur), qui règle la musique de la phase en cours.
 - La musique du focus est **notée au début de la pause** et **reprend après** : la playlist
-  au même morceau et à la seconde près, une radio en direct.
+  au même morceau et à la seconde près, une radio en direct. Toute radio reprise après plus de 5 s de pause
+  (notification Android, écran verrouillé, pause) est **rechargée en direct** (sinon le
+  navigateur la reprend là où elle s'était arrêtée, en retard).
 - **Bruits de fond générés** (Web Audio, aucun fichier) : pluie, orage lointain (grondements
   à des moments imprévisibles), vent par rafales, neige feutrée, café. Pas de bruit blanc /
   rose / brun (retirés, pas aimés). Baissés aussi en pause (réglable).
