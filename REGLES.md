@@ -52,7 +52,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   sans battement), et une forme au choix (Paramètres → Couleurs → Forme du mode Rythme) :
   barres, onde, **goutte** (par défaut), sonar ou étincelles, toutes en **néon** (cœur clair
   et halo, magenta → violet → bleu → cyan : selon la fréquence pour les barres, autour du
-  cercle pour l'onde et la goutte, avec l'âge pour le sonar, au hasard pour les étincelles). L'analyse (`audio.analyser`,
+  cercle pour l'onde et la goutte, avec l'âge pour le sonar, au hasard pour les étincelles).
+  Le **temps** aussi est en néon (cœur blanc, halo magenta → violet → cyan) et s'illumine sur
+  chaque temps fort. L'analyse (`audio.analyser`,
   `enableAnalysis()` dans `js/audio.js`) fait passer la musique par le moteur audio, en mode
   CORS (toutes les radios du menu l'acceptent ; testé) ; elle ne s'active qu'en mode Rythme,
   puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à

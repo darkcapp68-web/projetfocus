@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h49';
+const APP_VERSION = '29/10/2026 · 19h50';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -351,6 +351,7 @@ function rhythmStart() {
     rhythm.bpm = 0;
     if (rhythmFx) rhythmFx.clearRect(0, 0, rhythmCanvas.width, rhythmCanvas.height);
     dial.style.transform = '';
+    els.time.style.removeProperty('--neon');
     return;
   }
   if (!rhythm.on) { rhythm.on = true; requestAnimationFrame(rhythmFrame); }
@@ -433,6 +434,7 @@ function rhythmFrame(t) {
   if (beat) rhythm.lastBeat = t;
   const pulse = Math.max(0, 1 - (t - rhythm.lastBeat) / 350); // 1 sur le temps, puis s'éteint
   dial.style.transform = `scale(${(1 + pulse * 0.025).toFixed(4)})`;
+  els.time.style.setProperty('--neon', (0.35 + pulse * 0.65 + low * 0.2).toFixed(3)); // le temps s'illumine sur le temps fort
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
   ctx.lineCap = 'round';
