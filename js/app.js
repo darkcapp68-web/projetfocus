@@ -1,4 +1,4 @@
-import { DEFAULTS, STATIONS, SHOWN_STATIONS, PLAYLISTS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
+import { DEFAULTS, STATIONS, SHOWN_STATIONS, PLAYLISTS, BREATHS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 import { createSync } from './sync.js';
 
@@ -378,6 +378,50 @@ function renderCoach() {
 function showCoach() {
   if (T.breakEnded) { showText(T.resumeAt ? 'Pause terminée. On reprend doucement.' : 'Pause terminée. Reviens quand tu veux.', 'coach'); return; }
   showText(S.coachMode === 'one' && T.coach[0] ? T.coach[0] : '', 'coach');
+}
+
+/* =========================================================
+   Respiration guidée pendant la pause
+   ========================================================= */
+
+// Inspire : l'écran s'éclaircit ; retiens : rien ne bouge ; expire : il s'assombrit.
+const pulseEl = $('#pulse'), breathEl = $('#breath');
+let breathOn = false, breathTimer = 0;
+
+function breathSteps() {
+  const b = BREATHS.find((x) => x.id === S.breathPattern) || BREATHS[0];
+  if (b.steps) return b.steps;
+  return [['', S.pulseSeconds / 2], ['', S.pulseSeconds / 2]]; // simple pulsation
+}
+
+function setPulse(opacity, seconds) {
+  pulseEl.style.transitionDuration = seconds + 's';
+  pulseEl.style.opacity = opacity;
+}
+
+function breathStep(k) {
+  if (!breathOn) return;
+  const steps = breathSteps();
+  const [kind, sec] = steps[k % steps.length];
+  const dark = S.pulseIntensity / 100;
+  if (kind === 'inspire' || (!kind && k % 2 === 0)) setPulse(0, sec);
+  else if (kind === 'expire' || !kind) setPulse(dark, sec);
+  breathEl.textContent = kind;
+  breathEl.classList.toggle('on', !!kind && S.breathLabels);
+  breathTimer = setTimeout(() => breathStep(k + 1), sec * 1000);
+}
+
+function breathStart() {
+  breathOn = true;
+  setPulse(S.pulseIntensity / 100, 0); // on part « poumons vides », écran sombre
+  breathTimer = setTimeout(() => breathStep(0), 50); // laisse l'écran sombre s'afficher d'abord
+}
+
+function breathStop() {
+  breathOn = false;
+  clearTimeout(breathTimer);
+  setPulse(0, 1);
+  breathEl.classList.remove('on');
 }
 
 /* =========================================================
@@ -968,6 +1012,7 @@ function buildForm() {
     `<label class="block">${p.name} <small>un message par ligne</small><textarea data-k="messages.${p.id}" data-list rows="5"></textarea></label>`).join('');
 
   fillSelect($('#sel-chime'), CHIMES, S.chime);
+  fillSelect($('#sel-breath'), BREATHS, S.breathPattern);
   fillSelect($('#sel-default-noise'), NOISES, S.defaultNoise);
   fillStationSelects();
 }
@@ -1146,8 +1191,7 @@ function applySettings() {
   const st = document.documentElement.style;
   st.setProperty('--fg', S.textColor);
   st.setProperty('--dial', S.dialColor);
-  st.setProperty('--pulse-dur', S.pulseSeconds / 2 + 's');
-  st.setProperty('--pulse-max', S.pulseIntensity / 100);
+  if (breathOn) breathStop(); // nouveau rythme : render() la relance
   applyAudioLevels(300);
   if (T.phase === 'break') { renderCoach(); showCoach(); }
   if (T.phase === 'focus' && !S.messagesOn) showText('');
@@ -1162,10 +1206,13 @@ function render(force) {
 
   const classes = {
     'phase-idle': p === 'idle', 'phase-focus': p === 'focus', 'phase-break': p === 'break', 'phase-done': p === 'done',
-    paused: T.pausedRemaining != null, 'break-ended': T.breakEnded, pulse: S.pulseOn && !T.breakEnded,
+    paused: T.pausedRemaining != null, 'break-ended': T.breakEnded,
     'edit-break': T.editing === 'break', 'fmt-min': S.timeFormat === 'min', 'no-info': !S.showInfo,
   };
   for (const [c, on] of Object.entries(classes)) body.classList.toggle(c, on);
+
+  const wantBreath = p === 'break' && S.pulseOn && !T.breakEnded && !demo;
+  if (wantBreath !== breathOn) { if (wantBreath) breathStart(); else breathStop(); }
 
   const bg = demo ? day.color : p === 'break' ? T.breakColor || S.breakColor : S.dayGradient ? day.color : S.fixedColor;
   if (bg !== lastBg) {

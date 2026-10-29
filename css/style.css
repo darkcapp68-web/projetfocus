@@ -57,8 +57,18 @@ body.ui .ctl { opacity: 1; pointer-events: auto; }
 
 /* ---------- Pulsation de la pause ---------- */
 #pulse { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; }
-body.phase-break.pulse #pulse { animation: breathe var(--pulse-dur) ease-in-out infinite alternate; }
-@keyframes breathe { from { opacity: 0; } to { opacity: var(--pulse-max); } }
+/* La respiration est pilotée en JS : la durée de la transition = la durée de l'étape. */
+#pulse { transition-property: opacity; transition-timing-function: ease-in-out; }
+#breath {
+  margin-top: 0.8em;
+  min-height: 1.2em;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+#breath.on { opacity: 0.75; }
 
 /* ---------- Haut ---------- */
 #topbar {

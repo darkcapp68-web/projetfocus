@@ -6,7 +6,8 @@
 - Un seul écran : fond qui suit l'heure en dégradé continu (OKLab), cadran à tourner,
   temps au centre, contrôles qui apparaissent au toucher. Démo « journée en accéléré ».
 - Focus / pause / cycles / pause longue, préréglages 25/5 et 50/10.
-- Pause : couleur au hasard, respiration, une action du coach, maintenir pour reprendre,
+- Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
+  apaisante, carrée, 4-7-8), une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
   reprise automatique du focus après 5 s.
 - Messages bienveillants (40), coach, notifications, plein écran (désactivé par défaut).

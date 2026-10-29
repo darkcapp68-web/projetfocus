@@ -68,6 +68,16 @@ export const STATIONS = [
 // Musiques gardées dans le menu (le reste est décoché, à recocher dans Paramètres).
 export const SHOWN_STATIONS = ['tlminimal', 'fmopera', 'fmclassiqueplus', 'fmbaroque', 'fmeasy', 'swissclassic'];
 
+// Respiration guidée pendant la pause : étapes [« inspire » | « retiens » | « expire », secondes].
+// Cohérence cardiaque (méthode « 365 ») : 6 respirations par minute, 5 s / 5 s, sans retenue.
+export const BREATHS = [
+  { id: 'coherence', name: 'Cohérence cardiaque (5 s / 5 s)', steps: [['inspire', 5], ['expire', 5]] },
+  { id: 'apaisante', name: 'Apaisante (4 s / 6 s)', steps: [['inspire', 4], ['expire', 6]] },
+  { id: 'carree', name: 'Carrée (4-4-4-4)', steps: [['inspire', 4], ['retiens', 4], ['expire', 4], ['retiens', 4]] },
+  { id: '478', name: '4-7-8 (pour se détendre)', steps: [['inspire', 4], ['retiens', 7], ['expire', 8]] },
+  { id: 'simple', name: 'Simple pulsation (sans consignes)', steps: null },
+];
+
 export const NOISES = [
   { id: 'none', name: 'Aucun bruit' },
   { id: 'pluie', name: 'Pluie' },
@@ -145,7 +155,9 @@ export const DEFAULTS = {
 
   // Pause
   pulseOn: true,
-  pulseSeconds: 3,
+  breathPattern: 'coherence', // voir BREATHS
+  breathLabels: true, // « inspire / retiens / expire » sous le temps
+  pulseSeconds: 3, // rythme de la simple pulsation
   pulseIntensity: 30,
   fullscreenOnBreak: false, // un peu brutal : à activer dans Paramètres → Pause
   holdSeconds: 3,

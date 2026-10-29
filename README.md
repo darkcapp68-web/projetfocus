@@ -22,7 +22,11 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
    sans perdre le bruit choisi.
    Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la souris pour
    les faire revenir.
-3. À la fin du focus, l'écran prend **une couleur tirée au hasard et respire doucement**, avec
+3. À la fin du focus, l'écran prend **une couleur tirée au hasard et te guide pour respirer** :
+   il s'éclaircit quand tu inspires et s'assombrit quand tu expires, avec « inspire / expire »
+   sous le temps. Par défaut c'est la **cohérence cardiaque** (5 s / 5 s, 6 respirations par
+   minute : une pause de 5 min = une séance « 365 ») ; autres rythmes dans Paramètres → Pause
+   (apaisante 4/6, carrée 4-4-4-4, 4-7-8). Il y a aussi
    une action à faire. Ta musique du focus se met en pause et le lecteur passe sur la
    **musique de la pause** : par défaut une musique douce générée par l'appli (façon ascenseur),
    ou ce que tu choisis dans le menu du lecteur pendant la pause (même musique plus bas,
