@@ -168,6 +168,18 @@ body:not(.phase-idle) #setup { display: none; }
   text-wrap: balance;
 }
 #message.coach { font-size: 19px; opacity: 0.95; }
+
+/* Respiration sur une teinte claire : texte sombre, plus gras et plus opaque
+   (un trait fin s'efface sur le bleu ciel ou le doré). */
+body.ink-dark #time { font-weight: 400; }
+body.ink-dark #message { font-weight: 500; opacity: 1; }
+body.ink-dark #sub, body.ink-dark #breath { font-weight: 600; }
+body.ink-dark #breath.on { opacity: 0.9; }
+body.ink-dark #info, body.ink-dark #now-playing { font-weight: 500; }
+body.ink-dark #coach-list button { font-weight: 500; opacity: 0.9; }
+body.ink-dark button:not(#settings button) { border-color: rgba(0, 0, 0, 0.35); }
+body.ink-dark #dial .track { fill: rgba(0, 0, 0, 0.04); stroke: rgba(0, 0, 0, 0.25); }
+body.ink-dark #arc { stroke-width: 3; }
 #message.fade { opacity: 0; }
 body.phase-idle #message { display: none; }
 

@@ -408,6 +408,7 @@ function breathInk(color) {
   const light = color && rgbToOklab(hexToRgb(color))[0] > 0.75;
   st.setProperty('--fg', light ? '#1b1f24' : S.textColor);
   st.setProperty('--dial', light ? '#1b1f24' : S.dialColor);
+  body.classList.toggle('ink-dark', !!light);
 }
 
 function breathStep(k) {
