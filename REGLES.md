@@ -87,7 +87,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 
 ## 6. Son
 
-- **Lecteur** en bas : bouton ▶ / ❚❚, menu de musiques groupé, volume ; bruit de fond avec
+- **Lecteur** en bas, **gros pour le doigt et la souris** (boutons 46 px, menus et curseurs
+  d'au moins 44 px de haut) : bouton ▶ / ❚❚, menu de musiques groupé, volume ; bruit de fond avec
   le **même bouton ▶ / ❚❚** (coupe sans perdre le choix), menu et volume.
 - **Choisir une musique dans le menu la lance tout de suite.**
 - **Musiques** (ids dans `js/defaults.js`) :

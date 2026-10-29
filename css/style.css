@@ -237,7 +237,18 @@ footer {
   gap: 8px 22px;
   font-size: 13px;
 }
-#player .group { display: flex; align-items: center; gap: 8px; }
+#player .group { display: flex; align-items: center; gap: 10px; }
+/* Lecteur pensé pour le doigt et la souris : cibles d'au moins 44 px. */
+#player { font-size: 15px; gap: 10px 30px; }
+#player button.round { width: 46px; height: 46px; }
+#player button.play svg { width: 18px; height: 18px; }
+#player select { min-height: 44px; padding: 0.4em 0.3em; }
+#player input[type="range"] { width: 100px; height: 30px; zoom: 1.45; }
+@media (max-width: 480px) {
+  #player .group { gap: 8px; }
+  #player select { max-width: 10.5em; }
+  #player input[type="range"] { width: 72px; }
+}
 /* Boutons lecture / pause (musique et bruit de fond) */
 button.play svg { width: 14px; height: 14px; fill: currentColor; }
 button.play .i-pause, button.play.playing .i-play { display: none; }
