@@ -151,6 +151,7 @@ export const DEFAULTS = {
   breakColorRandom: true,
   breakColor: '#b3261e', // utilisée si la couleur au hasard est coupée
   dialColor: '#ffffff',
+  radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
   dialStyle: 'standard', // standard, liquide (le cadran se vide comme un verre) ou orbites
   textColor: '#ffffff',
 

@@ -336,14 +336,16 @@ export class AudioEngine {
 
     this.music.addEventListener('playing', () => { this.skips = 0; this._setMusicState('playing'); });
     this.music.addEventListener('ended', () => this.nextTrack());
-    // Une radio mise en pause (notification Android, entrée en pause…) reprendrait là où elle
-    // s'était arrêtée, en retard sur le direct : après plus de 5 s, on la recharge en direct.
+    // Une radio mise en pause (notification Android, entrée en pause…) reprend là où elle
+    // s'était arrêtée, en retard sur le direct : après plus de 5 s, on la recharge en direct
+    // (sauf réglage « là où elle s'était arrêtée »).
     this._pausedAt = 0;
+    this.resumeLive = true; // réglage « Reprise d'une radio après une pause »
     this.music.addEventListener('pause', () => { this._pausedAt = Date.now(); });
     this.music.addEventListener('play', () => {
       const late = this._pausedAt && Date.now() - this._pausedAt > 5000;
       this._pausedAt = 0;
-      if (late && this.station && this.station.kind !== 'tracks' && this.station.url) {
+      if (late && this.resumeLive && this.station && this.station.kind !== 'tracks' && this.station.url) {
         this.music.src = this.station.url;
         this.music.play().catch(() => {});
       }
