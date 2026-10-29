@@ -35,7 +35,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
   « Standard » (par défaut), « Niveau liquide » (pas d'arc : le cadran se vide comme un verre,
   plein à 60 min, liquide clair qui ondule) ou « Orbites » (arc fin, deux orbites où tournent
-  lentement de petites lunes). Choisis parmi une maquette de 10 pistes. Sous le cadran : bascule
+  lentement de petites lunes). Choisis parmi une maquette de 10 pistes. Les vagues et les lunes
+  bougent même si l'appareil demande de réduire les animations (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le

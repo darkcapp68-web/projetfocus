@@ -268,9 +268,11 @@ footer {
 #player input[type="range"] { width: 100px; height: 30px; zoom: 1.45; }
 /* Le curseur de volume passe sous son bouton et son menu (partout) ; sur un écran étroit
    (téléphone à la verticale), les deux blocs s'empilent. */
-#player .group { flex-wrap: wrap; justify-content: center; gap: 4px 10px; width: 300px; }
+/* Grille : bouton + menu sur la première ligne, le curseur toujours seul sur la seconde
+   (un retour à la ligne « flex » ne se faisait pas quand le menu était court). */
+#player .group { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 4px 10px; width: 300px; }
 #player select { max-width: 14em; }
-#player input[type="range"] { flex-basis: 100%; width: auto; max-width: 180px; }
+#player input[type="range"] { grid-column: 1 / -1; justify-self: center; width: 124px; }
 @media (max-width: 680px) {
   #player { flex-direction: column; gap: 8px; }
   #player .group { width: 100%; }
@@ -392,7 +394,6 @@ body.no-info #info { visibility: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html, body, .ctl, #message, #settings { transition-duration: 0.01s; }
-  #liquid .wave, #orbits .moon { animation: none; }
 }
 
 /* ---------- Musiques du menu (Paramètres) ---------- */
