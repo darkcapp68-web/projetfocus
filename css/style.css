@@ -234,7 +234,9 @@ select {
   max-width: 11em;
   cursor: pointer;
 }
-select option { background: #16162a; color: #fff; }
+select option, select optgroup { background: #16162a; color: #fff; }
+select optgroup { font-style: normal; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+select optgroup option { font-weight: 400; color: #fff; }
 
 input[type="range"] { width: 88px; accent-color: var(--fg); cursor: pointer; }
 
