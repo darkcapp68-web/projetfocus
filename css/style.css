@@ -419,6 +419,20 @@ body.no-info #info { visibility: hidden; }
   input[type="range"] { width: 72px; }
 }
 
+/* Mode normal : pendant le focus, le temps et l'arc s'entourent d'un halo doux qui monte et
+   redescend lentement (cycle de 12 s, deux fois plus lent que la respiration de la pause). */
+body.slow-glow.phase-focus:not(.paused) #time { animation: slow-glow-text 12s ease-in-out infinite; }
+body.slow-glow.phase-focus:not(.paused) #arc,
+body.slow-glow.phase-focus:not(.paused) #knob { animation: slow-glow-arc 12s ease-in-out infinite; }
+@keyframes slow-glow-text {
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.55), 0 0 28px rgba(255, 255, 255, 0.3); }
+}
+@keyframes slow-glow-arc {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html, body, .ctl, #message, #settings { transition-duration: 0.01s; }
 }

@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h50';
+const APP_VERSION = '29/10/2026 · 19h52';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1574,6 +1574,7 @@ function applySettings() {
   if (breathOn) breathStop(); // nouveau rythme : render() la relance
   audio.resumeLive = S.radioResume !== 'continuer';
   body.classList.toggle('dial-rythme', S.dialStyle === 'rythme');
+  body.classList.toggle('slow-glow', S.slowGlow && S.dialStyle === 'standard');
   audio.wantAnalysis = S.dialStyle === 'rythme';
   if (audio.wantAnalysis && audio.musicOn) audio.enableAnalysis(); // relance la radio, analysable
   rhythmStart();

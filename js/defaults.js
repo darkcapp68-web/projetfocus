@@ -154,6 +154,7 @@ export const DEFAULTS = {
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
   dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause) ou rythme
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
+  slowGlow: true, // mode normal : halo qui monte et descend lentement pendant le focus
   textColor: '#ffffff',
 
   // Pause

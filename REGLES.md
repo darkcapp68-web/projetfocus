@@ -33,7 +33,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
   l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
-  « **Normal** » (par défaut, l'arc et les chiffres) ou « **Rêveur** » : le cadran est posé
+  « **Normal** » (par défaut, l'arc et les chiffres ; pendant le focus, **lueur lente** : un
+  halo blanc doux autour du temps et de l'arc, qui monte et redescend en 12 s, réglable) ou « **Rêveur** » : le cadran est posé
   dans un **cadre en engrenages** (`img/cadre-reveur.webp`, image générée sans personnage,
   fausse transparence retirée avec `tools/detourer-damier.py`) ; son centre est un voile
   sombre transparent qui garde la couleur du fond. Pendant le focus, un **atome** : soleil au
