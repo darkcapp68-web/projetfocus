@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h22';
+const APP_VERSION = '29/10/2026 · 19h41';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -332,6 +332,165 @@ function setScene() {
   body.classList.toggle('scene-liquid', liquid);
   if (solar && !solarOn) { solarOn = true; requestAnimationFrame(drawSolar); }
   else if (!solar) solarOn = false;
+}
+
+/* ---------- Mode « Rythme » : le cercle réagit à la musique ---------- */
+
+// Analyse : spectre en dB, compensé du volume du lecteur, puis ramené à l'échelle des
+// dernières secondes (sensibilité automatique) : une musique calme ou jouée bas bouge
+// autant qu'une forte. Les temps forts sont des pics de basses nettement au-dessus de la
+// moyenne récente ; le BPM vient de l'écart régulier entre ces pics (autocorrélation sur 8 s).
+const rhythmCanvas = $('#rhythm-fx');
+const rhythmFx = rhythmCanvas?.getContext('2d');
+const rhythm = { on: false, bpm: 0, samples: [], prevLow: 0, fluxAvg: 0.02, lastBeat: 0, peak: -60, ampPeak: 0.05, rings: [], sparks: [] };
+
+function rhythmStart() {
+  const want = S.dialStyle === 'rythme' && !!rhythmFx;
+  if (!want) {
+    rhythm.on = false;
+    rhythm.bpm = 0;
+    if (rhythmFx) rhythmFx.clearRect(0, 0, rhythmCanvas.width, rhythmCanvas.height);
+    dial.style.transform = '';
+    return;
+  }
+  if (!rhythm.on) { rhythm.on = true; requestAnimationFrame(rhythmFrame); }
+}
+
+function rhythmBpm() {
+  const now = performance.now(), span = 8000, step = 10, n = span / step;
+  const g = new Float32Array(n);
+  for (const [tt, v] of rhythm.samples) {
+    const k = Math.floor((tt - (now - span)) / step);
+    if (k >= 0 && k < n) g[k] = Math.max(g[k], v);
+  }
+  const mean = g.reduce((s, v) => s + v, 0) / n;
+  let energy = 0;
+  for (let i = 0; i < n; i++) { g[i] -= mean; energy += g[i] * g[i]; }
+  let best = 0, bestLag = 0;
+  for (let lag = Math.round(60000 / 180 / step); lag <= Math.round(60000 / 70 / step); lag++) {
+    let s = 0;
+    for (let i = 0; i + lag < n; i++) s += g[i] * g[i + lag];
+    if (s > best) { best = s; bestLag = lag; }
+  }
+  return energy && best / energy > 0.12 ? Math.round(60000 / (bestLag * step)) : 0;
+}
+
+setInterval(() => {
+  if (!rhythm.on) return;
+  const cut = performance.now() - 9000;
+  while (rhythm.samples.length && rhythm.samples[0][0] < cut) rhythm.samples.shift();
+  const b = audio.musicOn ? rhythmBpm() : 0;
+  rhythm.bpm = b ? (rhythm.bpm ? Math.round(rhythm.bpm * 0.6 + b * 0.4) : b) : (audio.musicOn ? rhythm.bpm : 0);
+}, 1000);
+
+function rhythmFrame(t) {
+  if (!rhythm.on) return;
+  requestAnimationFrame(rhythmFrame);
+  const an = audio.analyser;
+  const w = Math.round(rhythmCanvas.clientWidth * devicePixelRatio);
+  if (!w) return;
+  if (rhythmCanvas.width !== w) { rhythmCanvas.width = w; rhythmCanvas.height = w; }
+  const ctx = rhythmFx, C = w / 2, u = w / 420, R = 128 * u; // 1 unité du cadran = u px
+  ctx.clearRect(0, 0, w, w);
+  if (!an || !audio.musicOn || document.hidden) { dial.style.transform = ''; return; }
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--dial').trim() || '#fff';
+  rhythm.freq ||= new Float32Array(an.frequencyBinCount);
+  rhythm.wave ||= new Float32Array(an.fftSize);
+  an.getFloatFrequencyData(rhythm.freq);
+  const comp = -20 * Math.log10(Math.max(audio.music.volume, 0.02)); // compense le volume
+  let top = -200;
+  for (let i = 1; i < 200; i++) top = Math.max(top, rhythm.freq[i] + comp);
+  rhythm.peak = Math.max(top, rhythm.peak - 0.04); // sensibilité automatique (redescend doucement)
+  const level = (i) => clamp((rhythm.freq[i] + comp - (rhythm.peak - 42)) / 42, 0, 1);
+  const band = (a, b) => { let s = 0; for (let i = a; i < b; i++) s += level(i); return s / (b - a); };
+  const low = band(1, 8);
+  const flux = Math.max(0, low - rhythm.prevLow);
+  rhythm.prevLow = low;
+  rhythm.samples.push([performance.now(), flux]);
+  rhythm.fluxAvg = rhythm.fluxAvg * 0.97 + flux * 0.03;
+  const beat = flux > Math.max(0.04, rhythm.fluxAvg * 3) && t - rhythm.lastBeat > 250;
+  if (beat) rhythm.lastBeat = t;
+  const pulse = Math.max(0, 1 - (t - rhythm.lastBeat) / 350); // 1 sur le temps, puis s'éteint
+  dial.style.transform = `scale(${(1 + pulse * 0.025).toFixed(4)})`;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineCap = 'round';
+  // Lueur sur le temps
+  if (pulse > 0) {
+    ctx.globalAlpha = pulse * 0.25;
+    ctx.lineWidth = 10 * u;
+    ctx.beginPath(); ctx.arc(C, C, R + 6 * u * pulse, 0, 2 * Math.PI); ctx.stroke();
+  }
+  const form = S.rhythmForm;
+  if (form === 'barres') {
+    ctx.globalAlpha = 0.6;
+    ctx.lineWidth = 2.2 * u;
+    const N = 64;
+    for (let i = 0; i < N / 2; i++) {
+      const v = level(Math.floor(2 * Math.pow(100, i / (N / 2))));
+      const len = (1 + v * v * 18) * u;
+      for (const s of [1, -1]) {
+        const a = s * ((i + 0.5) / N) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(C + (R + 8 * u) * Math.sin(a), C - (R + 8 * u) * Math.cos(a));
+        ctx.lineTo(C + (R + 8 * u + len) * Math.sin(a), C - (R + 8 * u + len) * Math.cos(a));
+        ctx.stroke();
+      }
+    }
+  } else if (form === 'onde') {
+    an.getFloatTimeDomainData(rhythm.wave);
+    let amp = 0;
+    for (const v of rhythm.wave) amp = Math.max(amp, Math.abs(v));
+    rhythm.ampPeak = Math.max(amp, rhythm.ampPeak * 0.995, 0.01);
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = 1.6 * u;
+    ctx.beginPath();
+    for (let i = 0; i <= 256; i++) {
+      const a = (i / 256) * 2 * Math.PI - Math.PI / 2;
+      const v = rhythm.wave[Math.floor((i % 256) * rhythm.wave.length / 256)] / rhythm.ampPeak;
+      const r = R + 9 * u + v * 22 * u;
+      if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
+    }
+    ctx.stroke();
+  } else if (form === 'goutte') {
+    const mid = band(8, 40), high = band(40, 160), tt = t / 1000;
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const a = (i / 120) * 2 * Math.PI;
+      const r = R * 0.86 + (low * 13 + pulse * 5 + Math.sin(a * 3 + tt * 0.9) * (4 + mid * 13)
+        + Math.sin(a * 5 - tt * 1.3) * (2 + high * 11) + Math.sin(a * 2 + tt * 0.4) * 3) * u;
+      if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
+    }
+    ctx.closePath();
+    ctx.globalAlpha = 0.1 + low * 0.12;
+    ctx.fill();
+    ctx.globalAlpha = 0.45;
+    ctx.lineWidth = 1 * u;
+    ctx.stroke();
+  } else if (form === 'sonar') {
+    if (beat) rhythm.rings.push(t);
+    rhythm.rings = rhythm.rings.filter((r0) => t - r0 < 1600);
+    for (const r0 of rhythm.rings) {
+      const age = (t - r0) / 1600;
+      ctx.globalAlpha = (1 - age) * 0.5;
+      ctx.lineWidth = (1.5 * (1 - age) + 0.3) * u;
+      ctx.beginPath(); ctx.arc(C, C, R + (4 + age * 75) * u, 0, 2 * Math.PI); ctx.stroke();
+    }
+  } else if (form === 'etincelles') {
+    if (beat) {
+      for (let k = 0; k < 16; k++) {
+        const a = Math.random() * 2 * Math.PI, sp = (30 + Math.random() * 45) * u;
+        rhythm.sparks.push({ x: C + (R + 3 * u) * Math.cos(a), y: C + (R + 3 * u) * Math.sin(a), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t0: t, s: (0.8 + Math.random() * 1.2) * u });
+      }
+    }
+    rhythm.sparks = rhythm.sparks.filter((p) => t - p.t0 < 1800);
+    for (const p of rhythm.sparks) {
+      const age = (t - p.t0) / 1000;
+      ctx.globalAlpha = Math.max(0, 1 - age / 1.8) * 0.85;
+      ctx.beginPath(); ctx.arc(p.x + p.vx * age, p.y + p.vy * age + 15 * u * age * age, p.s, 0, 2 * Math.PI); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
 }
 
 let dragging = false, dragPrev = 0;
@@ -1373,6 +1532,10 @@ function applySettings() {
   body.classList.toggle('dial-reveur', S.dialStyle === 'reveur');
   if (breathOn) breathStop(); // nouveau rythme : render() la relance
   audio.resumeLive = S.radioResume !== 'continuer';
+  body.classList.toggle('dial-rythme', S.dialStyle === 'rythme');
+  audio.wantAnalysis = S.dialStyle === 'rythme';
+  if (audio.wantAnalysis && audio.musicOn) audio.enableAnalysis(); // relance la radio, analysable
+  rhythmStart();
   applyAudioLevels(300);
   if (T.phase === 'break') { renderCoach(); showCoach(); }
   if (T.phase === 'focus' && !S.messagesOn) showText('');
@@ -1418,6 +1581,7 @@ function render(force) {
     const b = BREATHS.find((x) => x.id === S.breathPattern) || BREATHS[0];
     sub += ' · ' + b.name.split(' (')[0].toLowerCase();
   }
+  if (S.dialStyle === 'rythme' && rhythm.bpm && (p === 'focus' || p === 'break')) sub += ` · ${rhythm.bpm} BPM`;
   setText(els.sub, sub);
 
   if (force || p === 'idle') {

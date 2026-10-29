@@ -341,6 +341,8 @@ export class AudioEngine {
     // (sauf réglage « là où elle s'était arrêtée »).
     this._pausedAt = 0;
     this.resumeLive = true; // réglage « Reprise d'une radio après une pause »
+    this.wantAnalysis = false; // mode « Rythme » : analyser la musique
+    this.analyser = null;
     this.music.addEventListener('pause', () => { this._pausedAt = Date.now(); });
     this.music.addEventListener('play', () => {
       const late = this._pausedAt && Date.now() - this._pausedAt > 5000;
@@ -386,10 +388,34 @@ export class AudioEngine {
     return this.ctx;
   }
 
+  /* ---------- Analyse de la musique (mode « Rythme ») ---------- */
+  // La musique passe alors par le moteur audio, avec un analyseur (spectre, forme d'onde).
+  // Il faut que la radio autorise l'analyse depuis un autre site (en-tête CORS) : c'est le
+  // cas de toutes celles du menu ; les playlists sont sur le site. Une fois branché, le
+  // lecteur le reste jusqu'au rechargement de la page.
+  enableAnalysis() {
+    if (this.analyser) return true;
+    const ctx = this.ensure();
+    if (!ctx) return false;
+    this.music.crossOrigin = 'anonymous';
+    const src = ctx.createMediaElementSource(this.music);
+    this.analyser = ctx.createAnalyser();
+    this.analyser.fftSize = 1024;
+    this.analyser.smoothingTimeConstant = 0.6;
+    src.connect(this.analyser);
+    this.analyser.connect(ctx.destination);
+    // Ce qui joue déjà a été chargé sans autorisation d'analyse : on le relance.
+    if (this.station && !this.music.paused) {
+      this.playStation(this.station, this.track ? { file: this.track.file, time: this.music.currentTime } : null);
+    }
+    return true;
+  }
+
   /* ---------- Radio et playlist embarquée ---------- */
   // `resume` : { file, time } pour reprendre la playlist au morceau et à la seconde près.
   playStation(station, resume) {
     this._stopLift();
+    if (this.wantAnalysis && !this.analyser) { this.enableAnalysis(); if (this.station === station && !this.music.paused) return; }
     this.station = station;
     this.queue = null;
     this.track = null;

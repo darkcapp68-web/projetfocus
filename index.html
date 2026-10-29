@@ -76,6 +76,8 @@
       </svg>
       <!-- Mode rêveur : cadre en engrenages autour du cadran (image générée, sans personnage) -->
       <img id="dial-frame" src="img/cadre-reveur.webp" alt="" aria-hidden="true">
+      <!-- Mode rythme : effets dessinés autour du cercle, au rythme de la musique -->
+      <canvas id="rhythm-fx" aria-hidden="true"></canvas>
       <div id="center">
         <div id="time">25:00</div>
         <div id="sub">focus</div>
@@ -221,7 +223,8 @@
       <label>Couleur fixe (si le dégradé est coupé)<input type="color" data-k="fixedColor"></label>
       <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
       <label>Couleur de la pause (si pas au hasard)<input type="color" data-k="breakColor"></label>
-      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option></select></label>
+      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option></select></label>
+      <label>Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
       <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
       <label>Couleur du texte<input type="color" data-k="textColor"></label>
       <details class="more">

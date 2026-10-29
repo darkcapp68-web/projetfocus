@@ -45,7 +45,17 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   inverse du fond). En rêveur, ni temps
   ni nom de phase pendant que le temps passe ; **au repos, le cadran normal** (arc, point,
   graduations, chiffres) pour bien voir ce qu'on règle : le cadre et la scène n'apparaissent
-  qu'au démarrage. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
+  qu'au démarrage.
+  « **Rythme** » : le cadran normal, mais le cercle **réagit à la musique** qui joue :
+  il bat sur les temps forts (léger grossissement et lueur), le **BPM** s'affiche sous le
+  temps (« focus · 124 BPM », estimé en ~10 s, fiable sur l'électro, absent sur le classique
+  sans battement), et une forme au choix (Paramètres → Couleurs → Forme du mode Rythme) :
+  barres, onde, **goutte** (par défaut), sonar ou étincelles. L'analyse (`audio.analyser`,
+  `enableAnalysis()` dans `js/audio.js`) fait passer la musique par le moteur audio, en mode
+  CORS (toutes les radios du menu l'acceptent ; testé) ; elle ne s'active qu'en mode Rythme,
+  puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à
+  l'échelle des dernières secondes : une musique calme ou jouée bas bouge autant qu'une
+  forte. Prototype et essais : `perso/rythme.html` (non publié). Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le

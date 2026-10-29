@@ -143,6 +143,10 @@ body.adjusting #liquid-level { transition: none; }
   top: calc(50% - var(--dial-size) * 0.506);
 }
 body.scene-solar #dial-frame, body.scene-liquid #dial-frame { display: block; }
+/* Mode rythme : canevas plus grand que le cadran, pour que les effets débordent du cercle. */
+#rhythm-fx { display: none; position: absolute; left: -20%; top: -20%; width: 140%; height: 140%; pointer-events: none; }
+body.dial-rythme #rhythm-fx { display: block; }
+#dial { transition: transform 0.08s ease-out; }
 body.scene-solar #dial .track, body.scene-liquid #dial .track { fill: url(#orb-veil); stroke: none; }
 #comet-head { fill: #fff; }
 
