@@ -266,6 +266,8 @@ body.no-info #info { visibility: hidden; }
   overflow-y: auto;
   overscroll-behavior: contain;
   background: rgba(14, 14, 26, 0.94);
+  color: #fff; /* fond toujours sombre : ne suit pas la teinte de l'écran */
+  --fg: #fff;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   padding: 0 20px max(28px, env(safe-area-inset-bottom));
