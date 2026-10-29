@@ -121,7 +121,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 7,
+  version: 8,
 
   // Temps
   focusMin: 25,
@@ -268,7 +268,8 @@ export const DEFAULTS = {
   controlsDelay: 4,
   keepAwake: true,
 
-  // Synchronisation Google Drive (voir README) : identifiant de l'appli chez Google.
-  syncClientId: '',
+  // Synchronisation Google Drive (voir README) : identifiant de l'appli chez Google
+  // (projet Google Cloud « projetfocus », client Application Web ; ce n'est pas un secret).
+  syncClientId: '1037045732074-h7jfi17r74sdgnrjqspprvtm18i2dlgm.apps.googleusercontent.com',
   updatedAt: 0, // date du dernier changement de réglage (la plus récente gagne)
 };

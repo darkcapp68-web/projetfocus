@@ -37,15 +37,10 @@ premier pour reprendre le travail).
 
 ## Ce dont j'ai besoin de toi
 
-1. **Publier sur GitHub Pages** (tout en dépend : PC installé, APK, synchronisation).
-   - Fait : dépôt public **`darkcapp68-web/projetfocus`** créé (vide).
-   - Me donner ton **accord pour pousser** le code (environ 110 Mo, à cause de la musique).
-   - Activer GitHub Pages : Settings → Pages → branche `main`, dossier `/ (root)`.
-   - Savoir : tout le dépôt sera public, y compris CAHIER_DES_CHARGES.md et CHANTIER.md.
-2. **ID client Google** pour la synchronisation Drive (guide : README, « Synchroniser avec
-   Google Drive ») : un projet Google Cloud `projetfocus` à part, client de type
-   **Application Web**, origines `http://localhost:8417` et `https://darkcapp68-web.github.io`,
-   ton adresse en utilisateur test. Me donner l'ID (il n'est pas secret).
+1. **Publication** : fait. Site en ligne sur https://darkcapp68-web.github.io/projetfocus/
+   (dépôt `darkcapp68-web/projetfocus`, GitHub Pages sur `main` / root).
+2. **Synchronisation Google** : ID client mis dans le code. Reste à essayer la connexion avec
+   le vrai Google (Paramètres → Sauvegarde → Se connecter à Google Drive) sur le site publié.
 3. **APK** (après la publication) :
    - fait : l'adresse du site est réglée sur `darkcapp68-web.github.io` ;
    - créer la **clé de signature** dans Android Studio et la garder hors du dépôt ;

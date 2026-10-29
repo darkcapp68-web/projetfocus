@@ -190,8 +190,8 @@ propriétaire, donc toi. C'est gratuit.
    c'est ton appli en test) → **Continuer** → coche l'accès aux fichiers → **Continuer**.
 3. La ligne d'état indique « Synchronisé à … ».
 
-Astuce : donne-moi l'ID client et je le mets directement dans le code ; il n'y aura plus
-rien à coller, seulement « Se connecter ».
+L'ID client du projet `projetfocus` est déjà dans le code (`js/defaults.js`) : il n'y a rien
+à coller, seulement « Se connecter à Google Drive ».
 
 Bon à savoir :
 - Google renouvelle la connexion environ toutes les heures : au premier toucher, une petite

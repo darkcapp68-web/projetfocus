@@ -57,6 +57,8 @@ function sanitize(s) {
     s.defaultRadio = 'tlminimal';
     s.version = 7;
   }
+  // Version 8 : l'ID client Google est fourni par l'appli (plus rien à coller).
+  if (s.version < 8) { if (!s.syncClientId) s.syncClientId = DEFAULTS.syncClientId; s.version = 8; }
   return s;
 }
 

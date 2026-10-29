@@ -129,13 +129,14 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 7).
+  enregistrés (version actuelle : 8).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Synchronisation Google Drive** : fichier visible `projetfocus-parametres.json` dans
   « Mon Drive » (portée `drive.file`), lu au premier toucher et au retour sur l'appli,
-  réécrit 3 s après chaque changement, la plus récente version gagne (`updatedAt`). Attend
-  l'ID client Google de l'utilisateur (projet Google Cloud séparé, client **Application
-  Web**). Non synchronisés : musique hors ligne, phase en cours.
+  réécrit 3 s après chaque changement, la plus récente version gagne (`updatedAt`). ID client
+  Google dans `js/defaults.js` (projet Google Cloud `projetfocus`, client **Application Web**,
+  origines `http://localhost:8417` et `https://darkcapp68-web.github.io`, en test). Le code
+  secret du client n'est **jamais** utilisé ni écrit dans le dépôt. Non synchronisés : musique hors ligne, phase en cours.
 - Les réglages sont propres à chaque navigateur **et à chaque adresse** (localhost,
   127.0.0.1, github.io sont des mémoires séparées).
 
