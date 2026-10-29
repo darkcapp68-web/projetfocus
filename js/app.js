@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h47';
+const APP_VERSION = '29/10/2026 · 19h49';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -383,6 +383,27 @@ setInterval(() => {
   rhythm.bpm = b ? (rhythm.bpm ? Math.round(rhythm.bpm * 0.6 + b * 0.4) : b) : (audio.musicOn ? rhythm.bpm : 0);
 }, 1000);
 
+// Néon : le même tracé trois fois, du halo large et transparent au cœur fin et clair.
+// `paint(light)` renvoie la couleur (dégradé ou teinte) pour une luminosité donnée.
+function neon(ctx, u, path, paint, strength = 1) {
+  ctx.globalCompositeOperation = 'lighter';
+  for (const [lw, al, light] of [[7, 0.14, 60], [3.6, 0.32, 66], [1.3, 0.95, 88]]) {
+    ctx.strokeStyle = paint(light);
+    ctx.globalAlpha = Math.min(1, al * strength);
+    ctx.lineWidth = lw * u;
+    path();
+    ctx.stroke();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// Dégradé qui fait le tour du cercle : magenta → violet → bleu → cyan → … → magenta.
+function neonRing(ctx, C, light) {
+  const g = ctx.createConicGradient(-Math.PI / 2, C, C);
+  [[0, 300], [0.25, 255], [0.5, 190], [0.75, 255], [1, 300]].forEach(([o, h]) => g.addColorStop(o, `hsl(${h} 100% ${light}%)`));
+  return g;
+}
+
 function rhythmFrame(t) {
   if (!rhythm.on) return;
   requestAnimationFrame(rhythmFrame);
@@ -449,52 +470,63 @@ function rhythmFrame(t) {
     let amp = 0;
     for (const v of rhythm.wave) amp = Math.max(amp, Math.abs(v));
     rhythm.ampPeak = Math.max(amp, rhythm.ampPeak * 0.995, 0.01);
-    ctx.globalAlpha = 0.75;
-    ctx.lineWidth = 1.6 * u;
-    ctx.beginPath();
-    for (let i = 0; i <= 256; i++) {
-      const a = (i / 256) * 2 * Math.PI - Math.PI / 2;
-      const v = rhythm.wave[Math.floor((i % 256) * rhythm.wave.length / 256)] / rhythm.ampPeak;
-      const r = R + 9 * u + v * 22 * u;
-      if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
-    }
-    ctx.stroke();
+    neon(ctx, u, () => {
+      ctx.beginPath();
+      for (let i = 0; i <= 256; i++) {
+        const a = (i / 256) * 2 * Math.PI - Math.PI / 2;
+        const v = rhythm.wave[Math.floor((i % 256) * rhythm.wave.length / 256)] / rhythm.ampPeak;
+        const r = R + 9 * u + v * 22 * u;
+        if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
+      }
+    }, (light) => neonRing(ctx, C, light), 0.9);
   } else if (form === 'goutte') {
     const mid = band(8, 40), high = band(40, 160), tt = t / 1000;
-    ctx.beginPath();
-    for (let i = 0; i <= 120; i++) {
-      const a = (i / 120) * 2 * Math.PI;
-      const r = R * 0.86 + (low * 13 + pulse * 5 + Math.sin(a * 3 + tt * 0.9) * (4 + mid * 13)
-        + Math.sin(a * 5 - tt * 1.3) * (2 + high * 11) + Math.sin(a * 2 + tt * 0.4) * 3) * u;
-      if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
-    }
-    ctx.closePath();
-    ctx.globalAlpha = 0.1 + low * 0.12;
+    const blob = () => {
+      ctx.beginPath();
+      for (let i = 0; i <= 120; i++) {
+        const a = (i / 120) * 2 * Math.PI;
+        const r = R * 0.86 + (low * 13 + pulse * 5 + Math.sin(a * 3 + tt * 0.9) * (4 + mid * 13)
+          + Math.sin(a * 5 - tt * 1.3) * (2 + high * 11) + Math.sin(a * 2 + tt * 0.4) * 3) * u;
+        if (i) ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); else ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a));
+      }
+      ctx.closePath();
+    };
+    // Intérieur légèrement teinté (magenta en haut, cyan en bas), puis contour néon.
+    const fill = ctx.createLinearGradient(C, C - R, C, C + R);
+    fill.addColorStop(0, 'hsl(300 100% 65%)'); fill.addColorStop(1, 'hsl(190 100% 60%)');
+    blob();
+    ctx.fillStyle = fill;
+    ctx.globalAlpha = 0.1 + low * 0.14;
     ctx.fill();
-    ctx.globalAlpha = 0.45;
-    ctx.lineWidth = 1 * u;
-    ctx.stroke();
+    neon(ctx, u, blob, (light) => neonRing(ctx, C, light), 0.7);
   } else if (form === 'sonar') {
     if (beat) rhythm.rings.push(t);
     rhythm.rings = rhythm.rings.filter((r0) => t - r0 < 1600);
     for (const r0 of rhythm.rings) {
       const age = (t - r0) / 1600;
-      ctx.globalAlpha = (1 - age) * 0.5;
-      ctx.lineWidth = (1.5 * (1 - age) + 0.3) * u;
-      ctx.beginPath(); ctx.arc(C, C, R + (4 + age * 75) * u, 0, 2 * Math.PI); ctx.stroke();
+      const hue = 300 - age * 110; // naît magenta, finit cyan
+      neon(ctx, u * (1 - age * 0.6), () => { ctx.beginPath(); ctx.arc(C, C, R + (4 + age * 75) * u, 0, 2 * Math.PI); },
+        (light) => `hsl(${hue} 100% ${light}%)`, (1 - age) * 0.8);
     }
   } else if (form === 'etincelles') {
     if (beat) {
       for (let k = 0; k < 16; k++) {
         const a = Math.random() * 2 * Math.PI, sp = (30 + Math.random() * 45) * u;
-        rhythm.sparks.push({ x: C + (R + 3 * u) * Math.cos(a), y: C + (R + 3 * u) * Math.sin(a), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t0: t, s: (0.8 + Math.random() * 1.2) * u });
+        rhythm.sparks.push({ x: C + (R + 3 * u) * Math.cos(a), y: C + (R + 3 * u) * Math.sin(a), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t0: t, s: (0.8 + Math.random() * 1.2) * u, hue: 190 + Math.random() * 110 });
       }
     }
     rhythm.sparks = rhythm.sparks.filter((p) => t - p.t0 < 1800);
     for (const p of rhythm.sparks) {
       const age = (t - p.t0) / 1000;
-      ctx.globalAlpha = Math.max(0, 1 - age / 1.8) * 0.85;
-      ctx.beginPath(); ctx.arc(p.x + p.vx * age, p.y + p.vy * age + 15 * u * age * age, p.s, 0, 2 * Math.PI); ctx.fill();
+      const fade = Math.max(0, 1 - age / 1.8);
+      const x = p.x + p.vx * age, y = p.y + p.vy * age + 15 * u * age * age;
+      ctx.globalCompositeOperation = 'lighter';
+      for (const [k, al, light] of [[3.2, 0.18, 60], [1.8, 0.35, 68], [1, 0.95, 90]]) {
+        ctx.fillStyle = `hsl(${p.hue} 100% ${light}%)`;
+        ctx.globalAlpha = al * fade;
+        ctx.beginPath(); ctx.arc(x, y, p.s * k, 0, 2 * Math.PI); ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
     }
   }
   ctx.globalAlpha = 1;
