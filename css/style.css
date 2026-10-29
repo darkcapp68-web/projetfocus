@@ -110,8 +110,8 @@ body:not(.phase-idle) #quick { visibility: hidden; }
 body.phase-idle #dial { cursor: grab; }
 body.phase-idle.adjusting #dial { cursor: grabbing; }
 
-#dial .track { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.2); stroke-width: 2; }
-#arc { fill: none; stroke: var(--dial); stroke-width: 2; stroke-linecap: round; transition: opacity 0.4s; }
+#dial .track { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.22); stroke-width: 5; }
+#arc { fill: none; stroke: var(--dial); stroke-width: 5; stroke-linecap: round; transition: opacity 0.4s; }
 #knob { fill: var(--dial); transition: opacity 0.4s; }
 body.adjusting #arc, body.adjusting #knob { transition: none; }
 
@@ -178,7 +178,6 @@ body.ink-dark #breath.on { opacity: 0.9; }
 body.ink-dark #coach-list button { opacity: 0.9; }
 body.ink-dark button:not(#settings button) { border-color: rgba(0, 0, 0, 0.35); }
 body.ink-dark #dial .track { fill: rgba(0, 0, 0, 0.04); stroke: rgba(0, 0, 0, 0.25); }
-body.ink-dark #arc { stroke-width: 3; }
 #message.fade { opacity: 0; }
 body.phase-idle #message { display: none; }
 

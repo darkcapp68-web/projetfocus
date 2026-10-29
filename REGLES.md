@@ -29,7 +29,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   plus proche. Réglable : couleurs, heures, noms, ou couleur fixe.
 - **Démo** : Paramètres → Couleurs → « Voir la journée en accéléré » (24 h en 30 s, heure
   affichée en bas, un toucher arrête).
-- **Cadran** façon minuteur de cuisine : arc blanc fin de 2 px sur cercle translucide, point
+- **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
   l'arc se vide dans le sens des aiguilles d'une montre. Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
