@@ -61,6 +61,13 @@ par Google Drive.
 5. **Optionnel** : abonnement DI.FM Premium un jour → je peux ajouter la saisie de la clé
    d'écoute pour avoir toutes leurs chaînes électro sans pub.
 
+## Idées en réserve
+
+- **Cadres du mode Rêveur** : le cadre en engrenages est intégré (29/10). D'autres images
+  de cadre (méditation, anneau) ont été essayées dans `perso/cadres.html` (dossier `perso/`
+  exclu de GitHub) ; celle « méditation » montre un personnage protégé (Shaka, Saint Seiya)
+  et ne doit pas être publiée. Piste : laisser choisir le cadre dans les Paramètres.
+
 ## Limites connues
 
 - Chrome bloque le son sans geste : après un rechargement, rien ne joue avant Démarrer

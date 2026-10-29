@@ -33,11 +33,16 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
   l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
-  « **Normal** » (par défaut, l'arc et les chiffres) ou « **Rêveur** » : pendant le focus, un
-  petit **système solaire** (soleil au centre, 8 planètes aux couleurs proches des vraies sur
-  des orbites en ellipses inclinées, qui passent devant ou derrière le soleil) et une
-  **comète** qui part du bord et atteint le soleil à la fin du focus ; pendant la pause, la
-  **vague** (le cadran se vide comme un verre, couleur inverse du fond). En rêveur, ni temps
+  « **Normal** » (par défaut, l'arc et les chiffres) ou « **Rêveur** » : le cadran est posé
+  dans un **cadre en engrenages** (`img/cadre-reveur.webp`, image générée sans personnage,
+  fausse transparence retirée avec `tools/detourer-damier.py`) ; son centre est un voile
+  sombre transparent qui garde la couleur du fond. Pendant le focus, un **atome** : soleil au
+  centre, 8 planètes aux couleurs proches des vraies, chacune sur une orbite dans son propre
+  plan (inclinées de 68°, réparties sur 180°), l'ensemble tournant lentement en 3D (un tour
+  en 2 min), les planètes passant devant ou derrière le soleil ; **une seule trajectoire
+  tracée, qui change chaque minute** ; une **comète** part du bord et atteint le soleil à la
+  fin du focus. Pendant la pause, la **vague** (le cadran se vide comme un verre, couleur
+  inverse du fond). En rêveur, ni temps
   ni nom de phase pendant que le temps passe ; au repos la scène de ce qu'on règle, avec les
   chiffres. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de

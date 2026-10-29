@@ -132,7 +132,20 @@ body.dial-reveur.phase-focus #sub, body.dial-reveur.phase-break #sub { visibilit
 body.adjusting #liquid-level { transition: none; }
 #liquid .wave { animation: dial-wave 6s ease-in-out infinite alternate; }
 @keyframes dial-wave { to { transform: translateX(-140px); } }
-#solar-orbits ellipse { fill: none; stroke: rgba(255, 255, 255, 0.13); stroke-width: 0.8; }
+/* Une seule trajectoire tracée, qui change chaque minute (fondu). */
+#solar-orbits path { fill: none; stroke: rgba(255, 231, 163, 0.55); stroke-width: 0.8; opacity: 0; transition: opacity 2.5s ease; }
+#solar-orbits path.lit { opacity: 1; }
+/* Cadre en engrenages : son trou central (ovale) est calé sur le cercle du cadran. */
+#dial-frame {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  width: calc(var(--dial-size) * 1.0701);
+  left: calc(50% - var(--dial-size) * 0.5359);
+  top: calc(50% - var(--dial-size) * 0.506);
+}
+body.dial-reveur #dial-frame { display: block; }
+body.dial-reveur #dial .track { fill: url(#orb-veil); stroke: none; }
 #comet-head { fill: #fff; }
 
 /* Graduations : seulement pendant le réglage */

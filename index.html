@@ -35,7 +35,15 @@
     <div id="dial-wrap">
       <svg id="dial" viewBox="0 0 300 300" role="slider" tabindex="0" aria-label="Durée en minutes"
            aria-valuemin="1" aria-valuemax="60" aria-valuenow="25">
-        <defs><clipPath id="dial-clip"><circle cx="150" cy="150" r="125.5"/></clipPath></defs>
+        <defs>
+          <clipPath id="dial-clip"><circle cx="150" cy="150" r="125.5"/></clipPath>
+          <!-- Mode rêveur : voile sombre transparent, le centre garde la couleur du fond -->
+          <radialGradient id="orb-veil">
+            <stop offset="0" stop-color="#000" stop-opacity="0.12"/>
+            <stop offset="0.9" stop-color="#000" stop-opacity="0.38"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0.45"/>
+          </radialGradient>
+        </defs>
         <circle class="track" cx="150" cy="150" r="128"/>
         <!-- Mode rêveur, pause : le cadran se vide comme un verre -->
         <g id="liquid" clip-path="url(#dial-clip)">
@@ -47,7 +55,7 @@
           </g>
         </g>
         <!-- Mode rêveur, focus : un petit système solaire ; la comète atteint le soleil à la fin -->
-        <g id="solar">
+        <g id="solar" clip-path="url(#dial-clip)">
           <defs>
             <radialGradient id="sun-glow">
               <stop offset="0" stop-color="#fff3c4"/>
@@ -66,6 +74,8 @@
         <circle id="arc" cx="150" cy="150" r="128" transform="rotate(-90 150 150)"/>
         <circle id="knob" cx="150" cy="22" r="7"/>
       </svg>
+      <!-- Mode rêveur : cadre en engrenages autour du cadran (image générée, sans personnage) -->
+      <img id="dial-frame" src="img/cadre-reveur.webp" alt="" aria-hidden="true">
       <div id="center">
         <div id="time">25:00</div>
         <div id="sub">focus</div>

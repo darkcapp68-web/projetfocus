@@ -3,7 +3,7 @@
 // GitHub Pages arrive dès le chargement suivant (l'ancienne stratégie « cache d'abord »
 // en demandait deux, d'où des écrans qui ne reflétaient pas les derniers changements).
 
-const CACHE = 'projetfocus-v5';
+const CACHE = 'projetfocus-v6';
 const ASSETS = [
   './',
   'index.html',
@@ -18,6 +18,7 @@ const ASSETS = [
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',
   'icons/apple-touch-icon.png',
+  'img/cadre-reveur.webp',
 ];
 
 self.addEventListener('install', (e) => {

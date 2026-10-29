@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 17h01';
+const APP_VERSION = '29/10/2026 · 19h18';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -234,33 +234,33 @@ function drawDial(sec) {
 
 /* ---------- Mode rêveur : système solaire (focus) et vague (pause) ---------- */
 
-// Orbites en ellipses inclinées ; une planète passe devant le soleil sur la moitié basse
-// de son orbite (plus près de nous, un peu plus grosse), derrière sur la moitié haute.
+// Forme « atome » : chaque planète a son orbite dans un plan différent (inclinées de 68°,
+// réparties sur 180°), vue un peu d'en haut ; l'ensemble tourne lentement sur lui-même
+// (un tour en 2 min). Une planète passe devant le soleil quand elle vient vers nous (plus
+// grosse), derrière sinon. Une seule trajectoire est tracée : elle change chaque minute.
 // Couleurs approchant les vraies ; périodes ralenties pour rester calme.
 const PLANETS = [
-  { r: 32, size: 1.8, color: '#a8a39d', period: 14 },  // Mercure
-  { r: 44, size: 2.8, color: '#e8cf9c', period: 24 },  // Vénus
-  { r: 57, size: 3.0, color: '#4a8fd8', period: 36 },  // Terre
-  { r: 69, size: 2.3, color: '#c8532a', period: 60 },  // Mars
-  { r: 88, size: 6.2, color: '#d9b38c', period: 140 }, // Jupiter
-  { r: 105, size: 5.2, color: '#e6c97f', period: 230, ring: true }, // Saturne
-  { r: 120, size: 3.8, color: '#9fe0e6', period: 420 }, // Uranus
-  { r: 133, size: 3.6, color: '#4466d8', period: 700 }, // Neptune
+  { r: 28, size: 1.8, color: '#a8a39d', period: 14 },  // Mercure
+  { r: 40, size: 2.6, color: '#e8cf9c', period: 24 },  // Vénus
+  { r: 52, size: 2.8, color: '#4a8fd8', period: 36 },  // Terre
+  { r: 63, size: 2.2, color: '#c8532a', period: 60 },  // Mars
+  { r: 79, size: 5.6, color: '#d9b38c', period: 140 }, // Jupiter
+  { r: 94, size: 4.8, color: '#e6c97f', period: 230, ring: true }, // Saturne
+  { r: 106, size: 3.4, color: '#9fe0e6', period: 420 }, // Uranus
+  { r: 117, size: 3.3, color: '#4466d8', period: 700 }, // Neptune
 ];
-const TILT = -14 * Math.PI / 180, FLAT = 0.32;
+const INC = 68 * Math.PI / 180, PITCH = 18 * Math.PI / 180, SPIN = 120; // s par tour
 const solarBack = $('#solar-back'), solarFront = $('#solar-front');
 let solarOn = false;
 
 (function buildSolar() {
   if (!solarBack) return;
   const ns = 'http://www.w3.org/2000/svg';
-  const deg = TILT * 180 / Math.PI;
   PLANETS.forEach((pl, i) => {
-    const o = document.createElementNS(ns, 'ellipse');
-    o.setAttribute('cx', 150); o.setAttribute('cy', 150);
-    o.setAttribute('rx', pl.r); o.setAttribute('ry', pl.r * FLAT);
-    o.setAttribute('transform', `rotate(${deg} 150 150)`);
-    $('#solar-orbits').appendChild(o);
+    pl.node = (i * 180 / PLANETS.length) * Math.PI / 180;
+    pl.phase = i * 1.7; // départs étalés
+    pl.path = document.createElementNS(ns, 'path');
+    $('#solar-orbits').appendChild(pl.path);
     const g = document.createElementNS(ns, 'g');
     const c = document.createElementNS(ns, 'circle');
     c.setAttribute('r', pl.size); c.setAttribute('fill', pl.color);
@@ -269,36 +269,53 @@ let solarOn = false;
       const ring = document.createElementNS(ns, 'ellipse');
       ring.setAttribute('rx', pl.size * 2.2); ring.setAttribute('ry', pl.size * 0.7);
       ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', pl.color);
-      ring.setAttribute('stroke-width', 1.2); ring.setAttribute('opacity', 0.85);
-      ring.setAttribute('transform', `rotate(${deg})`);
+      ring.setAttribute('stroke-width', 1.1); ring.setAttribute('opacity', 0.85);
+      ring.setAttribute('transform', 'rotate(-14)');
       g.appendChild(ring);
     }
     pl.el = g;
-    pl.phase = i * 1.7; // départs étalés
     solarBack.appendChild(g);
   });
 })();
 
+// Point de l'orbite (angle a) projeté à l'écran, avec sa profondeur (z > 0 : vers nous).
+function atomPoint(pl, a, yaw) {
+  const ox = pl.r * Math.cos(a), oy = pl.r * Math.sin(a);
+  const y0 = oy * Math.cos(INC), z0 = oy * Math.sin(INC);
+  const x1 = ox * Math.cos(pl.node) - y0 * Math.sin(pl.node), y1 = ox * Math.sin(pl.node) + y0 * Math.cos(pl.node);
+  const x2 = x1 * Math.cos(yaw) + z0 * Math.sin(yaw), z2 = -x1 * Math.sin(yaw) + z0 * Math.cos(yaw);
+  return { x: 150 + x2, y: 150 + y1 * Math.cos(PITCH) - z2 * Math.sin(PITCH), z: y1 * Math.sin(PITCH) + z2 * Math.cos(PITCH) };
+}
+
+let litOrbit = -1;
 function drawSolar() {
   if (!solarOn) return;
   const t = Date.now() / 1000;
-  const cosT = Math.cos(TILT), sinT = Math.sin(TILT);
-  for (const pl of PLANETS) {
-    const a = pl.phase + (t / pl.period) * 2 * Math.PI;
-    const ex = pl.r * Math.cos(a), ey = pl.r * FLAT * Math.sin(a);
-    const x = 150 + ex * cosT - ey * sinT, y = 150 + ex * sinT + ey * cosT;
-    const front = Math.sin(a) > 0;
-    const k = 1 + 0.22 * Math.sin(a); // plus gros au premier plan
-    pl.el.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${k.toFixed(3)})`);
-    const want = front ? solarFront : solarBack;
+  const yaw = (t / SPIN) * 2 * Math.PI;
+  const lit = Math.floor(Date.now() / 60000) % PLANETS.length; // une trajectoire par minute
+  PLANETS.forEach((pl, i) => {
+    const q = atomPoint(pl, pl.phase + (t / pl.period) * 2 * Math.PI, yaw);
+    pl.el.setAttribute('transform', `translate(${q.x.toFixed(2)} ${q.y.toFixed(2)}) scale(${(1 + 0.25 * q.z / 120).toFixed(3)})`);
+    const want = q.z > 0 ? solarFront : solarBack;
     if (pl.el.parentNode !== want) want.appendChild(pl.el);
-  }
+    if (i === lit) {
+      let d = '';
+      for (let k = 0; k <= 72; k++) {
+        const p = atomPoint(pl, (k / 72) * 2 * Math.PI, yaw);
+        d += (k ? ' L ' : 'M ') + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+      }
+      pl.path.setAttribute('d', d);
+    }
+    if (i === lit && litOrbit !== lit) pl.path.classList.add('lit');
+    else if (i !== lit) pl.path.classList.remove('lit');
+  });
+  litOrbit = lit;
   // Comète : part du bord au début du focus et atteint le soleil à la fin.
   const p = T.phase === 'focus' && T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0;
-  const d = 142 - p * 130, ang = (-40 + p * 70) * Math.PI / 180;
+  const d = 124 - p * 112, ang = (-40 + p * 70) * Math.PI / 180;
   const hx = 150 + d * Math.cos(ang), hy = 150 + d * Math.sin(ang);
   const ux = (hx - 150) / d, uy = (hy - 150) / d; // la queue pointe à l'opposé du soleil
-  const len = 16 + 22 * p, w = 2.2;
+  const len = 14 + 20 * p, w = 2;
   $('#comet-head').setAttribute('cx', hx.toFixed(2)); $('#comet-head').setAttribute('cy', hy.toFixed(2));
   $('#comet-tail').setAttribute('d', `M ${hx - uy * w} ${hy + ux * w} L ${hx + ux * len} ${hy + uy * len} L ${hx + uy * w} ${hy - ux * w} Z`);
   requestAnimationFrame(drawSolar);
