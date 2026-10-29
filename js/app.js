@@ -419,7 +419,8 @@ function applyAudioLevels(fadeMs = 1500) {
   if (brk && S.duckNoise) noise *= S.musicVolWork > 0 ? Math.min(1, S.musicVolBreak / S.musicVolWork) : 0;
   audio.setNoiseLevel(noise);
   volMusic.value = brk ? S.musicVolBreak : S.musicVolWork;
-  $('#vol-break').value = S.musicVolBreak;
+  volMusic.setAttribute('aria-label', brk ? 'Volume de la musique de pause' : 'Volume de la musique');
+  volMusic.title = brk ? 'Volume de la musique de pause' : 'Volume de la musique';
   volNoise.value = S.noiseVol;
 }
 
@@ -568,15 +569,6 @@ selNoise.addEventListener('change', () => {
   audioTouched = true;
   if (selNoise.value !== 'none') noiseOn = true; // choisir un bruit le rallume
   applyNoise();
-});
-
-// Curseur de l'écran de pause : règle le volume de la musique de pause.
-$('#vol-break').addEventListener('input', (e) => {
-  audioTouched = true;
-  audio.ensure();
-  S.musicVolBreak = Number(e.target.value);
-  applyAudioLevels(0);
-  saveSettings(); syncForm();
 });
 
 volMusic.addEventListener('input', () => {
