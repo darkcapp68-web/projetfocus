@@ -394,8 +394,10 @@ function breathSteps() {
   return [['', S.pulseSeconds / 2], ['', S.pulseSeconds / 2]]; // simple pulsation
 }
 
-function setPulse(opacity, seconds) {
+// Voile posé sur le fond : sa couleur et son opacité glissent pendant toute l'étape.
+function setPulse(opacity, seconds, color = '#000000') {
   pulseEl.style.transitionDuration = seconds + 's';
+  pulseEl.style.backgroundColor = color;
   pulseEl.style.opacity = opacity;
 }
 
@@ -404,7 +406,12 @@ function breathStep(k) {
   const steps = breathSteps();
   const [kind, sec] = steps[k % steps.length];
   const dark = S.pulseIntensity / 100;
-  if (kind === 'inspire' || (!kind && k % 2 === 0)) setPulse(0, sec);
+  if (kind && S.breathColors) {
+    // Une teinte par étape : inspire, retiens, expire.
+    if (kind === 'inspire') setPulse(dark, sec, S.breathInspireColor);
+    else if (kind === 'retiens') setPulse(dark, Math.min(1.5, sec), S.breathHoldColor);
+    else setPulse(dark, sec, S.breathExpireColor);
+  } else if (kind === 'inspire' || (!kind && k % 2 === 0)) setPulse(0, sec);
   else if (kind === 'expire' || !kind) setPulse(dark, sec);
   breathEl.textContent = kind;
   breathEl.classList.toggle('on', !!kind && S.breathLabels);
@@ -413,7 +420,8 @@ function breathStep(k) {
 
 function breathStart() {
   breathOn = true;
-  setPulse(S.pulseIntensity / 100, 0); // on part « poumons vides », écran sombre
+  // On part « poumons vides » : écran sombre (ou teinte de l'expiration).
+  setPulse(S.pulseIntensity / 100, 0, S.breathColors ? S.breathExpireColor : '#000000');
   breathTimer = setTimeout(() => breathStep(0), 50); // laisse l'écran sombre s'afficher d'abord
 }
 

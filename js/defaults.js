@@ -157,6 +157,10 @@ export const DEFAULTS = {
   pulseOn: true,
   breathPattern: 'coherence', // voir BREATHS
   breathLabels: true, // « inspire / retiens / expire » sous le temps
+  breathColors: true, // une teinte par étape (sauf simple pulsation)
+  breathInspireColor: '#8fd3ff', // bleu ciel
+  breathHoldColor: '#ffd36e', // doré
+  breathExpireColor: '#000000', // assombrit
   pulseSeconds: 3, // rythme de la simple pulsation
   pulseIntensity: 30,
   fullscreenOnBreak: false, // un peu brutal : à activer dans Paramètres → Pause

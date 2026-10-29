@@ -58,7 +58,7 @@ body.ui .ctl { opacity: 1; pointer-events: auto; }
 /* ---------- Pulsation de la pause ---------- */
 #pulse { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; }
 /* La respiration est pilotée en JS : la durée de la transition = la durée de l'étape. */
-#pulse { transition-property: opacity; transition-timing-function: ease-in-out; }
+#pulse { transition-property: opacity, background-color; transition-timing-function: ease-in-out; }
 #breath {
   margin-top: 0.8em;
   min-height: 1.2em;
