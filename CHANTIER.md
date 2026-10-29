@@ -28,8 +28,8 @@ premier pour reprendre le travail).
   le site publié. Guide : `android/README.md`.
 
 - APK de test construit avec Gradle (`android/app/build/outputs/apk/debug/app-debug.apk`,
-  4,9 Mo, paquet `fr.projetfocus.app`). Il pointe encore sur `TON-COMPTE.github.io` : il ne
-  sert à rien avant la publication du site.
+  4,9 Mo, paquet `fr.projetfocus.app`). Il pointe sur `darkcapp68-web.github.io/projetfocus/` : il
+  ne sert à rien avant la publication du site (à reconstruire, l'adresse a changé).
 
 ## En cours
 
@@ -38,19 +38,18 @@ premier pour reprendre le travail).
 ## Ce dont j'ai besoin de toi
 
 1. **Publier sur GitHub Pages** (tout en dépend : PC installé, APK, synchronisation).
-   - Créer le dépôt **`projetfocus`** sur ton compte GitHub (public, vide).
-   - Me donner ton **nom d'utilisateur GitHub** et ton **accord pour pousser** le code
-     (environ 110 Mo, à cause de la musique).
+   - Fait : dépôt public **`darkcapp68-web/projetfocus`** créé (vide).
+   - Me donner ton **accord pour pousser** le code (environ 110 Mo, à cause de la musique).
    - Activer GitHub Pages : Settings → Pages → branche `main`, dossier `/ (root)`.
    - Savoir : tout le dépôt sera public, y compris CAHIER_DES_CHARGES.md et CHANTIER.md.
 2. **ID client Google** pour la synchronisation Drive (guide : README, « Synchroniser avec
    Google Drive ») : un projet Google Cloud `projetfocus` à part, client de type
-   **Application Web**, origines `http://localhost:8417` et `https://TON-COMPTE.github.io`,
+   **Application Web**, origines `http://localhost:8417` et `https://darkcapp68-web.github.io`,
    ton adresse en utilisateur test. Me donner l'ID (il n'est pas secret).
 3. **APK** (après la publication) :
-   - remplacer `TON-COMPTE` dans `android/app/build.gradle.kts` (je peux le faire) ;
+   - fait : l'adresse du site est réglée sur `darkcapp68-web.github.io` ;
    - créer la **clé de signature** dans Android Studio et la garder hors du dépôt ;
-   - pour enlever la barre d'adresse : créer le dépôt **`TON-COMPTE.github.io`** avec
+   - pour enlever la barre d'adresse : créer le dépôt **`darkcapp68-web.github.io`** avec
      `.well-known/assetlinks.json` (je prépare le fichier avec l'empreinte SHA-256).
 4. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
    - couleurs de la respiration, maintenant affichées telles quelles (bleu ciel / doré /

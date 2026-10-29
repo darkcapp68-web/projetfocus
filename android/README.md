@@ -18,11 +18,11 @@ Android Studio synchronise Gradle tout seul.
 Dans `app/build.gradle.kts`, en haut :
 
 ```kotlin
-val siteHost = "TON-COMPTE.github.io"
+val siteHost = "darkcapp68-web.github.io"
 val sitePath = "/projetfocus/"
 ```
 
-Remplace `TON-COMPTE` par ton nom d'utilisateur GitHub une fois le site publié.
+Compte GitHub : `darkcapp68-web` (site : `https://darkcapp68-web.github.io/projetfocus/`).
 
 ## Construire et installer
 
@@ -42,12 +42,12 @@ l'adresse du site (pense alors à augmenter `versionCode` dans `app/build.gradle
 Sans vérification, l'appli marche mais Chrome affiche une fine barre avec l'adresse en haut.
 Pour la faire disparaître, le site doit déclarer qu'il fait confiance à l'appli, avec un
 fichier `assetlinks.json` placé **à la racine du domaine** :
-`https://TON-COMPTE.github.io/.well-known/assetlinks.json`.
+`https://darkcapp68-web.github.io/.well-known/assetlinks.json`.
 
 1. Récupère l'empreinte de ta clé : dans Android Studio, panneau **Gradle** →
    `app → Tasks → android → signingReport` (ou, pour la clé définitive :
    `keytool -list -v -keystore ta-cle.jks`). Copie la ligne **SHA-256**.
-2. Sur GitHub, crée un dépôt nommé exactement **`TON-COMPTE.github.io`** (c'est le site
+2. Sur GitHub, crée un dépôt nommé exactement **`darkcapp68-web.github.io`** (c'est le site
    « racine » de ton compte), avec un fichier `.well-known/assetlinks.json` :
 
    ```json

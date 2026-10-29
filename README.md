@@ -99,10 +99,10 @@ Rien n'a été envoyé sur GitHub : c'est à toi de le faire, quand tu veux.
 1. Sur https://github.com/new, crée un dépôt nommé **`projetfocus`** sur ton compte perso.
    Laisse-le **public** (GitHub Pages gratuit ne publie que les dépôts publics) et ne coche
    rien (pas de README, pas de licence).
-2. Dans un terminal, dans `C:\projetfocus` (remplace `TON-COMPTE`) :
+2. Dans un terminal, dans `C:\projetfocus` :
 
    ```bash
-   git remote add origin https://github.com/TON-COMPTE/projetfocus.git
+   git remote add origin https://github.com/darkcapp68-web/projetfocus.git
    ```
 
    ```bash
@@ -112,7 +112,7 @@ Rien n'a été envoyé sur GitHub : c'est à toi de le faire, quand tu veux.
 3. Sur GitHub, dans le dépôt : **Settings → Pages**. Sous « Build and deployment », choisis
    **Deploy from a branch**, branche **main**, dossier **/ (root)**, puis **Save**.
 4. Une à deux minutes plus tard, l'appli est en ligne à
-   `https://TON-COMPTE.github.io/projetfocus/`.
+   `https://darkcapp68-web.github.io/projetfocus/`.
 
 Pour publier une modification ensuite : `git add -A`, `git commit -m "…"`, `git push`.
 Les appareils qui ont déjà l'appli prennent la nouvelle version au deuxième lancement.
@@ -123,7 +123,7 @@ Les appareils qui ont déjà l'appli prennent la nouvelle version au deuxième l
 
 ## Installer l'appli
 
-Une fois publiée, ouvre `https://TON-COMPTE.github.io/projetfocus/` puis :
+Une fois publiée, ouvre `https://darkcapp68-web.github.io/projetfocus/` puis :
 
 - **PC (Chrome ou Edge)** : l'icône « Installer » dans la barre d'adresse (un écran avec une
   flèche), ou menu `⋮` → *Caster, enregistrer et partager* → *Installer projetfocus*
@@ -179,7 +179,7 @@ propriétaire, donc toi. C'est gratuit.
 6. Rubrique **Clients** (ou « Identifiants ») → **Créer un client** (« ID client OAuth ») :
    - type : **Application Web**, nom : `projetfocus` ;
    - **Origines JavaScript autorisées** → ajoute `http://localhost:8417` et, quand l'appli
-     sera publiée, `https://TON-COMPTE.github.io` (sans `/projetfocus` à la fin) ;
+     sera publiée, `https://darkcapp68-web.github.io` (sans `/projetfocus` à la fin) ;
    - **Créer**, puis copie l'**ID client** (il se termine par `.apps.googleusercontent.com`).
      Cet identifiant n'est pas un secret.
 

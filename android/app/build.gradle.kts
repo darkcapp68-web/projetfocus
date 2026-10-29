@@ -5,7 +5,7 @@ plugins {
 // L'APK n'est qu'une coquille : il ouvre le site publié dans le moteur de Chrome
 // (Trusted Web Activity). Toute la maintenance se fait sur le site, pas ici.
 // Seule chose à adapter : l'adresse du site une fois publié sur GitHub Pages.
-val siteHost = "TON-COMPTE.github.io"
+val siteHost = "darkcapp68-web.github.io"
 val sitePath = "/projetfocus/"
 
 android {
