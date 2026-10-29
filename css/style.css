@@ -373,7 +373,7 @@ body.no-info #info { visibility: hidden; }
 /* Section ouverte : sa ligne est surlignée et ses réglages décalés à droite. */
 #settings details.sec[open] > summary {
   margin: 0 -20px;
-  padding: 14px 20px;
+  padding: 14px 20px 14px 36px; /* le titre ne touche pas le trait bleu */
   background: rgba(143, 211, 255, 0.16);
   font-weight: 600;
 }
