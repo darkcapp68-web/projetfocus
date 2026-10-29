@@ -36,8 +36,9 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
 
 L'appli se souvient de tout, même si tu fermes ou recharges la page : la phase et le temps
 restant, la couleur de la pause, la musique choisie (avec le morceau et la seconde exacte de la
-playlist) et le bruit de fond. Le navigateur exige un geste pour lancer du son : après un
-rechargement, la musique repart au premier toucher. Choisir une musique dans le menu la lance
+playlist) et le bruit de fond. Après un rechargement, l'appli relance le son tout de suite
+quand le navigateur l'autorise (site souvent écouté, appli installée) ; sinon le lecteur
+affiche « Touche l'écran pour relancer ta musique » et elle repart au premier toucher. Choisir une musique dans le menu la lance
 tout de suite.
 
 Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent). Les réglages sont rangés en 8 sections repliables (Temps, Pause, Volumes et sons, Musiques, Messages, Couleurs, Affichage, Sauvegarde) : une seule s'ouvre à la fois.

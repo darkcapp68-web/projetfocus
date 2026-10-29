@@ -544,6 +544,7 @@ function renderPlayer() {
     b.addEventListener('click', () => audio.nextTrack());
     np.appendChild(b);
   } else if (on && st) np.textContent = st.desc;
+  else if (!audioTouched && hadSound()) np.textContent = 'Touche l’écran pour relancer ta musique.';
   if (on && 'mediaSession' in navigator && window.MediaMetadata) {
     const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
@@ -601,6 +602,19 @@ function resumeSavedAudio(e) {
   // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
   if (onBreak()) pauseAudio();
   if (noiseOn && selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
+}
+
+const hadSound = () => savedAudio.playing || (noiseOn && selNoise.value !== 'none') || onBreak();
+
+// Au chargement : on tente de relancer le son tout de suite. Le navigateur ne l'autorise
+// que s'il fait confiance au site (souvent écouté, appli installée) ; sinon on attend
+// le premier toucher, et le lecteur l'indique.
+async function autoResumeOnLoad() {
+  if (!hadSound()) return;
+  const ctx = audio.ensure();
+  if (ctx && ctx.state !== 'running') await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 400))]);
+  if (ctx?.state === 'running' && !audioTouched) resumeSavedAudio(null);
+  renderPlayer();
 }
 
 $('#btn-music').addEventListener('click', () => {
@@ -1300,6 +1314,7 @@ sync.start();
 if (T.phase === 'focus') startMessages();
 if (T.phase === 'break') { renderCoach(); showCoach(); }
 renderPlayer();
+autoResumeOnLoad();
 render(true);
 poke();
 setInterval(tick, 250);
