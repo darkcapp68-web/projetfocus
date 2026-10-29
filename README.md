@@ -175,7 +175,8 @@ Une série en cours survit à un rechargement de la page.
 - **Coach** : une action affichée à la fois (décision de style) ; deux autres idées sont
   proposées au toucher, et on peut les choisir à la place.
 - **Pulsation** : une respiration toutes les 3 s par défaut (décision de style), réglable de 1 à 8 s.
-- **Plein écran** : les navigateurs ne l'autorisent qu'après un geste de l'utilisateur. Si la
+- **Plein écran** : désactivé par défaut (jugé trop brutal) ; à cocher dans Paramètres → Pause.
+  Les navigateurs ne l'autorisent qu'après un geste de l'utilisateur. Si la
   pause commence sans toi, le plein écran se fait au premier toucher ou clic.
 - **Fenêtre cachée** : Chrome ralentit les pages cachées ; la notification peut arriver avec
   jusqu'à une minute de retard si aucun son ne joue. Le temps affiché reste juste.

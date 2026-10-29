@@ -93,7 +93,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 4,
+  version: 5,
 
   // Temps
   focusMin: 25,
@@ -128,7 +128,7 @@ export const DEFAULTS = {
   pulseOn: true,
   pulseSeconds: 3,
   pulseIntensity: 30,
-  fullscreenOnBreak: true,
+  fullscreenOnBreak: false, // un peu brutal : à activer dans Paramètres → Pause
   holdSeconds: 3,
   notifyOn: true,
 

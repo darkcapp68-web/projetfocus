@@ -43,6 +43,8 @@ function sanitize(s) {
     for (const id of ['lautlofi', 'lautminimal', 'lautambient']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
     s.version = 4;
   }
+  // Version 5 : plus de plein écran automatique en pause (réactivable).
+  if (s.version < 5) { s.fullscreenOnBreak = false; s.version = 5; }
   return s;
 }
 
