@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cadran futuriste</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500&family=Rajdhani:wght@500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&family=Exo+2:wght@200;300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root { --bg: #9b5e30; }
   * { box-sizing: border-box; }
@@ -14,28 +13,29 @@
   .sub { text-align: center; opacity: 0.75; margin: 0 0 18px; font-size: 14px; }
   .bgs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
   .bgs button { font: inherit; font-size: 13px; color: #fff; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35); border-radius: 99px; padding: 6px 14px; cursor: pointer; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px 18px; max-width: 1180px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px 18px; max-width: 1180px; margin: 0 auto; }
   .card { display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .card h2 { font-size: 16px; font-weight: 500; margin: 0; }
-  .card p { margin: 0; font-size: 13px; opacity: 0.8; text-align: center; max-width: 30ch; }
+  .card p { margin: 0; font-size: 13px; opacity: 0.8; text-align: center; max-width: 32ch; }
   svg { width: min(260px, 80vw); height: auto; overflow: visible; }
-  .time { font-size: 50px; text-anchor: middle; dominant-baseline: central; fill: #fff; }
+  .time { font-size: 50px; text-anchor: middle; dominant-baseline: central; fill: #fff; font-family: system-ui, "Segoe UI", sans-serif; }
   .lbl { font-size: 10px; letter-spacing: 0.25em; text-anchor: middle; fill: #fff; opacity: 0.7; }
-  .num { font-size: 9px; text-anchor: middle; dominant-baseline: central; fill: #fff; opacity: 0.7; }
-  .t-classic { font-family: system-ui, "Segoe UI", sans-serif; font-weight: 400; }
-  .t-orbitron { font-family: Orbitron, sans-serif; font-weight: 400; font-size: 40px; letter-spacing: 0.04em; }
-  .t-rajdhani { font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 58px; letter-spacing: 0.03em; }
-  .t-mono { font-family: "JetBrains Mono", monospace; font-weight: 300; font-size: 44px; }
-  .sec { transform-origin: 150px 150px; animation: spin 60s linear infinite; }
-  .sweep { transform-origin: 150px 150px; animation: spin 4s linear infinite; }
+  .exo { font-family: "Exo 2", sans-serif; font-weight: 200; font-size: 56px; }
+  .raj { font-family: Rajdhani, sans-serif; font-weight: 600; font-size: 56px; }
+  .stm { font-family: "Share Tech Mono", monospace; font-size: 48px; }
+  .spin60 { transform-origin: 150px 150px; animation: spin 60s linear infinite; }
+  .spin20 { transform-origin: 150px 150px; animation: spin 20s linear infinite; }
+  .spin90r { transform-origin: 150px 150px; animation: spin 90s linear infinite reverse; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .pulse { animation: pulse 2.4s ease-in-out infinite; }
-  @keyframes pulse { 50% { opacity: 0.35; } }
+  .wave { animation: wave 6s ease-in-out infinite alternate; }
+  @keyframes wave { to { transform: translateX(-140px); } }
+  .blink { animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
 </style>
 </head>
 <body>
-<h1>Cadran : 4 looks à comparer</h1>
-<p class="sub">Même horloge, même place. Change le fond pour voir chaque look selon le moment de la journée.</p>
+<h1>Cadran : d'autres pistes</h1>
+<p class="sub">Même temps restant (25 min sur 60). Change le fond pour juger selon le moment de la journée.</p>
 <div class="bgs">
   <button data-bg="#9b5e30">Après-midi</button>
   <button data-bg="#2f6b4f">Midi</button>
@@ -47,92 +47,101 @@
 
 <div class="grid">
 
-  <!-- A. Actuel -->
   <div class="card">
-    <svg viewBox="0 0 300 300" aria-label="Cadran actuel">
+    <svg viewBox="0 0 300 300">
       <circle cx="150" cy="150" r="128" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.22)" stroke-width="5"/>
       <circle cx="150" cy="150" r="128" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)"/>
       <circle cx="86" cy="261" r="7" fill="#fff"/>
-      <text class="time t-classic" x="150" y="142">17:24</text>
+      <text class="time" x="150" y="142">17:24</text>
       <text class="lbl" x="150" y="186">FOCUS</text>
     </svg>
     <h2>A · Actuel</h2>
     <p>Pour comparer.</p>
   </div>
 
-  <!-- B. Néon doux -->
   <div class="card">
-    <svg viewBox="0 0 300 300" aria-label="Cadran néon doux">
-      <defs>
-        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="5" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glowtext" x="-20%" y="-40%" width="140%" height="180%">
-          <feGaussianBlur stdDeviation="3" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <circle cx="150" cy="150" r="128" fill="rgba(0,0,0,0.12)" stroke="rgba(255,255,255,0.14)" stroke-width="3"/>
-      <circle cx="150" cy="150" r="128" fill="none" stroke="#e9fbff" stroke-width="4" stroke-linecap="round" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)" filter="url(#glow)"/>
-      <circle class="pulse" cx="86" cy="261" r="7" fill="#fff" filter="url(#glow)"/>
-      <text class="time t-classic" x="150" y="142" filter="url(#glowtext)">17:24</text>
-      <text class="lbl" x="150" y="186">FOCUS</text>
+    <svg viewBox="0 0 300 300"><g id="seg"></g>
+      <text class="time raj" x="150" y="140">17:24</text>
+      <text class="lbl" x="150" y="186" style="font-family: Rajdhani; font-size: 12px; letter-spacing: 0.4em;">25 MIN</text>
     </svg>
-    <h2>B · Néon doux</h2>
-    <p>L'arc et le point brillent légèrement, le point « respire ». Le reste ne change pas.</p>
+    <h2>E · Segments</h2>
+    <p>60 petits segments, un par minute : ceux qui restent sont allumés, la minute en cours clignote doucement.</p>
   </div>
 
-  <!-- C. Tableau de bord -->
   <div class="card">
-    <svg viewBox="0 0 300 300" aria-label="Cadran tableau de bord">
-      <defs>
-        <filter id="glow2" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <circle cx="150" cy="150" r="128" fill="rgba(0,0,0,0.14)" stroke="rgba(255,255,255,0.16)" stroke-width="3"/>
-      <circle cx="150" cy="150" r="128" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)" filter="url(#glow2)"/>
-      <circle cx="86" cy="261" r="6" fill="#fff" filter="url(#glow2)"/>
-      <g id="ticksC"></g>
-      <circle cx="150" cy="150" r="104" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <g class="sec">
-        <circle cx="150" cy="46" r="3" fill="#bff3ff" filter="url(#glow2)"/>
-      </g>
-      <text class="time t-rajdhani" x="150" y="144">17:24</text>
-      <text class="lbl" x="150" y="190" style="font-family: Rajdhani; font-size: 12px; letter-spacing: 0.4em;">FOCUS · 2/4</text>
+    <svg viewBox="0 0 300 300"><g id="dots"></g>
+      <g class="spin60"><circle cx="150" cy="40" r="3" fill="#fff"/></g>
+      <text class="time stm" x="150" y="146">17:24</text>
+      <text class="lbl" x="150" y="186" style="font-family: 'Share Tech Mono'; font-size: 11px;">FOCUS</text>
     </svg>
-    <h2>C · Tableau de bord</h2>
-    <p>Lueur légère, petit point des secondes qui fait le tour en 60 s, graduations fines, chiffres géométriques.</p>
+    <h2>F · Constellation</h2>
+    <p>Un anneau de points lumineux qui s'éteignent un à un ; un point fait le tour en 60 s à l'intérieur.</p>
   </div>
 
-  <!-- D. Écran de visée -->
   <div class="card">
-    <svg viewBox="0 0 300 300" aria-label="Cadran écran de visée">
+    <svg viewBox="0 0 300 300">
       <defs>
-        <filter id="glow3" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3.5" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#bff3ff" stop-opacity="0"/>
-          <stop offset="1" stop-color="#bff3ff" stop-opacity="0.55"/>
+        <linearGradient id="gr" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff"/>
+          <stop offset="1" stop-color="#9ff0ff"/>
         </linearGradient>
       </defs>
-      <circle cx="150" cy="150" r="138" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="2 6"/>
-      <circle cx="150" cy="150" r="128" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-      <g class="sweep" opacity="0.5">
-        <path d="M150 150 L150 24 A126 126 0 0 1 222 46 Z" fill="url(#fade)" opacity="0.25"/>
-      </g>
-      <circle cx="150" cy="150" r="128" fill="none" stroke="#bff3ff" stroke-width="3" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)" filter="url(#glow3)"/>
-      <g id="ticksD"></g>
-      <path d="M150 8 v12 M150 280 v12 M8 150 h12 M280 150 h12" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
-      <text class="time t-orbitron" x="150" y="144">17:24</text>
-      <text class="lbl" x="150" y="186" style="font-family: Orbitron; font-size: 9px; letter-spacing: 0.45em;">FOCUS</text>
+      <circle cx="150" cy="150" r="120" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="22"/>
+      <circle cx="150" cy="150" r="120" fill="none" stroke="url(#gr)" stroke-width="22" stroke-linecap="round" stroke-dasharray="754" stroke-dashoffset="440" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)"/>
+      <text class="time exo" x="150" y="142">17:24</text>
+      <text class="lbl" x="150" y="186" style="font-family: 'Exo 2'; font-weight: 300; font-size: 11px;">FOCUS</text>
     </svg>
-    <h2>D · Écran de visée</h2>
-    <p>Le plus « science-fiction » : chiffres Orbitron, couronne pointillée, balayage lent, repères en croix.</p>
+    <h2>G · Anneau plein</h2>
+    <p>Un anneau épais et doux, en dégradé blanc vers turquoise, façon montre connectée. Chiffres très fins.</p>
+  </div>
+
+  <div class="card">
+    <svg viewBox="0 0 300 300">
+      <defs><clipPath id="disc"><circle cx="150" cy="150" r="124"/></clipPath></defs>
+      <circle cx="150" cy="150" r="128" fill="rgba(0,0,0,0.12)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+      <g clip-path="url(#disc)">
+        <g class="wave">
+          <path d="M0 180 q 35 -12 70 0 t 70 0 t 70 0 t 70 0 t 70 0 t 70 0 V 320 H 0 Z" fill="rgba(255,255,255,0.22)"/>
+          <path d="M0 186 q 35 10 70 0 t 70 0 t 70 0 t 70 0 t 70 0 t 70 0 V 320 H 0 Z" fill="rgba(255,255,255,0.14)"/>
+        </g>
+      </g>
+      <text class="time exo" x="150" y="132">17:24</text>
+      <text class="lbl" x="150" y="172" style="font-family: 'Exo 2'; font-weight: 300; font-size: 11px;">FOCUS</text>
+    </svg>
+    <h2>H · Niveau liquide</h2>
+    <p>Pas d'arc : le cadran est rempli d'un liquide lumineux qui ondule et baisse avec le temps.</p>
+  </div>
+
+  <div class="card">
+    <svg viewBox="0 0 300 300">
+      <circle cx="150" cy="150" r="132" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="108" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="84" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <circle cx="150" cy="150" r="132" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="829" stroke-dashoffset="484" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)"/>
+      <g class="spin20"><circle cx="150" cy="42" r="4" fill="#fff"/></g>
+      <g class="spin90r"><circle cx="150" cy="66" r="2.5" fill="rgba(255,255,255,0.7)"/><circle cx="150" cy="234" r="2" fill="rgba(255,255,255,0.5)"/></g>
+      <text class="time raj" x="150" y="142" style="font-size: 44px;">17:24</text>
+      <text class="lbl" x="150" y="176" style="font-family: Rajdhani; font-size: 11px; letter-spacing: 0.4em;">FOCUS</text>
+    </svg>
+    <h2>I · Orbites</h2>
+    <p>Trois orbites fines où tournent lentement de petites « lunes ». Calme et vivant, façon planétarium.</p>
+  </div>
+
+  <div class="card">
+    <svg viewBox="0 0 300 300">
+      <g style="mix-blend-mode: screen">
+        <circle cx="148" cy="150" r="128" fill="none" stroke="#ff4fd8" stroke-width="4" stroke-linecap="round" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(148 150) rotate(-90) scale(1 -1) translate(-148 -150)" opacity="0.8"/>
+        <circle cx="152" cy="150" r="128" fill="none" stroke="#4ff3ff" stroke-width="4" stroke-linecap="round" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(152 150) rotate(-90) scale(1 -1) translate(-152 -150)" opacity="0.8"/>
+      </g>
+      <circle cx="150" cy="150" r="128" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="804" stroke-dashoffset="469" transform="translate(150 150) rotate(-90) scale(1 -1) translate(-150 -150)"/>
+      <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text class="time stm" x="148" y="146" fill="#ff4fd8" style="fill:#ff4fd8; opacity: 0.7">17:24</text>
+      <text class="time stm" x="152" y="146" style="fill:#4ff3ff; opacity: 0.7">17:24</text>
+      <text class="time stm" x="150" y="146">17:24</text>
+      <text class="lbl" x="150" y="186" style="font-family: 'Share Tech Mono'; font-size: 11px;">FOCUS<tspan class="blink">_</tspan></text>
+    </svg>
+    <h2>J · Hologramme</h2>
+    <p>Léger décalage rose / turquoise sur l'arc et les chiffres, comme un hologramme ; curseur qui clignote.</p>
   </div>
 
 </div>
@@ -140,23 +149,29 @@
 <script>
   document.querySelectorAll('[data-bg]').forEach((b) => b.addEventListener('click', () => document.documentElement.style.setProperty('--bg', b.dataset.bg)));
   const ns = 'http://www.w3.org/2000/svg';
-  function ticks(id, r1, long, short, every5only) {
-    const g = document.getElementById(id);
-    for (let m = 0; m < 60; m++) {
-      const big = m % 5 === 0;
-      if (every5only && !big) continue;
-      const a = (m / 60) * 2 * Math.PI;
-      const r0 = r1 - (big ? long : short);
-      const l = document.createElementNS(ns, 'line');
-      l.setAttribute('x1', 150 + r0 * Math.sin(a)); l.setAttribute('y1', 150 - r0 * Math.cos(a));
-      l.setAttribute('x2', 150 + r1 * Math.sin(a)); l.setAttribute('y2', 150 - r1 * Math.cos(a));
-      l.setAttribute('stroke', '#fff'); l.setAttribute('stroke-width', big ? 1.6 : 0.8);
-      l.setAttribute('opacity', big ? 0.75 : 0.35);
-      g.appendChild(l);
-    }
+  const left = 25;
+  const seg = document.getElementById('seg');
+  for (let m = 0; m < 60; m++) {
+    const a = (m / 60) * 2 * Math.PI, r0 = 112, r1 = 134;
+    const on = m >= 60 - left;
+    const l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', 150 + r0 * Math.sin(a)); l.setAttribute('y1', 150 - r0 * Math.cos(a));
+    l.setAttribute('x2', 150 + r1 * Math.sin(a)); l.setAttribute('y2', 150 - r1 * Math.cos(a));
+    l.setAttribute('stroke', '#fff'); l.setAttribute('stroke-width', 5); l.setAttribute('stroke-linecap', 'round');
+    l.setAttribute('opacity', on ? 0.95 : 0.15);
+    if (m === 60 - left) l.setAttribute('class', 'blink');
+    seg.appendChild(l);
   }
-  ticks('ticksC', 118, 9, 4, false);
-  ticks('ticksD', 120, 10, 0, true);
+  const dots = document.getElementById('dots');
+  for (let m = 0; m < 120; m++) {
+    const a = (m / 120) * 2 * Math.PI, r = 128 + (m % 2 ? 0 : 0);
+    const on = m >= 120 - left * 2;
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', 150 + r * Math.sin(a)); c.setAttribute('cy', 150 - r * Math.cos(a));
+    c.setAttribute('r', on ? (m % 10 === 0 ? 3.2 : 2.2) : 1.3);
+    c.setAttribute('fill', '#fff'); c.setAttribute('opacity', on ? 0.95 : 0.25);
+    dots.appendChild(c);
+  }
 </script>
 </body>
 </html>
