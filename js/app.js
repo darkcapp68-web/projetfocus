@@ -8,6 +8,9 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const body = document.body;
 
+// Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
+// d'un coup d'œil si un appareil a la dernière.
+const APP_VERSION = '29/10/2026 · 16h15';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1212,6 +1215,24 @@ undoBtn?.addEventListener('click', () => {
   undoBtn.hidden = true;
   saveSettings(); buildForm(); syncForm(); applySettings();
   note('Réglages d’avant remis ; ils partent vers Google Drive.');
+});
+
+// Version de l'appli, et mise à jour forcée : on vide le cache du site (la musique gardée
+// hors ligne reste) puis on recharge depuis le réseau.
+const versionEl = $('#app-version');
+if (versionEl) versionEl.textContent = 'Version du ' + APP_VERSION;
+$('#btn-update')?.addEventListener('click', async () => {
+  if (!navigator.onLine) { note('Pas de réseau : mise à jour impossible pour l’instant.'); return; }
+  $('#btn-update').textContent = 'Mise à jour…';
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    await reg?.update();
+  } catch { /* pas de service worker : le rechargement suffit */ }
+  try {
+    for (const k of await caches.keys()) if (!k.includes('music')) await caches.delete(k);
+  } catch { /* cache indisponible */ }
+  saveEverything();
+  location.reload();
 });
 
 $('#btn-day-demo').addEventListener('click', startDayDemo);

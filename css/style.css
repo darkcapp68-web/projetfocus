@@ -327,6 +327,8 @@ body.no-info #info { visibility: hidden; }
 .day-row input[type="text"] { min-width: 0; }
 #settings .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 #settings .note { font-size: 12px; opacity: 0.6; }
+#settings .app-version { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 22px; }
+#settings .app-version .link { font-size: 13px; }
 
 /* ---------- Petits écrans ---------- */
 @media (max-height: 560px) {
