@@ -76,7 +76,28 @@ const audio = new AudioEngine();
 const hexToRgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const rgbToHex = (c) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
 const toMin = (hm) => { const [h, m] = hm.split(':').map(Number); return ((h * 60 + (m || 0)) % 1440 + 1440) % 1440; };
-const BLEND_MIN = 90; // chaque couleur glisse vers la suivante pendant les 90 min qui la précèdent
+
+// Mélange dans l'espace OKLab : les teintes intermédiaires restent vives (pas de gris boueux
+// entre l'orange de l'aube et le bleu du matin).
+const toLinear = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+const fromLinear = (v) => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+function rgbToOklab([r8, g8, b8]) {
+  const [r, g, b] = [r8, g8, b8].map(toLinear);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s];
+}
+function oklabToRgb([L, A, B]) {
+  const l = (L + 0.3963377774 * A + 0.2158037573 * B) ** 3;
+  const m = (L - 0.1055613458 * A - 0.0638541728 * B) ** 3;
+  const s = (L - 0.0894841775 * A - 1.2914855480 * B) ** 3;
+  return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s].map((v) => clamp(fromLinear(v), 0, 255));
+}
 
 // Démo : la journée entière défile en 30 secondes (Paramètres → Couleurs).
 const DEMO_MS = 30000;
@@ -117,11 +138,12 @@ function dayAt(date = colorClock()) {
   const cur = pts[i], next = pts[(i + 1) % pts.length];
   const len = (next.m - cur.m + 1440) % 1440 || 1440;
   const since = (now - cur.m + 1440) % 1440;
-  const blend = Math.min(BLEND_MIN, len / 2);
-  let t = since > len - blend ? (since - (len - blend)) / blend : 0;
-  t = t * t * (3 - 2 * t);
-  const a = hexToRgb(cur.color), b = hexToRgb(next.color);
-  return { color: rgbToHex(a.map((v, j) => v + (b[j] - v) * t)), name: cur.name };
+  // La couleur glisse en continu, minute par minute, d'un moment au suivant :
+  // à l'heure réglée, la couleur du moment est « pure ».
+  const t = (1 - Math.cos(Math.PI * since / len)) / 2;
+  const a = rgbToOklab(hexToRgb(cur.color)), b = rgbToOklab(hexToRgb(next.color));
+  // Le nom affiché est celui du moment le plus proche.
+  return { color: rgbToHex(oklabToRgb(a.map((v, j) => v + (b[j] - v) * t))), name: t < 0.5 ? cur.name : next.name };
 }
 
 /* =========================================================
@@ -1287,4 +1309,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 // Petit accès pour les tests manuels depuis la console du navigateur.
-window.projetfocus = { T, get S() { return S; }, audio, startBreak, breakTimeUp, startFocus, render };
+window.projetfocus = { T, get S() { return S; }, audio, dayAt, startBreak, breakTimeUp, startFocus, render };
