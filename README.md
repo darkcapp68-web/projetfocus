@@ -51,6 +51,8 @@ Il faut seulement Python (déjà installé chez toi).
      le focus (en bas : « focus · 2/4 »).
    - Ouvre Paramètres, change une couleur ou la pulsation : l'effet est immédiat.
    - Choisis « Pluie » dans le menu des bruits : tu dois entendre la pluie.
+   - Lance la musique (bouton ▶ en bas) : « Lofi hors ligne » joue un morceau, le titre
+     s'affiche avec « suivant ». Essaie aussi une radio, par exemple « I♥Chillhop ».
 4. Pour voir la version téléphone sur le PC : touche `F12`, puis l'icône téléphone.
 
 `Ctrl+C` dans le terminal arrête le serveur.
@@ -101,7 +103,7 @@ Une fois publiée, ouvre `https://TON-COMPTE.github.io/projetfocus/` puis :
   → *Installer*.
 - **iPhone ou iPad (Safari)** : bouton Partager → *Sur l'écran d'accueil*.
 
-Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios).
+Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique lofi, voir « Tout garder » dans Paramètres → Son).
 
 Au premier démarrage d'un focus, le navigateur demande l'autorisation d'afficher des
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
@@ -123,12 +125,16 @@ Une série en cours survit à un rechargement de la page.
 Écarts et limites :
 
 - **Radios SomaFM** : SomaFM refuse ses flux quand ils sont lus depuis un autre site
-  (testé : refus depuis `localhost` comme depuis une adresse `github.io`). L'appli ne contourne
-  pas ce blocage : si la radio refuse, un lien « Écouter … sur somafm.com » apparaît sous le
-  lecteur et ouvre leur lecteur officiel dans un onglet. Tes propres liens audio (Paramètres →
-  Son → Mes liens) se lisent, eux, directement dans l'appli. *À décider* : demander
-  l'autorisation à SomaFM, ou choisir d'autres radios qui autorisent la lecture depuis un site.
-- **Morceaux lofi embarqués** : aucun, faute de licence vérifiée (voir [CREDITS.md](CREDITS.md)).
+  (testé depuis `localhost` comme depuis une adresse `github.io`). L'appli ne contourne pas
+  ce blocage : les trois stations SomaFM (marquées ↗) ouvrent leur page dans un onglet.
+  À la place, l'appli lit **I♥Chillhop**, **Lofi (laut.fm)**, **Nightride Chillsynth** et
+  **Radio Paradise Mellow**. Ce sont des radios externes : elles peuvent changer d'adresse,
+  et I♥Chillhop ou laut.fm peuvent glisser un jingle ou une pub.
+- **Morceaux lofi embarqués** : 9 morceaux de HoliznaCC0 (environ 25 min, domaine public,
+  licence vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)). C'est la musique par
+  défaut, en ordre aléatoire. Ils pèsent 56 Mo (MP3 320 kbit/s d'origine) : l'appli ne les
+  télécharge pas d'office. Chaque morceau écouté reste sur l'appareil, et le bouton
+  Paramètres → Son → « Tout garder (56 Mo) » les télécharge tous d'un coup pour le hors ligne.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.
 - **Cadran** : le style minimal (arc blanc fin) remplace le secteur violet / rouge du premier
@@ -158,6 +164,7 @@ Aucun outil à installer : HTML, CSS et JavaScript, sans étape de build.
 | `css/style.css` | le style |
 | `js/app.js` | minuteur, cadran, messages, coach, Paramètres |
 | `js/audio.js` | radio, bruits générés, signaux sonores |
-| `js/defaults.js` | valeurs par défaut, messages, actions du coach, radios |
+| `js/defaults.js` | valeurs par défaut, messages, actions du coach, radios, liste des morceaux |
+| `music/` | les 9 morceaux lofi CC0 (voir CREDITS.md) |
 | `sw.js` | mode hors ligne |
 | `tools/make-icons.mjs` | regénère les icônes : `node tools/make-icons.mjs` |

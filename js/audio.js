@@ -8,6 +8,12 @@ const MIRRORS = ['ice1', 'ice2', 'ice5', 'ice6'];
 
 function whiteSample() { return Math.random() * 2 - 1; }
 
+function shuffled(list) {
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
 // Remplit un canal de `len` échantillons ; `gen` reçoit (tableau, fréquence).
 function makeLoop(ctx, gen, channels = 2) {
   const rate = ctx.sampleRate;
@@ -147,10 +153,16 @@ export class AudioEngine {
     this._fadeTimer = null;
     this.onchange = () => {};
 
-    this.music.addEventListener('playing', () => this._setMusicState('playing'));
+    this.music.addEventListener('playing', () => { this.skips = 0; this._setMusicState('playing'); });
+    this.music.addEventListener('ended', () => this.nextTrack());
+    if ('mediaSession' in navigator) {
+      try { navigator.mediaSession.setActionHandler('nexttrack', () => this.nextTrack()); } catch { /* non géré */ }
+    }
     this.music.addEventListener('waiting', () => this._setMusicState('loading'));
     this.music.addEventListener('error', () => {
       if (!this.music.getAttribute('src')) return;
+      // Morceau absent (hors ligne, pas encore en cache) : on essaie le suivant.
+      if (this.queue && ++this.skips < this.queue.length) { this.nextTrack(); return; }
       // Serveur SomaFM suivant si celui-ci ne répond pas.
       const m = this.music.src.match(/:\/\/(ice\d)\.somafm\.com/);
       const next = m && MIRRORS[MIRRORS.indexOf(m[1]) + 1];
@@ -179,14 +191,34 @@ export class AudioEngine {
     return this.ctx;
   }
 
-  /* ---------- Radio ---------- */
+  /* ---------- Radio et playlist embarquée ---------- */
   playStation(station) {
     this.station = station;
-    this.music.src = station.url;
+    this.queue = null;
+    this.track = null;
+    if (station.kind === 'tracks') {
+      this.queue = shuffled(station.tracks);
+      this.qi = 0;
+      this.skips = 0;
+      this.track = this.queue[0];
+      this.music.src = this.track.file;
+    } else {
+      this.music.src = station.url;
+    }
     this.music.volume = this.musicLevel;
     this._setMusicState('loading');
     // Une erreur de chargement passe par l'événement 'error' (serveurs de secours).
     return this.music.play().catch((e) => { if (e.name === 'NotAllowedError') this._setMusicState('error'); });
+  }
+
+  nextTrack() {
+    if (!this.queue) return;
+    this.qi++;
+    if (this.qi >= this.queue.length) { this.queue = shuffled(this.queue); this.qi = 0; }
+    this.track = this.queue[this.qi];
+    this.music.src = this.track.file;
+    this.music.play().catch(() => {});
+    this.onchange();
   }
 
   stopMusic() {

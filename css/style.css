@@ -221,7 +221,8 @@ footer {
 #btn-music .i-pause, #btn-music.playing .i-play { display: none; }
 #btn-music.playing .i-pause { display: inline; }
 #now-playing { width: 100%; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
-#now-playing a { color: inherit; text-underline-offset: 3px; }
+#now-playing button.link { font-size: inherit; padding: 0 0.3em; text-decoration: underline; text-underline-offset: 3px; }
+#settings small#music-status { margin-right: auto; }
 
 select {
   background: transparent;

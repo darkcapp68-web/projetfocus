@@ -1,10 +1,30 @@
 // Valeurs par défaut, bibliothèque audio et textes de départ.
 // Tout ce qui est ici peut être modifié depuis le panneau « Paramètres ».
 
+// Morceaux embarqués (CC0, voir CREDITS.md) : jouent aussi hors ligne.
+export const TRACKS = [
+  { file: 'music/holiznacc0-2-hour-delay.mp3', title: '2 Hour Delay' },
+  { file: 'music/holiznacc0-winter-blues.mp3', title: 'Winter Blues' },
+  { file: 'music/holiznacc0-first-snow.mp3', title: 'First Snow' },
+  { file: 'music/holiznacc0-snow-drift.mp3', title: 'Snow Drift' },
+  { file: 'music/holiznacc0-fire-place.mp3', title: 'Fire Place' },
+  { file: 'music/holiznacc0-kids.mp3', title: 'Kids' },
+  { file: 'music/holiznacc0-spring-at-last.mp3', title: 'Spring At Last' },
+  { file: 'music/holiznacc0-sense-of-purpose.mp3', title: 'Sense Of Purpose' },
+  { file: 'music/holiznacc0-april-showers.mp3', title: 'April Showers' },
+];
+
+// kind 'tracks' : la playlist embarquée ; 'stream' : radio lue dans l'appli ;
+// 'link' : radio qui refuse d'être lue depuis un autre site, ouverte dans un onglet.
 export const STATIONS = [
-  { id: 'groovesalad', name: 'Groove Salad', desc: 'électro chill', url: 'https://ice1.somafm.com/groovesalad-128-mp3', page: 'https://somafm.com/groovesalad/' },
-  { id: 'deepspaceone', name: 'Deep Space One', desc: 'ambient', url: 'https://ice1.somafm.com/deepspaceone-128-mp3', page: 'https://somafm.com/deepspaceone/' },
-  { id: 'fluid', name: 'Fluid', desc: 'hip-hop instrumental', url: 'https://ice1.somafm.com/fluid-128-mp3', page: 'https://somafm.com/fluid/' },
+  { id: 'lofi', kind: 'tracks', name: 'Lofi hors ligne', desc: 'HoliznaCC0 · domaine public' },
+  { id: 'chillhop', kind: 'stream', name: 'I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { id: 'lautlofi', kind: 'stream', name: 'Lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
+  { id: 'chillsynth', kind: 'stream', name: 'Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
+  { id: 'rpmellow', kind: 'stream', name: 'Radio Paradise Mellow', desc: 'Radio Paradise · mélange doux', url: 'https://stream.radioparadise.com/mellow-128' },
+  { id: 'groovesalad', kind: 'link', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
+  { id: 'deepspaceone', kind: 'link', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
+  { id: 'fluid', kind: 'link', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
 ];
 
 export const NOISES = [
@@ -154,7 +174,7 @@ export const DEFAULTS = {
   musicVolBreak: 10,
   noiseVol: 30,
   duckNoise: true,
-  defaultRadio: 'groovesalad',
+  defaultRadio: 'lofi',
   defaultNoise: 'none',
   autoStartAudio: true,
   customLinks: [], // une ligne par lien : « Nom | https://… »

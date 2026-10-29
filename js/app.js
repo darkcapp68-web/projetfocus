@@ -1,4 +1,4 @@
-import { DEFAULTS, STATIONS, NOISES, CHIMES, MESSAGE_POOLS } from './defaults.js';
+import { DEFAULTS, STATIONS, TRACKS, NOISES, CHIMES, MESSAGE_POOLS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -375,10 +375,11 @@ function allStations() {
     const [name, url] = line.includes('|') ? line.split('|').map((x) => x.trim()) : ['Lien ' + (i + 1), line.trim()];
     return { id: 'perso' + i, name: name || 'Lien ' + (i + 1), url, desc: 'perso' };
   }).filter((s) => /^https?:\/\//i.test(s.url));
-  return [...STATIONS.map((s) => ({ ...s, desc: 'SomaFM · ' + s.desc })), ...own];
+  return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: TRACKS } : s)), ...own];
 }
 
-const isStreamable = (url) => !/youtube\.com|youtu\.be|spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com/i.test(url);
+const isStreamable = (url) => !/youtube\.com|youtu\.be|spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com|somafm\.com\/[a-z]/i.test(url);
+const kindOf = (st) => st.kind || (isStreamable(st.url) ? 'stream' : 'link');
 
 function fillSelect(sel, items, value, none) {
   sel.innerHTML = '';
@@ -402,33 +403,38 @@ function applyAudioLevels(fadeMs = 1500) {
 function playSelectedStation() {
   const st = allStations().find((s) => s.id === selStation.value);
   if (!st) return;
-  if (!isStreamable(st.url)) { window.open(st.url, '_blank', 'noopener'); return; }
-  applyAudioLevels(0);
-  audio.playStation(st);
-  if ('mediaSession' in navigator && window.MediaMetadata) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: st.name, artist: st.desc, album: 'projetfocus' });
+  if (kindOf(st) === 'link') {
+    // SomaFM refuse ses flux lus depuis un autre site : on ouvre son lecteur officiel.
+    window.open(st.url, '_blank', 'noopener');
+    $('#now-playing').textContent = 'Ouvert dans un onglet.';
+    return;
   }
+  applyAudioLevels(0);
+  audio.playStation({ ...st, kind: kindOf(st) });
 }
 
 function renderPlayer() {
   const on = audio.musicOn;
   $('#btn-music').classList.toggle('playing', on);
-  $('#btn-music').setAttribute('aria-label', on ? 'Couper la radio' : 'Lancer la radio');
-  const st = allStations().find((s) => s.id === selStation.value);
+  $('#btn-music').setAttribute('aria-label', on ? 'Couper la musique' : 'Lancer la musique');
+  const st = audio.station;
   const np = $('#now-playing');
-  if (audio.musicState === 'error' && st?.page) {
-    // SomaFM refuse ses flux lus depuis un autre site : on ouvre son lecteur officiel.
-    np.innerHTML = '';
-    const a = document.createElement('a');
-    a.href = st.page;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.textContent = `Écouter ${st.name} sur somafm.com ↗`;
-    np.appendChild(a);
-  } else if (audio.musicState === 'error') np.textContent = 'Radio injoignable (hors ligne ?)';
+  np.innerHTML = '';
+  if (audio.musicState === 'error') np.textContent = st?.kind === 'tracks' ? 'Morceaux indisponibles hors ligne.' : 'Radio injoignable (hors ligne ?)';
   else if (audio.musicState === 'loading') np.textContent = 'Connexion…';
-  else if (on && st) np.textContent = st.desc;
-  else np.textContent = '';
+  else if (on && audio.track) {
+    np.append(`${audio.track.title} · HoliznaCC0 `);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'link';
+    b.textContent = 'suivant';
+    b.addEventListener('click', () => audio.nextTrack());
+    np.appendChild(b);
+  } else if (on && st) np.textContent = st.desc;
+  if (on && 'mediaSession' in navigator && window.MediaMetadata) {
+    const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
+    navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
+  }
 }
 audio.onchange = renderPlayer;
 
@@ -457,11 +463,39 @@ volNoise.addEventListener('input', () => {
   saveSettings(); syncForm();
 });
 
+// Même nom de cache que dans sw.js.
+const MUSIC_CACHE = 'projetfocus-music-v1';
+const trackUrl = (t) => new URL(t.file, location.href).href;
+
+async function musicStatus() {
+  if (!('caches' in window)) return;
+  const cache = await caches.open(MUSIC_CACHE);
+  let n = 0;
+  for (const t of TRACKS) if (await cache.match(trackUrl(t))) n++;
+  $('#music-status').textContent = `${n}/${TRACKS.length} morceaux sur l'appareil`;
+}
+
+$('#btn-cache-music').addEventListener('click', async () => {
+  if (!('caches' in window)) return;
+  const btn = $('#btn-cache-music');
+  btn.disabled = true;
+  const cache = await caches.open(MUSIC_CACHE);
+  try {
+    for (const t of TRACKS) {
+      if (!(await cache.match(trackUrl(t)))) await cache.add(trackUrl(t));
+      await musicStatus();
+    }
+  } catch {
+    $('#music-status').textContent = 'Téléchargement interrompu (connexion ?)';
+  }
+  btn.disabled = false;
+});
+
 function autoStartAudio() {
   if (!S.autoStartAudio) return;
   if (!audio.musicOn && selStation.value && selStation.value !== 'none') {
     const st = allStations().find((s) => s.id === selStation.value);
-    if (st && isStreamable(st.url)) playSelectedStation();
+    if (st && kindOf(st) !== 'link') playSelectedStation();
   }
   if (selNoise.value !== 'none' && audio.noiseId !== selNoise.value) audio.setNoise(selNoise.value);
 }
@@ -686,6 +720,7 @@ let settingsOpen = false;
 function openSettings() {
   settingsOpen = true;
   syncForm();
+  musicStatus();
   sheet.inert = false;
   sheet.classList.add('open');
   body.classList.add('ui');
