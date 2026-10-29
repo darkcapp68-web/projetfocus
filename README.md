@@ -66,8 +66,8 @@ Il faut seulement Python (déjà installé chez toi).
    - Ouvre Paramètres, change une couleur ou la pulsation : l'effet est immédiat.
    - Essaie les bruits de fond : pluie, orage lointain (un grondement de temps en temps),
      vent, neige, café.
-   - Lance la musique (bouton ▶ en bas) : « Lofi hors ligne » joue un morceau, le titre
-     s'affiche avec « suivant ». Essaie aussi une radio, par exemple « I♥Chillhop ».
+   - Lance la musique (bouton ▶ en bas) : « Playlist lofi » joue un morceau, le titre
+     s'affiche avec « suivant ». Essaie aussi une radio, par exemple « Radio I♥Chillhop ».
 4. Pour voir la version téléphone sur le PC : touche `F12`, puis l'icône téléphone.
 
 `Ctrl+C` dans le terminal arrête le serveur.
@@ -147,8 +147,8 @@ Une série en cours survit à un rechargement de la page.
   **Radio Paradise Mellow**. Ce sont des radios externes : elles peuvent changer d'adresse,
   et I♥Chillhop ou laut.fm peuvent glisser un jingle ou une pub.
 - **Bibliothèque embarquée** : deux playlists de HoliznaCC0, dans le domaine public (licence
-  vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Lofi » (9 morceaux, 56 Mo,
-  la musique par défaut) et « Ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
+  vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Playlist lofi » (9 morceaux, 56 Mo,
+  la musique par défaut) et « Playlist ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
   Ce sont les MP3 d'origine (320 kbit/s), donc lourds : l'appli ne les télécharge pas d'office.
   Chaque morceau écouté reste sur l'appareil ; Paramètres → Musiques → Bibliothèque hors ligne permet de
   télécharger ou de retirer une playlist entière.

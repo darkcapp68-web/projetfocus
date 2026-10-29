@@ -5,7 +5,7 @@
 // Les morceaux se gardent sur l'appareil à l'écoute, ou d'un coup (Paramètres → Bibliothèque).
 export const PLAYLISTS = {
   lofi: {
-    name: 'Lofi',
+    name: 'Playlist lofi',
     size: 56,
     tracks: [
       { file: 'music/holiznacc0-2-hour-delay.mp3', title: '2 Hour Delay' },
@@ -20,7 +20,7 @@ export const PLAYLISTS = {
     ],
   },
   ambient: {
-    name: 'Ambient électro',
+    name: 'Playlist ambient électro',
     size: 51,
     tracks: [
       { file: 'music/holiznacc0-deja-vu.mp3', title: 'Deja Vu' },
@@ -37,15 +37,15 @@ export const PLAYLISTS = {
 // kind 'tracks' : une playlist embarquée ; 'stream' : radio lue dans l'appli ;
 // 'link' : radio qui refuse d'être lue depuis un autre site, ouverte dans un onglet.
 export const STATIONS = [
-  { id: 'lofi', kind: 'tracks', group: 'Hors ligne', name: 'Lofi', desc: 'HoliznaCC0 · domaine public' },
-  { id: 'ambient', kind: 'tracks', group: 'Hors ligne', name: 'Ambient électro', desc: 'HoliznaCC0 · domaine public' },
-  { id: 'chillhop', kind: 'stream', group: 'Radios chill', name: 'I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
-  { id: 'lautlofi', kind: 'stream', group: 'Radios chill', name: 'Lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
-  { id: 'chillsynth', kind: 'stream', group: 'Radios chill', name: 'Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
+  { id: 'lofi', kind: 'tracks', group: 'Playlists (marchent hors ligne)', name: 'Playlist lofi', desc: 'HoliznaCC0 · domaine public' },
+  { id: 'ambient', kind: 'tracks', group: 'Playlists (marchent hors ligne)', name: 'Playlist ambient électro', desc: 'HoliznaCC0 · domaine public' },
+  { id: 'chillhop', kind: 'stream', group: 'Radios chill', name: 'Radio I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { id: 'lautlofi', kind: 'stream', group: 'Radios chill', name: 'Radio lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
+  { id: 'chillsynth', kind: 'stream', group: 'Radios chill', name: 'Radio Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
   { id: 'rpmellow', kind: 'stream', group: 'Radios chill', name: 'Radio Paradise Mellow', desc: 'Radio Paradise · mélange doux', url: 'https://stream.radioparadise.com/mellow-128' },
-  { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Minimal (laut.fm)', desc: 'laut.fm · minimal techno, microhouse', url: 'https://stream.laut.fm/minimal' },
-  { id: 'sleepingpill', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Ambient Sleeping Pill', desc: 'stereoscenic.com · ambient sans rythme', url: 'https://radio.stereoscenic.com/asp-h' },
-  { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Ambient Radio (laut.fm)', desc: 'laut.fm · ambient, chillout', url: 'https://stream.laut.fm/ambient' },
+  { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio minimal (laut.fm)', desc: 'laut.fm · minimal techno, microhouse', url: 'https://stream.laut.fm/minimal' },
+  { id: 'sleepingpill', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Ambient Sleeping Pill', desc: 'stereoscenic.com · ambient sans rythme', url: 'https://radio.stereoscenic.com/asp-h' },
+  { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio ambient (laut.fm)', desc: 'laut.fm · ambient, chillout', url: 'https://stream.laut.fm/ambient' },
   { id: 'groovesalad', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
   { id: 'deepspaceone', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
   { id: 'fluid', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },

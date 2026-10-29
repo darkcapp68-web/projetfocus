@@ -231,7 +231,7 @@ select {
   border: 0;
   border-bottom: 1px solid var(--line);
   padding: 0.25em 0.2em;
-  max-width: 11em;
+  max-width: 15em;
   cursor: pointer;
 }
 select option, select optgroup { background: #16162a; color: #fff; }
