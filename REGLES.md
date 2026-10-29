@@ -184,3 +184,4 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `music/` | 16 MP3 CC0 (voir `CREDITS.md`) |
 | `android/` | projet Android Studio de l'APK (voir `android/README.md`) |
 | `tools/make-icons.mjs` | icônes du site et de l'APK |
+| `tools/qrcode.py` | QR code de n'importe quel texte ou adresse : `python tools/qrcode.py "texte" [fichier.png\|.svg]` (segno installé tout seul dans `tools/.pylib`, ignoré par git) |
