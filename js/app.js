@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h41';
+const APP_VERSION = '29/10/2026 · 19h47';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -423,20 +423,27 @@ function rhythmFrame(t) {
   }
   const form = S.rhythmForm;
   if (form === 'barres') {
-    ctx.globalAlpha = 0.6;
-    ctx.lineWidth = 2.2 * u;
+    // Néon : halo coloré (deux couches larges et transparentes) puis cœur fin presque blanc ;
+    // la teinte suit la fréquence (basses magenta → aigus cyan). Pas de flou : reste fluide.
     const N = 64;
+    ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < N / 2; i++) {
       const v = level(Math.floor(2 * Math.pow(100, i / (N / 2))));
       const len = (1 + v * v * 18) * u;
+      const hue = 300 - (i / (N / 2)) * 120;
       for (const s of [1, -1]) {
         const a = s * ((i + 0.5) / N) * 2 * Math.PI;
-        ctx.beginPath();
-        ctx.moveTo(C + (R + 8 * u) * Math.sin(a), C - (R + 8 * u) * Math.cos(a));
-        ctx.lineTo(C + (R + 8 * u + len) * Math.sin(a), C - (R + 8 * u + len) * Math.cos(a));
-        ctx.stroke();
+        const x0 = C + (R + 8 * u) * Math.sin(a), y0 = C - (R + 8 * u) * Math.cos(a);
+        const x1 = C + (R + 8 * u + len) * Math.sin(a), y1 = C - (R + 8 * u + len) * Math.cos(a);
+        for (const [lw, al, light] of [[7, 0.12 + v * 0.1, 60], [3.6, 0.3 + v * 0.2, 65], [1.3, 0.95, 88]]) {
+          ctx.strokeStyle = `hsl(${hue} 100% ${light}%)`;
+          ctx.globalAlpha = al;
+          ctx.lineWidth = lw * u;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        }
       }
     }
+    ctx.globalCompositeOperation = 'source-over';
   } else if (form === 'onde') {
     an.getFloatTimeDomainData(rhythm.wave);
     let amp = 0;

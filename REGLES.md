@@ -50,7 +50,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   il bat sur les temps forts (léger grossissement et lueur), le **BPM** s'affiche sous le
   temps (« focus · 124 BPM », estimé en ~10 s, fiable sur l'électro, absent sur le classique
   sans battement), et une forme au choix (Paramètres → Couleurs → Forme du mode Rythme) :
-  barres, onde, **goutte** (par défaut), sonar ou étincelles. L'analyse (`audio.analyser`,
+  barres (néon : cœur clair et halo, de magenta pour les basses à cyan pour les aigus),
+  onde, **goutte** (par défaut), sonar ou étincelles. L'analyse (`audio.analyser`,
   `enableAnalysis()` dans `js/audio.js`) fait passer la musique par le moteur audio, en mode
   CORS (toutes les radios du menu l'acceptent ; testé) ; elle ne s'active qu'en mode Rythme,
   puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à
