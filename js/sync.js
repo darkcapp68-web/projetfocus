@@ -1,7 +1,6 @@
-// Synchronisation des Paramètres avec Google Drive.
-// Un fichier visible « projetfocus-parametres.json » dans ton Drive : à l'ouverture on le lit,
-// à chaque changement on le réécrit ; la version la plus récente (updatedAt) gagne, sauf à la
-// première connexion d'un appareil, où le Drive gagne toujours.
+// Sauvegarde des Paramètres sur Google Drive, à la main : « Sauvegarder » envoie les réglages
+// de cet appareil dans un fichier visible « projetfocus-parametres.json » ; « Reprendre » les
+// ramène sur un autre appareil. Rien d'automatique : jamais de conflit entre appareils.
 // L'accès (portée drive.file) se limite aux fichiers créés par l'appli.
 
 const FILE_NAME = 'projetfocus-parametres.json';
@@ -9,16 +8,12 @@ const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const LS_SYNC = 'projetfocus.sync';
 const API = 'https://www.googleapis.com/drive/v3/files';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files';
-const PUSH_DELAY = 3000;
-
-const hhmm = () => new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
 export function createSync({ getSettings, applyRemote, onStatus }) {
   let state = (() => { try { return JSON.parse(localStorage.getItem(LS_SYNC)) || {}; } catch { return {}; } })();
   let token = null, tokenExp = 0, client = null, clientFor = '';
   let onToken = null, onTokenError = null;
-  let pushTimer = 0, pending = false, busy = false;
-  let autoAsked = false; // une seule fenêtre Google ouverte d'office tant qu'elle n'aboutit pas
+  let busy = false;
 
   const save = () => { try { localStorage.setItem(LS_SYNC, JSON.stringify(state)); } catch { /* rien */ } };
   const status = (text, kind = '') => onStatus({ text, kind, connected: !!state.connected });
@@ -108,7 +103,7 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
       return;
     }
     const b = 'projetfocus' + Math.random().toString(36).slice(2);
-    const meta = { name: FILE_NAME, mimeType: 'application/json', description: 'Paramètres de projetfocus, synchronisés automatiquement.' };
+    const meta = { name: FILE_NAME, mimeType: 'application/json', description: 'Paramètres de projetfocus (Sauvegarder / Reprendre dans l’appli).' };
     const multipart = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n` +
       `--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
     const r = await drive(`${UPLOAD}?uploadType=multipart&fields=id`, {
@@ -118,67 +113,60 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
     save();
   }
 
-  // Compare les deux versions : la plus récente remplace l'autre.
-  async function syncNow() {
-    if (busy) { pending = true; return; }
+  const when = (ms) => new Date(ms).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(' ', ' à ');
+
+  // Les deux boutons partent d'un clic : la fenêtre Google peut s'ouvrir si besoin
+  // (la première fois pour l'accord, ensuite elle se referme seule).
+  async function run(label, job) {
+    if (busy) return;
     busy = true;
-    pending = false;
     try {
-      status('Synchronisation…');
+      status(label);
+      await getToken(!state.connected);
+      state.connected = true;
       state.fileId = await findFile();
       save();
-      const local = getSettings();
-      if (state.fileId) {
-        const remote = await (await drive(`${API}/${state.fileId}?alt=media`)).json();
-        const r = Number(remote.updatedAt) || 0, l = Number(local.updatedAt) || 0;
-        // Première synchronisation de cet appareil : le Drive gagne toujours (sinon un
-        // appareil neuf, juste touché, écraserait les réglages de tous les autres).
-        if (!state.lastSync || r > l) applyRemote(remote);
-        else if (r < l) await writeFile(local);
-      } else {
-        await writeFile(local);
-      }
-      state.lastSync = Date.now();
-      save();
-      status(`Synchronisé à ${hhmm()} · fichier « ${FILE_NAME} » dans ton Drive`, 'ok');
+      await job();
     } catch (e) {
-      pending = true;
-      status(tokenOk()
-        ? `Pas de synchronisation (${e.message}) : nouvel essai plus tard.`
-        : 'Connexion à renouveler : clique « Synchroniser maintenant ».', 'warn');
+      status(e.message === 'sans identifiant'
+        ? 'Ajoute d’abord l’ID client Google (voir le README).'
+        : `Google Drive indisponible (${e.message}).`, 'warn');
     } finally {
       busy = false;
     }
-    if (pending && tokenOk()) setTimeout(syncNow, PUSH_DELAY);
   }
 
-  async function withToken(firstTime) {
-    try {
-      await getToken(firstTime);
-    } catch (e) {
-      pending = true;
-      status(e.message === 'sans identifiant'
-        ? 'Ajoute d’abord l’ID client Google (voir le README).'
-        : `Synchronisation en pause (${e.message}) : clique « Synchroniser maintenant » quand tu veux.`, 'warn');
-      return;
-    }
-    autoAsked = false; // connexion rétablie : à la prochaine expiration, on pourra redemander une fois
-    await syncNow();
+  function showLast() {
+    const l = state.last;
+    if (!l) status(state.connected ? 'Connecté à Google Drive.' : 'Pas encore de sauvegarde depuis cet appareil.');
+    else status(`${l.kind === 'save' ? 'Sauvegardé sur le Drive' : 'Repris du Drive'} le ${when(l.at)}.`, 'ok');
   }
 
   return {
     get connected() { return !!state.connected; },
 
-    start() {
-      if (!state.connected) { status('Non connecté.'); return; }
-      pending = true;
-      status('Connecté · la synchronisation se fait au premier toucher.');
+    start: showLast,
+
+    // Envoie les réglages de cet appareil sur le Drive (ils remplacent la sauvegarde).
+    save() {
+      return run('Sauvegarde…', async () => {
+        await writeFile({ ...getSettings(), savedAt: Date.now() });
+        state.last = { kind: 'save', at: Date.now() };
+        save();
+        showLast();
+      });
     },
 
-    connect() {
-      state.connected = true;
-      save();
-      withToken(true);
+    // Reprend la dernière sauvegarde du Drive sur cet appareil.
+    load() {
+      return run('Récupération…', async () => {
+        if (!state.fileId) { status('Aucune sauvegarde sur le Drive : sauvegarde d’abord depuis ton appareil de référence.', 'warn'); return; }
+        const remote = await (await drive(`${API}/${state.fileId}?alt=media`)).json();
+        applyRemote(remote);
+        state.last = { kind: 'load', at: Date.now() };
+        save();
+        status(`Repris du Drive (sauvegarde du ${when(Number(remote.savedAt || remote.updatedAt) || Date.now())}).`, 'ok');
+      });
     },
 
     disconnect() {
@@ -186,33 +174,7 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
       token = null;
       state = {};
       save();
-      status('Non connecté. Le fichier reste dans ton Drive.');
-    },
-
-    syncNow() {
-      if (!state.connected) return;
-      if (tokenOk()) syncNow(); else withToken(false);
-    },
-
-    // Un paramètre a changé : on l'envoie quelques secondes après le dernier réglage.
-    changed() {
-      if (!state.connected) return;
-      pending = true;
-      clearTimeout(pushTimer);
-      pushTimer = setTimeout(() => {
-        if (tokenOk()) syncNow();
-        else status('Changement à envoyer : clique « Synchroniser maintenant » pour renouveler la connexion.', 'warn');
-      }, PUSH_DELAY);
-    },
-
-    // Premier toucher, page revenue au premier plan, retour du réseau.
-    gesture() {
-      // Une seule demande d'office ; si la fenêtre est fermée, on ne harcèle pas :
-      // la suite se fera par « Synchroniser maintenant » (ou à la prochaine ouverture).
-      if (state.connected && pending && !tokenOk() && !autoAsked) { autoAsked = true; withToken(false); }
-    },
-    wake() {
-      if (state.connected && tokenOk()) syncNow(); // récupère ce qui a changé sur un autre appareil
+      status('Déconnecté. La sauvegarde reste dans ton Drive.');
     },
   };
 }

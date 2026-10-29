@@ -132,19 +132,17 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
   enregistrés (version actuelle : 8).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
-- **Synchronisation Google Drive** : fichier visible `projetfocus-parametres.json` dans
-  « Mon Drive » (portée `drive.file`), lu au premier toucher et au retour sur l'appli,
-  réécrit 3 s après chaque changement, la plus récente version gagne (`updatedAt`), **sauf à
-  la première connexion d'un appareil : le Drive gagne toujours** (sinon un appareil neuf,
-  juste touché, écrase les réglages des autres). Avant chaque récupération, les réglages de
-  l'appareil sont gardés (`projetfocus.settings.avant-drive`) : bouton « Remettre mes réglages
-  d'avant » dans Sauvegarde.
-  Connexion Google expirée (environ 1 h) : **une seule** fenêtre Google ouverte d'office (au
-  premier toucher) ; si elle est fermée, plus de demande automatique, la synchronisation
-  attend « Synchroniser maintenant » ou la prochaine ouverture. ID client
+- **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
+  des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans
+  Sauvegarde. « **Sauvegarder mes paramètres** » écrit ceux de l'appareil dans le fichier
+  visible `projetfocus-parametres.json` de « Mon Drive » (portée `drive.file`, champ
+  `savedAt`) ; « **Reprendre mes paramètres** » (avec confirmation) les ramène sur l'appareil.
+  **Rien d'automatique** : aucune lecture ni écriture du Drive sans clic, jamais de fenêtre
+  Google d'office. Avant chaque reprise, les réglages de l'appareil sont gardés
+  (`projetfocus.settings.avant-drive`) : « Remettre mes réglages d'avant ». ID client
   Google dans `js/defaults.js` (projet Google Cloud `projetfocus`, client **Application Web**,
   origines `http://localhost:8417` et `https://darkcapp68-web.github.io`, en test). Le code
-  secret du client n'est **jamais** utilisé ni écrit dans le dépôt. Non synchronisés : musique hors ligne, phase en cours.
+  secret du client n'est **jamais** utilisé ni écrit dans le dépôt. Non sauvegardés : musique hors ligne, phase en cours.
 - Les réglages sont propres à chaque navigateur **et à chaque adresse** (localhost,
   127.0.0.1, github.io sont des mémoires séparées).
 
@@ -192,7 +190,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `css/style.css` | style |
 | `js/app.js` | minuteur, cadran, couleurs, respiration, messages, coach, lecteur, Paramètres, migrations |
 | `js/audio.js` | radio / playlists, musique de pause générée, bruits générés, dings, tic-tac |
-| `js/sync.js` | synchronisation Google Drive |
+| `js/sync.js` | sauvegarde / reprise sur Google Drive (à la main) |
 | `js/defaults.js` | valeurs par défaut, radios, playlists, respirations, messages |
 | `sw.js` | hors ligne |
 | `music/` | 16 MP3 CC0 (voir `CREDITS.md`) |

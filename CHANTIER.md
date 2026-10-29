@@ -42,9 +42,9 @@ par Google Drive.
 
 1. **Publication** : fait. Site en ligne sur https://darkcapp68-web.github.io/projetfocus/
    (dépôt `darkcapp68-web/projetfocus`, GitHub Pages sur `main` / root).
-2. **Synchronisation Google** : fait. ID client dans le code, testé avec le vrai Google sur
-   `localhost:8417` (fichier `projetfocus-parametres.json` créé dans le Drive). À faire une fois
-   sur chaque appareil : Paramètres → Sauvegarde → Se connecter à Google Drive.
+2. **Sauvegarde Google Drive** : à la main (« Sauvegarder » / « Reprendre mes paramètres »),
+   la synchronisation automatique a été abandonnée (conflits PC / téléphone). À essayer :
+   sauvegarder depuis le PC, reprendre sur le téléphone.
 3. **APK** (après la publication) :
    - fait : l'adresse du site est réglée sur `darkcapp68-web.github.io` ;
    - créer la **clé de signature** dans Android Studio et la garder hors du dépôt ;

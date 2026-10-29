@@ -202,12 +202,13 @@
 
     <details class="sec">
       <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
-      <p class="note">Synchronise tes réglages entre tous tes appareils via un fichier « projetfocus-parametres.json » dans ton Google Drive.</p>
+      <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus-parametres.json ») ; « Reprendre » les ramène sur un autre appareil.</p>
       <label class="block">ID client Google <small>à créer une fois : voir le README, « Synchroniser avec Google Drive »</small><input type="text" data-k="syncClientId" placeholder="123456-abc.apps.googleusercontent.com" spellcheck="false" autocomplete="off"></label>
       <div class="buttons">
-        <button type="button" id="btn-sync">Se connecter à Google Drive</button>
-        <button type="button" id="btn-sync-now" class="link" hidden>Synchroniser maintenant</button>
+        <button type="button" id="btn-sync-save">Sauvegarder mes paramètres</button>
+        <button type="button" id="btn-sync-load">Reprendre mes paramètres</button>
         <button type="button" id="btn-undo-sync" class="link" hidden>Remettre mes réglages d’avant</button>
+        <button type="button" id="btn-sync-out" class="link" hidden>Se déconnecter de Google</button>
       </div>
       <p id="sync-status" class="note" aria-live="polite"></p>
       <div class="buttons">

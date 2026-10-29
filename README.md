@@ -145,18 +145,19 @@ Au premier démarrage d'un focus, le navigateur demande l'autorisation d'affiche
 [android/README.md](android/README.md).
 ---
 
-## Synchroniser avec Google Drive (mêmes réglages partout)
+## Sauvegarder ses paramètres sur Google Drive (mêmes réglages partout)
 
 Chaque navigateur, chaque appareil et chaque adresse (`localhost`, `github.io`…) garde ses
-propres réglages. Pour les avoir partout, l'appli peut les enregistrer dans un fichier
-**« projetfocus-parametres.json »** de ton Google Drive (visible dans « Mon Drive »).
+propres réglages. Pour les retrouver ailleurs, deux boutons dans Paramètres → Sauvegarde :
 
-- À l'ouverture de l'appli (premier toucher), elle lit ce fichier ; à chaque réglage changé,
-  elle le réécrit quelques secondes après. Si deux appareils ont changé quelque chose,
-  **la version la plus récente gagne**.
-- L'appli n'a accès qu'aux fichiers qu'elle a créés elle-même dans ton Drive, rien d'autre.
-- Ne sont pas synchronisés : la musique gardée hors ligne et la phase en cours (chaque
-  appareil a son propre minuteur).
+- **Sauvegarder mes paramètres** : envoie les réglages de cet appareil dans un fichier
+  **« projetfocus-parametres.json »** de ton Google Drive (visible dans « Mon Drive »).
+- **Reprendre mes paramètres** : ramène sur cet appareil la dernière sauvegarde.
+  En cas d'erreur, « Remettre mes réglages d'avant » annule la reprise.
+
+Rien ne se fait tout seul : c'est toi qui choisis quand sauvegarder et quand reprendre, donc
+jamais de conflit entre appareils. L'appli n'a accès qu'aux fichiers qu'elle a créés
+elle-même dans ton Drive, rien d'autre. La musique gardée hors ligne n'est pas sauvegardée.
 
 ### Une seule fois : créer l'identifiant de l'appli chez Google (environ 10 minutes)
 
@@ -183,23 +184,16 @@ propriétaire, donc toi. C'est gratuit.
    - **Créer**, puis copie l'**ID client** (il se termine par `.apps.googleusercontent.com`).
      Cet identifiant n'est pas un secret.
 
-### Sur chaque appareil
+### À l'usage
 
-1. Paramètres → **Sauvegarde** → colle l'ID client → **Se connecter à Google Drive**.
-2. Choisis ton compte. Google affiche « Google n'a pas validé cette application » (normal,
-   c'est ton appli en test) → **Continuer** → coche l'accès aux fichiers → **Continuer**.
-3. La ligne d'état indique « Synchronisé à … ».
+1. Sur l'appareil où tes réglages sont bons : Paramètres → **Sauvegarde** → **Sauvegarder mes
+   paramètres**. La première fois, choisis ton compte ; Google affiche « Google n'a pas validé
+   cette application » (normal, c'est ton appli en test) → **Continuer** → coche l'accès aux
+   fichiers → **Continuer**.
+2. Sur un autre appareil : **Reprendre mes paramètres**.
 
-L'ID client du projet `projetfocus` est déjà dans le code (`js/defaults.js`) : il n'y a rien
-à coller, seulement « Se connecter à Google Drive ».
-
-Bon à savoir :
-- Google renouvelle la connexion environ toutes les heures : au premier toucher, une petite
-  fenêtre Google peut s'ouvrir et se refermer toute seule.
-- Tant que l'appli est « en test », Google peut redemander ton accord de temps en temps
-  (environ une fois par semaine).
-- Sans Internet, l'appli marche normalement et synchronise au retour de la connexion.
-- « Se déconnecter » arrête la synchronisation ; le fichier reste dans ton Drive.
+L'ID client du projet `projetfocus` est déjà dans le code (`js/defaults.js`) : rien à coller.
+Tant que l'appli est « en test », Google peut redemander ton accord de temps en temps.
 
 ---
 
@@ -274,7 +268,7 @@ Aucun outil à installer : HTML, CSS et JavaScript, sans étape de build.
 | `css/style.css` | le style |
 | `js/app.js` | minuteur, cadran, messages, coach, Paramètres |
 | `js/audio.js` | radio, bruits générés, signaux sonores |
-| `js/sync.js` | synchronisation des Paramètres avec Google Drive |
+| `js/sync.js` | sauvegarde / reprise des Paramètres sur Google Drive |
 | `js/defaults.js` | valeurs par défaut, messages, actions du coach, radios, liste des morceaux |
 | `music/` | les 9 morceaux lofi CC0 (voir CREDITS.md) |
 | `sw.js` | mode hors ligne |

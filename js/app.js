@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 16h40';
+const APP_VERSION = '29/10/2026 · 17h00';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -71,11 +71,10 @@ function loadSettings() {
   catch { return clone(DEFAULTS); }
 }
 
-// `touch` : un vrai changement (date notée, et envoi vers Google Drive si connecté).
+// `touch` : un vrai changement (date notée).
 function saveSettings(touch = true) {
   if (touch) S.updatedAt = Date.now();
   try { localStorage.setItem(LS_SETTINGS, JSON.stringify(S)); } catch { /* stockage indisponible */ }
-  if (touch) sync?.changed();
 }
 
 let S = loadSettings();
@@ -973,7 +972,6 @@ window.addEventListener('pointermove', (e) => {
 });
 window.addEventListener('pointerdown', (e) => {
   poke();
-  sync.gesture();
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
 }, true);
 window.addEventListener('keydown', (e) => {
@@ -1176,30 +1174,33 @@ function note(text) { $('#save-note').textContent = text; }
 
 var sync = createSync({
   getSettings: () => S,
-  // Paramètres plus récents trouvés sur le Drive : on les applique ici.
+  // « Reprendre » : les paramètres du Drive remplacent ceux de cet appareil (copie gardée).
   applyRemote: (remote) => {
     try { localStorage.setItem(LS_BEFORE_SYNC, JSON.stringify(S)); } catch { /* stockage indisponible */ }
     if (undoBtn) undoBtn.hidden = false;
+    const keepId = S.syncClientId;
+    delete remote.savedAt;
     S = sanitize(merge(DEFAULTS, remote));
-    saveSettings(false);
+    S.syncClientId ||= keepId;
+    saveSettings();
     buildForm(); syncForm(); applySettings();
-    note('Paramètres récupérés depuis Google Drive.');
+    note('Paramètres repris depuis Google Drive.');
   },
   onStatus: ({ text, kind, connected }) => {
     $('#sync-status').textContent = text;
     $('#sync-status').dataset.kind = kind;
-    $('#btn-sync').textContent = connected ? 'Se déconnecter' : 'Se connecter à Google Drive';
-    $('#btn-sync-now').hidden = !connected;
+    const out = $('#btn-sync-out');
+    if (out) out.hidden = !connected;
   },
 });
 
-$('#btn-sync').addEventListener('click', () => {
-  if (sync.connected) sync.disconnect(); else sync.connect();
+$('#btn-sync-save')?.addEventListener('click', () => sync.save());
+$('#btn-sync-load')?.addEventListener('click', () => {
+  if (confirm('Reprendre les paramètres sauvegardés sur Google Drive ? Ceux de cet appareil seront remplacés (tu pourras revenir en arrière).')) sync.load();
 });
-$('#btn-sync-now').addEventListener('click', () => sync.syncNow());
+$('#btn-sync-out')?.addEventListener('click', () => sync.disconnect());
 
-// Revenir aux réglages de cet appareil d'avant la dernière récupération depuis le Drive ;
-// ils deviennent les plus récents et repartent vers le Drive.
+// Revenir aux réglages de cet appareil d'avant la dernière reprise depuis le Drive.
 // (Absent d'une ancienne page encore en cache : on s'en passe.)
 const undoBtn = $('#btn-undo-sync');
 if (undoBtn) undoBtn.hidden = !localStorage.getItem(LS_BEFORE_SYNC);
@@ -1207,14 +1208,14 @@ undoBtn?.addEventListener('click', () => {
   let before;
   try { before = JSON.parse(localStorage.getItem(LS_BEFORE_SYNC)); } catch { /* copie illisible */ }
   if (!before) return;
-  if (!confirm('Remettre les réglages de cet appareil d’avant la dernière récupération depuis Google Drive ? Ils seront renvoyés vers le Drive.')) return;
+  if (!confirm('Remettre les réglages de cet appareil d’avant la dernière reprise depuis Google Drive ?')) return;
   const keepId = S.syncClientId;
   S = sanitize(merge(DEFAULTS, before));
   S.syncClientId ||= keepId;
   localStorage.removeItem(LS_BEFORE_SYNC);
   undoBtn.hidden = true;
   saveSettings(); buildForm(); syncForm(); applySettings();
-  note('Réglages d’avant remis ; ils partent vers Google Drive.');
+  note('Réglages d’avant remis sur cet appareil.');
 });
 
 // Version de l'appli, et mise à jour forcée : on vide le cache du site (la musique gardée
@@ -1238,7 +1239,6 @@ $('#btn-update')?.addEventListener('click', async () => {
 $('#btn-day-demo').addEventListener('click', startDayDemo);
 // Un toucher pendant la démo l'arrête (sauf dans la première demi-seconde).
 window.addEventListener('pointerdown', () => { if (demo && performance.now() - demo.t0 > 500) stopDayDemo(); });
-window.addEventListener('online', () => sync.wake());
 
 /* =========================================================
    Affichage
@@ -1371,7 +1371,6 @@ function tick() {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    sync.wake();
     tick();
     if (T.phase === 'focus' || T.phase === 'break') keepAwake(true);
   }
