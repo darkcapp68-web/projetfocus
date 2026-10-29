@@ -215,3 +215,4 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `android/` | projet Android Studio de l'APK (voir `android/README.md`) |
 | `tools/make-icons.mjs` | icônes du site et de l'APK |
 | `tools/qrcode.py` | QR code de n'importe quel texte ou adresse : `python tools/qrcode.py "texte" [fichier.png\|.svg]` (segno installé tout seul dans `tools/.pylib`, ignoré par git) |
+| `tools/detourer-damier.py` | retire le faux fond en damier qu'une IA dessine parfois à la place de la transparence : `python tools/detourer-damier.py image [sortie.webp]` (garde les lueurs en semi-transparence) |
