@@ -38,6 +38,11 @@ function sanitize(s) {
   if (s.version < 2) { s.autoChain = true; s.version = 2; }
   // Version 3 : musique douce en pause, un peu plus audible que l'ancien 10 %.
   if (s.version < 3) { if (s.musicVolBreak === 10) s.musicVolBreak = 25; s.version = 3; }
+  // Version 4 : les radios laut.fm (avec pub) sont décochées.
+  if (s.version < 4) {
+    for (const id of ['lautlofi', 'lautminimal', 'lautambient']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
+    s.version = 4;
+  }
   return s;
 }
 

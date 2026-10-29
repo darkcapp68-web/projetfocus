@@ -40,12 +40,12 @@ export const STATIONS = [
   { id: 'lofi', kind: 'tracks', group: 'Playlists (marchent hors ligne)', name: 'Playlist lofi', desc: 'HoliznaCC0 · domaine public' },
   { id: 'ambient', kind: 'tracks', group: 'Playlists (marchent hors ligne)', name: 'Playlist ambient électro', desc: 'HoliznaCC0 · domaine public' },
   { id: 'chillhop', kind: 'stream', group: 'Radios chill', name: 'Radio I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
-  { id: 'lautlofi', kind: 'stream', group: 'Radios chill', name: 'Radio lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
+  { id: 'lautlofi', kind: 'stream', group: 'Radios chill', name: 'Radio lofi (laut.fm, avec pub)', desc: 'laut.fm · lofi · avec publicité', url: 'https://stream.laut.fm/lofi' },
   { id: 'chillsynth', kind: 'stream', group: 'Radios chill', name: 'Radio Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
   { id: 'rpmellow', kind: 'stream', group: 'Radios chill', name: 'Radio Paradise Mellow', desc: 'Radio Paradise · mélange doux', url: 'https://stream.radioparadise.com/mellow-128' },
-  { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio minimal (laut.fm)', desc: 'laut.fm · minimal techno, microhouse', url: 'https://stream.laut.fm/minimal' },
+  { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio minimal (laut.fm, avec pub)', desc: 'laut.fm · minimal techno, microhouse · avec publicité', url: 'https://stream.laut.fm/minimal' },
   { id: 'sleepingpill', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Ambient Sleeping Pill', desc: 'stereoscenic.com · ambient sans rythme', url: 'https://radio.stereoscenic.com/asp-h' },
-  { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio ambient (laut.fm)', desc: 'laut.fm · ambient, chillout', url: 'https://stream.laut.fm/ambient' },
+  { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio ambient (laut.fm, avec pub)', desc: 'laut.fm · ambient, chillout · avec publicité', url: 'https://stream.laut.fm/ambient' },
   { id: 'groovesalad', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
   { id: 'deepspaceone', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
   { id: 'fluid', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
@@ -93,7 +93,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 3,
+  version: 4,
 
   // Temps
   focusMin: 25,
@@ -222,7 +222,9 @@ export const DEFAULTS = {
   defaultNoise: 'none',
   autoStartAudio: true,
   customLinks: [], // une ligne par lien : « Nom | https://… »
-  hiddenStations: [], // musiques décochées dans Paramètres : absentes du menu du lecteur
+  // Musiques décochées dans Paramètres : absentes du menu du lecteur.
+  // Les radios laut.fm passent de la publicité : décochées au départ.
+  hiddenStations: ['lautlofi', 'lautminimal', 'lautambient'],
 
   // Affichage
   timeFormat: 'mmss', // 'mmss' | 'min'

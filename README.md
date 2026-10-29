@@ -150,7 +150,9 @@ Une série en cours survit à un rechargement de la page.
   ce blocage : les trois stations SomaFM (marquées ↗) ouvrent leur page dans un onglet.
   À la place, l'appli lit **I♥Chillhop**, **Lofi (laut.fm)**, **Nightride Chillsynth** et
   **Radio Paradise Mellow**. Ce sont des radios externes : elles peuvent changer d'adresse,
-  et I♥Chillhop ou laut.fm peuvent glisser un jingle ou une pub.
+  et I♥Chillhop peut glisser un jingle. **laut.fm passe de la publicité** : ses trois radios
+  (lofi, minimal, ambient) sont décochées au départ ; Paramètres → Musiques → Musiques du menu
+  permet de les réactiver.
 - **Bibliothèque embarquée** : deux playlists de HoliznaCC0, dans le domaine public (licence
   vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Playlist lofi » (9 morceaux, 56 Mo,
   la musique par défaut) et « Playlist ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
