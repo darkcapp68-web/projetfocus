@@ -120,8 +120,6 @@ body.adjusting #arc, body.adjusting #knob { transition: none; }
 #liquid, #solar { display: none; }
 body.scene-liquid #liquid, body.scene-solar #solar { display: inline; }
 body.scene-liquid #arc, body.scene-liquid #knob, body.scene-solar #arc, body.scene-solar #knob { display: none; }
-body.scene-liquid #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
-body.scene-solar #dial .track { fill: rgba(0, 0, 0, 0.14); stroke-width: 1; stroke: rgba(255, 255, 255, 0.12); }
 body.dial-reveur.phase-focus #time, body.dial-reveur.phase-break #time,
 body.dial-reveur.phase-focus #sub, body.dial-reveur.phase-break #sub { visibility: hidden; }
 /* La vague prend la couleur inverse du fond (orangé → bleu clair, indigo → jaune pâle…). */
@@ -144,8 +142,8 @@ body.adjusting #liquid-level { transition: none; }
   left: calc(50% - var(--dial-size) * 0.5359);
   top: calc(50% - var(--dial-size) * 0.506);
 }
-body.dial-reveur #dial-frame { display: block; }
-body.dial-reveur #dial .track { fill: url(#orb-veil); stroke: none; }
+body.scene-solar #dial-frame, body.scene-liquid #dial-frame { display: block; }
+body.scene-solar #dial .track, body.scene-liquid #dial .track { fill: url(#orb-veil); stroke: none; }
 #comet-head { fill: #fff; }
 
 /* Graduations : seulement pendant le réglage */

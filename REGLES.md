@@ -43,8 +43,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   tracée, qui change chaque minute** ; une **comète** part du bord et atteint le soleil à la
   fin du focus. Pendant la pause, la **vague** (le cadran se vide comme un verre, couleur
   inverse du fond). En rêveur, ni temps
-  ni nom de phase pendant que le temps passe ; au repos la scène de ce qu'on règle, avec les
-  chiffres. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
+  ni nom de phase pendant que le temps passe ; **au repos, le cadran normal** (arc, point,
+  graduations, chiffres) pour bien voir ce qu'on règle : le cadre et la scène n'apparaissent
+  qu'au démarrage. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le

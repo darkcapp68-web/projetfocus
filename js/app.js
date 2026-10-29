@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 19h18';
+const APP_VERSION = '29/10/2026 · 19h22';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -321,12 +321,13 @@ function drawSolar() {
   requestAnimationFrame(drawSolar);
 }
 
-// Scène du cadran selon le mode et la phase (au repos : celle de ce qu'on règle).
+// Scène du cadran selon le mode et la phase. Au repos, le cadran normal (arc, point,
+// graduations) pour bien voir ce qu'on règle ; la scène et son cadre arrivent au démarrage.
 function setScene() {
   const dream = S.dialStyle === 'reveur' && !demo;
   const p = T.phase;
-  const solar = dream && (p === 'focus' || (p === 'idle' && T.editing !== 'break'));
-  const liquid = dream && (p === 'break' || (p === 'idle' && T.editing === 'break'));
+  const solar = dream && p === 'focus';
+  const liquid = dream && p === 'break';
   body.classList.toggle('scene-solar', solar);
   body.classList.toggle('scene-liquid', liquid);
   if (solar && !solarOn) { solarOn = true; requestAnimationFrame(drawSolar); }
