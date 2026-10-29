@@ -115,7 +115,7 @@ Une fois publiée, ouvre `https://TON-COMPTE.github.io/projetfocus/` puis :
   → *Installer*.
 - **iPhone ou iPad (Safari)** : bouton Partager → *Sur l'écran d'accueil*.
 
-Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique lofi, voir « Tout garder » dans Paramètres → Son).
+Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique embarquée, voir Paramètres → Bibliothèque hors ligne).
 
 Au premier démarrage d'un focus, le navigateur demande l'autorisation d'afficher des
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
@@ -143,11 +143,16 @@ Une série en cours survit à un rechargement de la page.
   À la place, l'appli lit **I♥Chillhop**, **Lofi (laut.fm)**, **Nightride Chillsynth** et
   **Radio Paradise Mellow**. Ce sont des radios externes : elles peuvent changer d'adresse,
   et I♥Chillhop ou laut.fm peuvent glisser un jingle ou une pub.
-- **Morceaux lofi embarqués** : 9 morceaux de HoliznaCC0 (environ 25 min, domaine public,
-  licence vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)). C'est la musique par
-  défaut, en ordre aléatoire. Ils pèsent 56 Mo (MP3 320 kbit/s d'origine) : l'appli ne les
-  télécharge pas d'office. Chaque morceau écouté reste sur l'appareil, et le bouton
-  Paramètres → Son → « Tout garder (56 Mo) » les télécharge tous d'un coup pour le hors ligne.
+- **Bibliothèque embarquée** : deux playlists de HoliznaCC0, dans le domaine public (licence
+  vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Lofi » (9 morceaux, 56 Mo,
+  la musique par défaut) et « Ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
+  Ce sont les MP3 d'origine (320 kbit/s), donc lourds : l'appli ne les télécharge pas d'office.
+  Chaque morceau écouté reste sur l'appareil ; Paramètres → Bibliothèque hors ligne permet de
+  télécharger ou de retirer une playlist entière.
+- **Style « Work with Paul »** (techno, house, ambient, sans paroles) : trois radios de ce
+  style sont ajoutées, testées depuis un autre site : Minimal (laut.fm), Ambient Sleeping
+  Pill et Ambient Radio (laut.fm). La house et la techno vraiment libres de droits sont rares :
+  il n'y en a pas d'embarquées pour l'instant.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.
 - **Cadran** : le style minimal (arc blanc fin) remplace le secteur violet / rouge du premier

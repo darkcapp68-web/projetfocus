@@ -1,4 +1,4 @@
-import { DEFAULTS, STATIONS, TRACKS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
+import { DEFAULTS, STATIONS, PLAYLISTS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -379,9 +379,9 @@ const volMusic = $('#vol-music'), volNoise = $('#vol-noise');
 function allStations() {
   const own = S.customLinks.map((line, i) => {
     const [name, url] = line.includes('|') ? line.split('|').map((x) => x.trim()) : ['Lien ' + (i + 1), line.trim()];
-    return { id: 'perso' + i, name: name || 'Lien ' + (i + 1), url, desc: 'perso' };
+    return { id: 'perso' + i, group: 'Mes liens', name: name || 'Lien ' + (i + 1), url, desc: 'perso' };
   }).filter((s) => /^https?:\/\//i.test(s.url));
-  return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: TRACKS } : s)), ...own];
+  return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: PLAYLISTS[s.id].tracks } : s)), ...own];
 }
 
 const isStreamable = (url) => !/youtube\.com|youtu\.be|spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com|somafm\.com\/[a-z]/i.test(url);
@@ -390,7 +390,14 @@ const kindOf = (st) => st.kind || (isStreamable(st.url) ? 'stream' : 'link');
 function fillSelect(sel, items, value, none) {
   sel.innerHTML = '';
   if (none) sel.add(new Option(none, 'none'));
-  for (const it of items) sel.add(new Option(it.name, it.id));
+  const groups = {};
+  for (const it of items) {
+    let parent = sel;
+    if (it.group) {
+      parent = groups[it.group] ||= sel.appendChild(Object.assign(document.createElement('optgroup'), { label: it.group }));
+    }
+    parent.appendChild(new Option(it.name, it.id));
+  }
   sel.value = [...sel.options].some((o) => o.value === value) ? value : sel.options[0]?.value;
 }
 
@@ -517,28 +524,56 @@ volNoise.addEventListener('input', () => {
 const MUSIC_CACHE = 'projetfocus-music-v1';
 const trackUrl = (t) => new URL(t.file, location.href).href;
 
-async function musicStatus() {
-  if (!('caches' in window)) return;
+// Bibliothèque hors ligne : chaque playlist se télécharge ou se retire d'un coup.
+async function libraryStatus() {
+  const box = $('#library');
+  if (!('caches' in window)) { box.textContent = 'Ce navigateur ne peut pas garder la musique hors ligne.'; return; }
   const cache = await caches.open(MUSIC_CACHE);
-  let n = 0;
-  for (const t of TRACKS) if (await cache.match(trackUrl(t))) n++;
-  $('#music-status').textContent = `${n}/${TRACKS.length} morceaux sur l'appareil`;
+  for (const [id, pl] of Object.entries(PLAYLISTS)) {
+    let n = 0;
+    for (const t of pl.tracks) if (await cache.match(trackUrl(t))) n++;
+    const row = box.querySelector(`[data-pl="${id}"]`);
+    if (!row || row.classList.contains('busy')) continue;
+    row.querySelector('small').textContent = `${n}/${pl.tracks.length} morceaux sur l'appareil · ${pl.size} Mo en tout`;
+    row.querySelector('.dl').hidden = n === pl.tracks.length;
+    row.querySelector('.rm').hidden = n === 0;
+  }
 }
 
-$('#btn-cache-music').addEventListener('click', async () => {
-  if (!('caches' in window)) return;
-  const btn = $('#btn-cache-music');
-  btn.disabled = true;
+function buildLibrary() {
+  $('#library').innerHTML = Object.entries(PLAYLISTS).map(([id, pl]) => `
+    <div class="lib-row" data-pl="${id}">
+      <span>${pl.name}<small></small></span>
+      <span class="pair"><button type="button" class="link dl">Télécharger</button><button type="button" class="link rm">Retirer</button></span>
+    </div>`).join('');
+}
+
+$('#library').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  const row = e.target.closest('.lib-row');
+  if (!btn || !row || !('caches' in window)) return;
+  const pl = PLAYLISTS[row.dataset.pl];
   const cache = await caches.open(MUSIC_CACHE);
+  if (btn.classList.contains('rm')) {
+    for (const t of pl.tracks) await cache.delete(trackUrl(t));
+    libraryStatus();
+    return;
+  }
+  row.classList.add('busy');
+  btn.disabled = true;
+  const info = row.querySelector('small');
   try {
-    for (const t of TRACKS) {
+    let k = 0;
+    for (const t of pl.tracks) {
+      info.textContent = `Téléchargement… ${++k}/${pl.tracks.length}`;
       if (!(await cache.match(trackUrl(t)))) await cache.add(trackUrl(t));
-      await musicStatus();
     }
   } catch {
-    $('#music-status').textContent = 'Téléchargement interrompu (connexion ?)';
+    info.textContent = 'Téléchargement interrompu (connexion ?)';
   }
+  row.classList.remove('busy');
   btn.disabled = false;
+  libraryStatus();
 });
 
 function autoStartAudio() {
@@ -778,7 +813,7 @@ let settingsOpen = false;
 function openSettings() {
   settingsOpen = true;
   syncForm();
-  musicStatus();
+  libraryStatus();
   sheet.inert = false;
   sheet.classList.add('open');
   body.classList.add('ui');
@@ -1019,6 +1054,7 @@ document.addEventListener('visibilitychange', () => {
    ========================================================= */
 
 buildForm();
+buildLibrary();
 syncForm();
 fillSelect(selNoise, NOISES, savedAudio.noise ?? S.defaultNoise);
 const firstStation = savedAudio.station ?? S.defaultRadio;

@@ -1,30 +1,54 @@
 // Valeurs par défaut, bibliothèque audio et textes de départ.
 // Tout ce qui est ici peut être modifié depuis le panneau « Paramètres ».
 
-// Morceaux embarqués (CC0, voir CREDITS.md) : jouent aussi hors ligne.
-export const TRACKS = [
-  { file: 'music/holiznacc0-2-hour-delay.mp3', title: '2 Hour Delay' },
-  { file: 'music/holiznacc0-winter-blues.mp3', title: 'Winter Blues' },
-  { file: 'music/holiznacc0-first-snow.mp3', title: 'First Snow' },
-  { file: 'music/holiznacc0-snow-drift.mp3', title: 'Snow Drift' },
-  { file: 'music/holiznacc0-fire-place.mp3', title: 'Fire Place' },
-  { file: 'music/holiznacc0-kids.mp3', title: 'Kids' },
-  { file: 'music/holiznacc0-spring-at-last.mp3', title: 'Spring At Last' },
-  { file: 'music/holiznacc0-sense-of-purpose.mp3', title: 'Sense Of Purpose' },
-  { file: 'music/holiznacc0-april-showers.mp3', title: 'April Showers' },
-];
+// Bibliothèque embarquée (CC0, voir CREDITS.md) : une playlist par ambiance.
+// Les morceaux se gardent sur l'appareil à l'écoute, ou d'un coup (Paramètres → Bibliothèque).
+export const PLAYLISTS = {
+  lofi: {
+    name: 'Lofi',
+    size: 56,
+    tracks: [
+      { file: 'music/holiznacc0-2-hour-delay.mp3', title: '2 Hour Delay' },
+      { file: 'music/holiznacc0-winter-blues.mp3', title: 'Winter Blues' },
+      { file: 'music/holiznacc0-first-snow.mp3', title: 'First Snow' },
+      { file: 'music/holiznacc0-snow-drift.mp3', title: 'Snow Drift' },
+      { file: 'music/holiznacc0-fire-place.mp3', title: 'Fire Place' },
+      { file: 'music/holiznacc0-kids.mp3', title: 'Kids' },
+      { file: 'music/holiznacc0-spring-at-last.mp3', title: 'Spring At Last' },
+      { file: 'music/holiznacc0-sense-of-purpose.mp3', title: 'Sense Of Purpose' },
+      { file: 'music/holiznacc0-april-showers.mp3', title: 'April Showers' },
+    ],
+  },
+  ambient: {
+    name: 'Ambient électro',
+    size: 51,
+    tracks: [
+      { file: 'music/holiznacc0-deja-vu.mp3', title: 'Deja Vu' },
+      { file: 'music/holiznacc0-boredom.mp3', title: 'Boredom' },
+      { file: 'music/holiznacc0-anxiety.mp3', title: 'Anxiety' },
+      { file: 'music/holiznacc0-love.mp3', title: 'Love' },
+      { file: 'music/holiznacc0-old-age.mp3', title: 'Old Age' },
+      { file: 'music/holiznacc0-dreams.mp3', title: 'Dreams' },
+      { file: 'music/holiznacc0-agoraphobia.mp3', title: 'Agoraphobia' },
+    ],
+  },
+};
 
-// kind 'tracks' : la playlist embarquée ; 'stream' : radio lue dans l'appli ;
+// kind 'tracks' : une playlist embarquée ; 'stream' : radio lue dans l'appli ;
 // 'link' : radio qui refuse d'être lue depuis un autre site, ouverte dans un onglet.
 export const STATIONS = [
-  { id: 'lofi', kind: 'tracks', name: 'Lofi hors ligne', desc: 'HoliznaCC0 · domaine public' },
-  { id: 'chillhop', kind: 'stream', name: 'I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
-  { id: 'lautlofi', kind: 'stream', name: 'Lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
-  { id: 'chillsynth', kind: 'stream', name: 'Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
-  { id: 'rpmellow', kind: 'stream', name: 'Radio Paradise Mellow', desc: 'Radio Paradise · mélange doux', url: 'https://stream.radioparadise.com/mellow-128' },
-  { id: 'groovesalad', kind: 'link', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
-  { id: 'deepspaceone', kind: 'link', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
-  { id: 'fluid', kind: 'link', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
+  { id: 'lofi', kind: 'tracks', group: 'Hors ligne', name: 'Lofi', desc: 'HoliznaCC0 · domaine public' },
+  { id: 'ambient', kind: 'tracks', group: 'Hors ligne', name: 'Ambient électro', desc: 'HoliznaCC0 · domaine public' },
+  { id: 'chillhop', kind: 'stream', group: 'Radios chill', name: 'I♥Chillhop', desc: 'ilovemusic.de · chillhop', url: 'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { id: 'lautlofi', kind: 'stream', group: 'Radios chill', name: 'Lofi (laut.fm)', desc: 'laut.fm · lofi', url: 'https://stream.laut.fm/lofi' },
+  { id: 'chillsynth', kind: 'stream', group: 'Radios chill', name: 'Chillsynth', desc: 'Nightride FM · synthwave calme', url: 'https://stream.nightride.fm/chillsynth.mp3' },
+  { id: 'rpmellow', kind: 'stream', group: 'Radios chill', name: 'Radio Paradise Mellow', desc: 'Radio Paradise · mélange doux', url: 'https://stream.radioparadise.com/mellow-128' },
+  { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Minimal (laut.fm)', desc: 'laut.fm · minimal techno, microhouse', url: 'https://stream.laut.fm/minimal' },
+  { id: 'sleepingpill', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Ambient Sleeping Pill', desc: 'stereoscenic.com · ambient sans rythme', url: 'https://radio.stereoscenic.com/asp-h' },
+  { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Ambient Radio (laut.fm)', desc: 'laut.fm · ambient, chillout', url: 'https://stream.laut.fm/ambient' },
+  { id: 'groovesalad', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
+  { id: 'deepspaceone', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
+  { id: 'fluid', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
 ];
 
 export const NOISES = [

@@ -222,7 +222,9 @@ footer {
 #btn-music.playing .i-pause { display: inline; }
 #now-playing { width: 100%; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
 #now-playing button.link { font-size: inherit; padding: 0 0.3em; text-decoration: underline; text-underline-offset: 3px; }
-#settings small#music-status { margin-right: auto; }
+.lib-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.lib-row small { display: block; }
+.lib-row button[hidden] { display: none; }
 
 select {
   background: transparent;
