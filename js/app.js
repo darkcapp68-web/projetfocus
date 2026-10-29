@@ -1,4 +1,4 @@
-import { DEFAULTS, STATIONS, PLAYLISTS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
+import { DEFAULTS, STATIONS, SHOWN_STATIONS, PLAYLISTS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 import { createSync } from './sync.js';
 
@@ -49,6 +49,13 @@ function sanitize(s) {
   if (s.version < 6) {
     for (const id of ['bwmirchi', 'bw2010']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
     s.version = 6;
+  }
+  // Version 7 : on ne garde que Technolovers Minimal et le classique (le reste est décoché).
+  if (s.version < 7) {
+    s.hiddenStations = [...STATIONS.map((st) => st.id), ...s.customLinks.map((_, i) => 'perso' + i)]
+      .filter((id) => !SHOWN_STATIONS.includes(id));
+    s.defaultRadio = 'tlminimal';
+    s.version = 7;
   }
   return s;
 }

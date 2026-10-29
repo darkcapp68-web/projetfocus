@@ -55,10 +55,18 @@ export const STATIONS = [
   { id: 'tldeephouse', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Deep House', desc: 'technolovers.fm · deep house', url: 'https://stream.technolovers.fm/deep-house' },
   { id: 'bwmirchi', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Mirchi Top 20 (pub probable)', desc: 'Radio Mirchi · tubes Bollywood du moment', url: 'https://drive.uber.radio/uber/bollywoodnow/icecast.audio' },
   { id: 'bw2010', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Bollywood 2010s (pub probable)', desc: 'uber.radio · Bollywood des années 2010', url: 'https://drive.uber.radio/uber/bollywood2010s/icecast.audio' },
+  { id: 'fmopera', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio France Musique Opéra', desc: 'Radio France · opéra, chant · sans pub', url: 'https://icecast.radiofrance.fr/francemusiqueopera-midfi.mp3' },
+  { id: 'fmclassiqueplus', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio France Musique Classique Plus', desc: 'Radio France · grandes œuvres · sans pub', url: 'https://icecast.radiofrance.fr/francemusiqueclassiqueplus-midfi.mp3' },
+  { id: 'fmbaroque', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio France Musique Baroque', desc: 'Radio France · baroque · sans pub', url: 'https://icecast.radiofrance.fr/francemusiquebaroque-midfi.mp3' },
+  { id: 'fmeasy', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio France Musique Easy Classique', desc: 'Radio France · classique doux · sans pub', url: 'https://icecast.radiofrance.fr/francemusiqueeasyclassique-midfi.mp3' },
+  { id: 'swissclassic', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio Swiss Classic', desc: 'SRG SSR (radio publique suisse) · classique, peu de paroles · sans pub', url: 'https://stream.srg-ssr.ch/m/rsc_de/mp3_128' },
   { id: 'groovesalad', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
   { id: 'deepspaceone', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
   { id: 'fluid', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
 ];
+
+// Musiques gardées dans le menu (le reste est décoché, à recocher dans Paramètres).
+export const SHOWN_STATIONS = ['tlminimal', 'fmopera', 'fmclassiqueplus', 'fmbaroque', 'fmeasy', 'swissclassic'];
 
 export const NOISES = [
   { id: 'none', name: 'Aucun bruit' },
@@ -103,7 +111,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 6,
+  version: 7,
 
   // Temps
   focusMin: 25,
@@ -229,14 +237,14 @@ export const DEFAULTS = {
   breakMusic: 'calme', // en pause : 'calme' (musique douce), 'same' (même musique plus bas), 'silence'
   noiseVol: 30,
   duckNoise: true,
-  defaultRadio: 'lofi',
+  defaultRadio: 'tlminimal',
   defaultNoise: 'none',
   autoStartAudio: true,
   customLinks: [], // une ligne par lien : « Nom | https://… »
   // Musiques décochées dans Paramètres : absentes du menu du lecteur.
   // Les radios laut.fm passent de la publicité : décochées au départ.
-  // Bollywood : publicité probable, à essayer en les cochant.
-  hiddenStations: ['lautlofi', 'lautminimal', 'lautambient', 'bwmirchi', 'bw2010'],
+  // Seules Technolovers Minimal et les radios classiques sont cochées au départ.
+  hiddenStations: STATIONS.map((st) => st.id).filter((id) => !SHOWN_STATIONS.includes(id)),
 
   // Affichage
   timeFormat: 'mmss', // 'mmss' | 'min'

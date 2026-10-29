@@ -63,6 +63,8 @@ droit et n'est jamais copiée dans l'appli.
 | Technolovers Minimal / Deep House | https://stream.technolovers.fm/minimal (et deep-house) | https://www.technolovers.fm/ |
 | Radio Mirchi Top 20 (pub probable) | https://drive.uber.radio/uber/bollywoodnow/icecast.audio | https://www.radiomirchi.com/ |
 | Bollywood 2010s (pub probable) | https://drive.uber.radio/uber/bollywood2010s/icecast.audio | https://uber.radio/ |
+| France Musique Opéra / Classique Plus / Baroque / Easy Classique (Radio France) | https://icecast.radiofrance.fr/francemusiqueopera-midfi.mp3 (et classiqueplus, baroque, easyclassique) | https://www.radiofrance.fr/francemusique |
+| Radio Swiss Classic (SRG SSR) | https://stream.srg-ssr.ch/m/rsc_de/mp3_128 | https://www.radioswissclassic.ch/ |
 
 Ces flux acceptent d'être lus depuis un autre site (testé le 29/10/2026).
 

@@ -227,7 +227,11 @@ Une série en cours survit à un rechargement de la page.
   Pill et Ambient Radio (laut.fm). Puis, trouvées dans l'annuaire radio-browser.info et testées :
   FIP Electro, Intergalactic FM (techno, et Dream Machine plus planante), NTS 1 et 2 (sans pub),
   Technolovers Minimal et Deep House, et deux radios Bollywood (Mirchi Top 20, Bollywood 2010s),
-  décochées au départ car probablement avec pub. La house et la techno vraiment libres de droits sont rares :
+  décochées au départ car probablement avec pub. Côté classique, cinq radios publiques sans pub :
+  France Musique Opéra, Classique Plus, Baroque et Easy Classique (Radio France), et Radio Swiss
+  Classic. Pour l'instant, seules Technolovers Minimal et ces radios classiques sont cochées ; les
+  autres se recochent dans Paramètres → Musiques → Musiques du menu.
+  La house et la techno vraiment libres de droits sont rares :
   il n'y en a pas d'embarquées pour l'instant.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.
