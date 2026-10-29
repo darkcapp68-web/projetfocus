@@ -838,6 +838,13 @@ function closeSettings() {
 }
 
 $('#btn-settings').addEventListener('click', openSettings);
+
+// Une seule section ouverte à la fois : le panneau reste court.
+sheet.addEventListener('toggle', (e) => {
+  const d = e.target;
+  if (!d.classList?.contains('sec') || !d.open) return;
+  for (const other of $$('details.sec', sheet)) if (other !== d) other.open = false;
+}, true);
 $('#btn-close').addEventListener('click', closeSettings);
 
 function getPath(path) { return path.split('.').reduce((o, k) => (o == null ? o : o[k]), S); }

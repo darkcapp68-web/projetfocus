@@ -333,3 +333,26 @@ body.no-info #info { visibility: hidden; }
 body.phase-break #pause-vol { display: flex; }
 #pause-vol:hover, #pause-vol:focus-within { opacity: 1; }
 #pause-vol input { width: 140px; }
+
+/* ---------- Paramètres repliables ---------- */
+#settings details.sec { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+#settings details.sec > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 14px 0;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  list-style: none;
+}
+#settings details > summary::-webkit-details-marker { display: none; }
+#settings details.sec > summary small { display: inline; flex: 1; }
+#settings details.sec > summary::after { content: "+"; opacity: 0.5; font-size: 18px; line-height: 1; }
+#settings details.sec[open] > summary::after { content: "−"; }
+#settings details.sec[open] { padding-bottom: 12px; }
+#settings details.more { margin-top: 6px; }
+#settings details.more > summary { padding: 9px 0; cursor: pointer; opacity: 0.8; font-size: 13px; list-style: none; }
+#settings details.more > summary::before { content: "▸ "; opacity: 0.6; }
+#settings details.more[open] > summary::before { content: "▾ "; }
+#settings details.more > summary small { display: inline; margin-left: 6px; }

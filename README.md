@@ -31,8 +31,8 @@ playlist) et le bruit de fond. Le navigateur exige un geste pour lancer du son :
 rechargement, la musique repart au premier toucher. Choisir une musique dans le menu la lance
 tout de suite.
 
-Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent).
-Dans Paramètres → Son → « Musiques du menu », décoche les radios et playlists qui ne te
+Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent). Les réglages sont rangés en 8 sections repliables (Temps, Pause, Volumes et sons, Musiques, Messages, Couleurs, Affichage, Sauvegarde) : une seule s'ouvre à la fois.
+Dans Paramètres → Musiques → « Musiques du menu », décoche les radios et playlists qui ne te
 plaisent pas : elles disparaissent du lecteur (tu peux les recocher quand tu veux).
 Les réglages restent sur l'appareil. Pour avoir les mêmes ailleurs : Paramètres → Exporter,
 puis Importer sur l'autre appareil.
@@ -118,7 +118,7 @@ Une fois publiée, ouvre `https://TON-COMPTE.github.io/projetfocus/` puis :
   → *Installer*.
 - **iPhone ou iPad (Safari)** : bouton Partager → *Sur l'écran d'accueil*.
 
-Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique embarquée, voir Paramètres → Bibliothèque hors ligne).
+Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique embarquée, voir Paramètres → Musiques → Bibliothèque hors ligne).
 
 Au premier démarrage d'un focus, le navigateur demande l'autorisation d'afficher des
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
@@ -150,7 +150,7 @@ Une série en cours survit à un rechargement de la page.
   vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Lofi » (9 morceaux, 56 Mo,
   la musique par défaut) et « Ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
   Ce sont les MP3 d'origine (320 kbit/s), donc lourds : l'appli ne les télécharge pas d'office.
-  Chaque morceau écouté reste sur l'appareil ; Paramètres → Bibliothèque hors ligne permet de
+  Chaque morceau écouté reste sur l'appareil ; Paramètres → Musiques → Bibliothèque hors ligne permet de
   télécharger ou de retirer une playlist entière.
 - **Style « Work with Paul »** (techno, house, ambient, sans paroles) : trois radios de ce
   style sont ajoutées, testées depuis un autre site : Minimal (laut.fm), Ambient Sleeping
