@@ -434,8 +434,6 @@ body.slow-glow.phase-focus:not(.paused):not(.ui) #dial-wrap { animation: slow-fa
 }
 
 /* ---------- Musiques du menu (Paramètres) ---------- */
-#settings .block-title { padding: 14px 0 4px; }
-#settings .block-title small { display: block; }
 #settings .pick-group { margin: 12px 0 0; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; }
 #settings label.pick { justify-content: flex-start; }
 #settings label.pick small { display: inline; margin-right: auto; }

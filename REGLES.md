@@ -61,7 +61,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   CORS (toutes les radios du menu l'acceptent ; testé) ; elle ne s'active qu'en mode Rythme,
   puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à
   l'échelle des dernières secondes : une musique calme ou jouée bas bouge autant qu'une
-  forte. Prototype et essais : `perso/rythme.html` (non publié). Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
+  forte. Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le
