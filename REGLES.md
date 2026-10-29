@@ -35,6 +35,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   l'arc se vide dans le sens des aiguilles d'une montre. Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
+- **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le
+  cadran prend la hauteur qui reste au-dessus du lecteur (environ 230 px) ; rien ne se
+  chevauche, la page défile seulement sur un très petit écran.
 - Info discrète en bas : « moment · phase · cycle » (ex. « Matinée · focus · 2/4 »).
 
 ## 3. Minuteur

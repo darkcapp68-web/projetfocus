@@ -250,8 +250,19 @@ footer {
 #player select { max-width: 14em; }
 #player input[type="range"] { flex-basis: 100%; width: auto; max-width: 180px; }
 @media (max-width: 680px) {
-  #player { flex-direction: column; gap: 14px; }
+  #player { flex-direction: column; gap: 8px; }
   #player .group { width: 100%; }
+  #player input[type="range"] { height: 22px; }
+}
+
+/* Téléphone à la verticale : tout remonte sous la barre du haut, le cadran prend la hauteur
+   qui reste (le lecteur en bas a besoin d'environ 230 px) ; sur un très petit écran, la page
+   défile plutôt que de faire se chevaucher les éléments. */
+@media (max-width: 680px) and (orientation: portrait) {
+  :root { --dial-size: max(190px, min(78vw, calc(100dvh - 490px), 420px)); }
+  body { overflow-y: auto; }
+  #stage { flex: 1 0 auto; justify-content: flex-start; padding-top: 10px; gap: 10px; }
+  #message { min-height: 0; }
 }
 /* Boutons lecture / pause (musique et bruit de fond) */
 button.play svg { width: 14px; height: 14px; fill: currentColor; }
