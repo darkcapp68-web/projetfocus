@@ -2,7 +2,7 @@
 // Stratégie « cache d'abord, mise à jour en arrière-plan » : les nouvelles versions
 // publiées sur GitHub Pages arrivent au chargement suivant.
 
-const CACHE = 'projetfocus-v3';
+const CACHE = 'projetfocus-v4';
 const ASSETS = [
   './',
   'index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   'js/app.js',
   'js/audio.js',
   'js/defaults.js',
+  'js/sync.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',

@@ -134,6 +134,64 @@ Au premier démarrage d'un focus, le navigateur demande l'autorisation d'affiche
 
 ---
 
+## Synchroniser avec Google Drive (mêmes réglages partout)
+
+Chaque navigateur, chaque appareil et chaque adresse (`localhost`, `github.io`…) garde ses
+propres réglages. Pour les avoir partout, l'appli peut les enregistrer dans un fichier
+**« projetfocus-parametres.json »** de ton Google Drive (visible dans « Mon Drive »).
+
+- À l'ouverture de l'appli (premier toucher), elle lit ce fichier ; à chaque réglage changé,
+  elle le réécrit quelques secondes après. Si deux appareils ont changé quelque chose,
+  **la version la plus récente gagne**.
+- L'appli n'a accès qu'aux fichiers qu'elle a créés elle-même dans ton Drive, rien d'autre.
+- Ne sont pas synchronisés : la musique gardée hors ligne et la phase en cours (chaque
+  appareil a son propre minuteur).
+
+### Une seule fois : créer l'identifiant de l'appli chez Google (environ 10 minutes)
+
+Google exige que toute appli qui se connecte au Drive ait un « ID client », créé par son
+propriétaire, donc toi. C'est gratuit.
+
+1. Ouvre https://console.cloud.google.com et connecte-toi avec ton compte Google.
+2. En haut, le sélecteur de projet → **Nouveau projet** → nom `projetfocus` → **Créer**,
+   puis sélectionne ce projet.
+3. Menu ☰ → **API et services** → **Bibliothèque** → cherche **Google Drive API** →
+   **Activer**.
+4. Menu ☰ → **API et services** → **Écran de consentement OAuth** (ou « Google Auth
+   Platform ») → **Commencer** :
+   - nom de l'appli : `projetfocus`, e-mail d'assistance : ton adresse ;
+   - audience : **Externe** ;
+   - coordonnées : ton adresse ; accepte les conditions → **Créer**.
+5. Rubrique **Audience** → **Utilisateurs test** → **Ajouter des utilisateurs** → ton
+   adresse Gmail → **Enregistrer**. Laisse l'appli « En test » : pas besoin de validation
+   par Google, et toi seul peux t'y connecter.
+6. Rubrique **Clients** (ou « Identifiants ») → **Créer un client** (« ID client OAuth ») :
+   - type : **Application Web**, nom : `projetfocus` ;
+   - **Origines JavaScript autorisées** → ajoute `http://localhost:8417` et, quand l'appli
+     sera publiée, `https://TON-COMPTE.github.io` (sans `/projetfocus` à la fin) ;
+   - **Créer**, puis copie l'**ID client** (il se termine par `.apps.googleusercontent.com`).
+     Cet identifiant n'est pas un secret.
+
+### Sur chaque appareil
+
+1. Paramètres → **Sauvegarde** → colle l'ID client → **Se connecter à Google Drive**.
+2. Choisis ton compte. Google affiche « Google n'a pas validé cette application » (normal,
+   c'est ton appli en test) → **Continuer** → coche l'accès aux fichiers → **Continuer**.
+3. La ligne d'état indique « Synchronisé à … ».
+
+Astuce : donne-moi l'ID client et je le mets directement dans le code ; il n'y aura plus
+rien à coller, seulement « Se connecter ».
+
+Bon à savoir :
+- Google renouvelle la connexion environ toutes les heures : au premier toucher, une petite
+  fenêtre Google peut s'ouvrir et se refermer toute seule.
+- Tant que l'appli est « en test », Google peut redemander ton accord de temps en temps
+  (environ une fois par semaine).
+- Sans Internet, l'appli marche normalement et synchronise au retour de la connexion.
+- « Se déconnecter » arrête la synchronisation ; le fichier reste dans ton Drive.
+
+---
+
 ## Ce qui est fait, et les écarts avec le cahier des charges
 
 Fait : écran unique minimal, couleur sur 24 h (6 moments réglables), cadran à tourner
@@ -201,6 +259,7 @@ Aucun outil à installer : HTML, CSS et JavaScript, sans étape de build.
 | `css/style.css` | le style |
 | `js/app.js` | minuteur, cadran, messages, coach, Paramètres |
 | `js/audio.js` | radio, bruits générés, signaux sonores |
+| `js/sync.js` | synchronisation des Paramètres avec Google Drive |
 | `js/defaults.js` | valeurs par défaut, messages, actions du coach, radios, liste des morceaux |
 | `music/` | les 9 morceaux lofi CC0 (voir CREDITS.md) |
 | `sw.js` | mode hors ligne |

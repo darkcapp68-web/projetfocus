@@ -357,3 +357,8 @@ body.no-info #info { visibility: hidden; }
 /* ---------- Lecteur pendant la pause : son propre menu ---------- */
 body:not(.phase-break) #sel-pause { display: none; }
 body.phase-break #sel-station, body.phase-break #btn-music { display: none; }
+
+/* ---------- Synchronisation Google Drive ---------- */
+#sync-status[data-kind="ok"] { opacity: 0.8; }
+#sync-status[data-kind="warn"] { color: #ffd479; opacity: 0.95; }
+#settings input[data-k="syncClientId"] { font-size: 12px; }

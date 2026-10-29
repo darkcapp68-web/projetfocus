@@ -241,4 +241,8 @@ export const DEFAULTS = {
   showInfo: true,
   controlsDelay: 4,
   keepAwake: true,
+
+  // Synchronisation Google Drive (voir README) : identifiant de l'appli chez Google.
+  syncClientId: '',
+  updatedAt: 0, // date du dernier changement de réglage (la plus récente gagne)
 };

@@ -1,5 +1,6 @@
 import { DEFAULTS, STATIONS, PLAYLISTS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
+import { createSync } from './sync.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -58,8 +59,11 @@ function loadSettings() {
   catch { return clone(DEFAULTS); }
 }
 
-function saveSettings() {
+// `touch` : un vrai changement (date notée, et envoi vers Google Drive si connecté).
+function saveSettings(touch = true) {
+  if (touch) S.updatedAt = Date.now();
   try { localStorage.setItem(LS_SETTINGS, JSON.stringify(S)); } catch { /* stockage indisponible */ }
+  if (touch) sync?.changed();
 }
 
 let S = loadSettings();
@@ -867,6 +871,7 @@ window.addEventListener('pointermove', (e) => {
 window.addEventListener('pointerdown', (e) => {
   poke();
   resumeSavedAudio(e);
+  sync.gesture();
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
 }, true);
 window.addEventListener('keydown', (e) => {
@@ -1044,7 +1049,9 @@ $('#file-import').addEventListener('change', async (e) => {
   e.target.value = '';
   if (!f) return;
   try {
+    const keepId = S.syncClientId;
     S = sanitize(merge(DEFAULTS, JSON.parse(await f.text())));
+    S.syncClientId ||= keepId;
     saveSettings(); buildForm(); syncForm(); applySettings();
     note('Paramètres importés.');
   } catch {
@@ -1054,12 +1061,39 @@ $('#file-import').addEventListener('change', async (e) => {
 
 $('#btn-reset').addEventListener('click', () => {
   if (!confirm('Revenir aux valeurs par défaut ? Tes réglages actuels seront remplacés.')) return;
-  S = clone(DEFAULTS);
+  S = { ...clone(DEFAULTS), syncClientId: S.syncClientId }; // la connexion Google reste
   saveSettings(); buildForm(); syncForm(); applySettings();
   note('Valeurs par défaut rétablies.');
 });
 
 function note(text) { $('#save-note').textContent = text; }
+
+/* =========================================================
+   Synchronisation avec Google Drive
+   ========================================================= */
+
+var sync = createSync({
+  getSettings: () => S,
+  // Paramètres plus récents trouvés sur le Drive : on les applique ici.
+  applyRemote: (remote) => {
+    S = sanitize(merge(DEFAULTS, remote));
+    saveSettings(false);
+    buildForm(); syncForm(); applySettings();
+    note('Paramètres récupérés depuis Google Drive.');
+  },
+  onStatus: ({ text, kind, connected }) => {
+    $('#sync-status').textContent = text;
+    $('#sync-status').dataset.kind = kind;
+    $('#btn-sync').textContent = connected ? 'Se déconnecter' : 'Se connecter à Google Drive';
+    $('#btn-sync-now').hidden = !connected;
+  },
+});
+
+$('#btn-sync').addEventListener('click', () => {
+  if (sync.connected) sync.disconnect(); else sync.connect();
+});
+$('#btn-sync-now').addEventListener('click', () => sync.syncNow());
+window.addEventListener('online', () => sync.wake());
 
 /* =========================================================
    Affichage
@@ -1147,7 +1181,7 @@ function render(force) {
 // Tout est gardé avant que la page se ferme, passe en arrière-plan ou s'endorme.
 function saveEverything() {
   saveState();
-  saveSettings();
+  saveSettings(false);
   saveAudio();
 }
 window.addEventListener('pagehide', saveEverything);
@@ -1181,6 +1215,7 @@ function tick() {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
+    sync.wake();
     tick();
     if (T.phase === 'focus' || T.phase === 'break') keepAwake(true);
   }
@@ -1199,6 +1234,7 @@ const firstStation = savedAudio.station ?? S.defaultRadio;
 selStation.value = [...selStation.options].some((o) => o.value === firstStation) ? firstStation : 'none';
 restoreState();
 applySettings();
+sync.start();
 if (T.phase === 'focus') startMessages();
 if (T.phase === 'break') { renderCoach(); showCoach(); }
 renderPlayer();
