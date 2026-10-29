@@ -1,4 +1,4 @@
-import { DEFAULTS, STATIONS, TRACKS, NOISES, CHIMES, MESSAGE_POOLS } from './defaults.js';
+import { DEFAULTS, STATIONS, TRACKS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -33,6 +33,10 @@ function sanitize(s) {
   s.coachActions = s.coachActions.filter((x) => typeof x === 'string' && x.trim());
   s.customLinks = s.customLinks.filter((x) => typeof x === 'string' && x.trim());
   for (const k of Object.keys(s.messages)) s.messages[k] = s.messages[k].filter((x) => typeof x === 'string' && x.trim());
+  // Version 2 : la pause enchaîne toute seule sur le focus (3 « ding », puis 5 s).
+  if (s.version < 2) { s.autoChain = true; s.version = 2; }
+  // Version 3 : musique douce en pause, un peu plus audible que l'ancien 10 %.
+  if (s.version < 3) { if (s.musicVolBreak === 10) s.musicVolBreak = 25; s.version = 3; }
   return s;
 }
 
@@ -83,6 +87,8 @@ const T = {
   endAt: 0, // horodatage de fin (ms)
   pausedRemaining: null, // secondes restantes si le focus est mis en pause
   breakEnded: false,
+  resumeAt: 0, // reprise automatique du focus (ms), 0 = on attend « Fait, je reprends »
+  breakColor: '', // couleur tirée pour cette pause
   isLong: false,
   afterBreak: false,
   coach: [], // actions proposées pour cette pause (la première est affichée)
@@ -309,7 +315,7 @@ function renderCoach() {
 }
 
 function showCoach() {
-  if (T.breakEnded) { showText('Pause terminée. Reviens quand tu veux.', 'coach'); return; }
+  if (T.breakEnded) { showText(T.resumeAt ? 'Pause terminée. On reprend doucement.' : 'Pause terminée. Reviens quand tu veux.', 'coach'); return; }
   showText(S.coachMode === 'one' && T.coach[0] ? T.coach[0] : '', 'coach');
 }
 
@@ -392,7 +398,8 @@ function onBreak() { return T.phase === 'break'; }
 
 function applyAudioLevels(fadeMs = 1500) {
   const brk = onBreak();
-  audio.setMusicLevel((brk ? S.musicVolBreak : S.musicVolWork) / 100, fadeMs);
+  if (brk && audio.liftOn) audio.setLiftLevel(S.musicVolBreak / 100);
+  else if (!audio.held) audio.setMusicLevel((brk ? S.musicVolBreak : S.musicVolWork) / 100, fadeMs);
   let noise = S.noiseVol / 100;
   if (brk && S.duckNoise) noise *= S.musicVolWork > 0 ? Math.min(1, S.musicVolBreak / S.musicVolWork) : 0;
   audio.setNoiseLevel(noise);
@@ -400,7 +407,7 @@ function applyAudioLevels(fadeMs = 1500) {
   volNoise.value = S.noiseVol;
 }
 
-function playSelectedStation() {
+function playSelectedStation(resume) {
   const st = allStations().find((s) => s.id === selStation.value);
   if (!st) return;
   if (kindOf(st) === 'link') {
@@ -409,8 +416,8 @@ function playSelectedStation() {
     $('#now-playing').textContent = 'Ouvert dans un onglet.';
     return;
   }
+  audio.playStation({ ...st, kind: kindOf(st) }, resume);
   applyAudioLevels(0);
-  audio.playStation({ ...st, kind: kindOf(st) });
 }
 
 function renderPlayer() {
@@ -435,25 +442,68 @@ function renderPlayer() {
     const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
   }
+  saveAudio();
 }
 audio.onchange = renderPlayer;
 
+// Dernière musique et dernier bruit choisis, et s'ils jouaient : retrouvés au prochain lancement.
+const LS_AUDIO = 'projetfocus.audio';
+const savedAudio = (() => { try { return JSON.parse(localStorage.getItem(LS_AUDIO)) || {}; } catch { return {}; } })();
+let audioTouched = false; // tant que rien n'a été touché, on ne remplace pas le souvenir
+
+function saveAudio() {
+  if (!audioTouched) return;
+  try {
+    localStorage.setItem(LS_AUDIO, JSON.stringify({
+      station: selStation.value,
+      playing: audio.musicOn,
+      noise: selNoise.value,
+      // Morceau de la playlist et position, pour reprendre exactement au même endroit.
+      track: audio.track?.file || null,
+      time: audio.track ? Math.floor(audio.music.currentTime) : 0,
+    }));
+  } catch { /* stockage indisponible */ }
+}
+
+// Le navigateur n'autorise le son qu'après un geste : on relance au premier toucher.
+function resumeSavedAudio(e) {
+  if (audioTouched) return;
+  audioTouched = true;
+  if (e?.target?.closest?.('#player')) return; // le lecteur s'en occupe lui-même
+  audio.ensure();
+  if (savedAudio.playing && selStation.value !== 'none') {
+    playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
+    // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
+    if (onBreak()) audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
+  }
+  if (selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
+}
+
 $('#btn-music').addEventListener('click', () => {
+  audioTouched = true;
   audio.ensure();
   if (audio.musicOn) audio.stopMusic(); else playSelectedStation();
 });
 
+// Choisir une musique la lance tout de suite.
 selStation.addEventListener('change', () => {
-  if (audio.musicOn) playSelectedStation();
+  audioTouched = true;
+  audio.ensure();
+  if (selStation.value === 'none') audio.stopMusic(); else playSelectedStation();
   renderPlayer();
 });
 
-selNoise.addEventListener('change', () => { applyAudioLevels(0); audio.setNoise(selNoise.value); });
+selNoise.addEventListener('change', () => {
+  audioTouched = true;
+  applyAudioLevels(0);
+  audio.setNoise(selNoise.value);
+  saveAudio();
+});
 
 volMusic.addEventListener('input', () => {
   const v = Number(volMusic.value);
   if (onBreak()) S.musicVolBreak = v; else S.musicVolWork = v;
-  audio.setMusicLevel(v / 100, 0);
+  if (onBreak() && audio.liftOn) audio.setLiftLevel(v / 100); else audio.setMusicLevel(v / 100, 0);
   saveSettings(); syncForm();
 });
 
@@ -508,12 +558,14 @@ function startFocus(afterBreak) {
   T.phase = 'focus';
   T.afterBreak = afterBreak;
   T.breakEnded = false;
+  T.resumeAt = 0;
   T.isLong = false;
   T.total = S.focusMin * 60;
   T.endAt = Date.now() + T.total * 1000;
   T.pausedRemaining = null;
   leaveFullscreen();
   keepAwake(true);
+  audio.leaveBreak(S.musicVolWork / 100);
   applyAudioLevels();
   startMessages();
   saveState();
@@ -527,7 +579,10 @@ function startBreak(fromTimer) {
   T.total = (T.isLong ? S.longBreakMin : S.breakMin) * 60;
   T.endAt = Date.now() + T.total * 1000;
   T.pausedRemaining = null;
+  T.resumeAt = 0;
+  T.breakColor = S.breakColorRandom ? pick(BREAK_COLORS, T.breakColor) : S.breakColor;
   pickCoach();
+  audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
   applyAudioLevels();
   enterFullscreen();
   if (fromTimer) {
@@ -542,16 +597,13 @@ function startBreak(fromTimer) {
 const lastCycle = () => S.cycles > 0 && T.cycle >= S.cycles;
 
 function breakTimeUp() {
-  chime();
+  audio.chime(S.chime, S.chimeVol / 100, S.endDings);
   if (lastCycle()) { finishSeries(); notify('Série terminée', 'Belle séance. Pense à t’arrêter pour de vrai.'); return; }
-  if (S.autoChain) {
-    T.cycle++;
-    startFocus(true);
-    notify('On reprend', 'Nouveau focus : ' + S.focusMin + ' min.');
-    return;
-  }
   T.breakEnded = true;
-  notify('La pause est finie', 'Reviens quand tu veux.');
+  // Reprise automatique : on laisse sonner les « ding », puis quelques secondes.
+  T.resumeAt = S.autoChain ? Date.now() + S.autoChainDelay * 1000 : 0;
+  if (S.autoChain) notify('On reprend', `Nouveau focus dans ${S.autoChainDelay} s.`);
+  else notify('La pause est finie', 'Reviens quand tu veux.');
   saveState();
   showCoach();
   render(true);
@@ -567,8 +619,10 @@ function resumeFromBreak() {
 function finishSeries() {
   T.phase = 'done';
   T.breakEnded = false;
+  T.resumeAt = 0;
   leaveFullscreen();
   keepAwake(false);
+  audio.leaveBreak(S.musicVolWork / 100);
   applyAudioLevels();
   showText('Belle série. Prends soin de toi.');
   saveState();
@@ -580,9 +634,11 @@ function resetAll() {
   T.cycle = 1;
   T.pausedRemaining = null;
   T.breakEnded = false;
+  T.resumeAt = 0;
   T.afterBreak = false;
   leaveFullscreen();
   keepAwake(false);
+  audio.leaveBreak(S.musicVolWork / 100);
   applyAudioLevels();
   showText('');
   saveState();
@@ -696,12 +752,14 @@ window.addEventListener('pointermove', (e) => {
   lastMove = { x: e.clientX, y: e.clientY };
   poke();
 });
-window.addEventListener('pointerdown', () => {
+window.addEventListener('pointerdown', (e) => {
   poke();
+  resumeSavedAudio(e);
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
 }, true);
 window.addEventListener('keydown', (e) => {
   poke();
+  resumeSavedAudio(e);
   if (settingsOpen) { if (e.key === 'Escape') closeSettings(); return; }
   const free = e.target === body || e.target === dial;
   if (e.key === ' ' && free && (T.phase === 'idle' || T.phase === 'focus' || T.phase === 'done')) {
@@ -891,7 +949,7 @@ function render(force) {
   };
   for (const [c, on] of Object.entries(classes)) body.classList.toggle(c, on);
 
-  const bg = p === 'break' ? S.breakColor : S.dayGradient ? day.color : S.fixedColor;
+  const bg = p === 'break' ? T.breakColor || S.breakColor : S.dayGradient ? day.color : S.fixedColor;
   if (bg !== lastBg) {
     lastBg = bg;
     document.documentElement.style.setProperty('--bg', bg);
@@ -904,6 +962,7 @@ function render(force) {
   let sub = '';
   if (p === 'idle') sub = T.editing === 'focus' ? 'focus' : 'pause';
   else if (p === 'focus') sub = T.pausedRemaining != null ? 'en pause' : 'focus';
+  else if (p === 'break' && T.resumeAt) sub = `reprise dans ${Math.max(0, Math.ceil((T.resumeAt - Date.now()) / 1000))} s`;
   else if (p === 'break') sub = T.isLong ? 'pause longue' : 'pause';
   setText(els.sub, sub);
 
@@ -930,9 +989,20 @@ function render(force) {
   if (title !== lastTitle) { lastTitle = title; document.title = title; }
 }
 
+// Tout est gardé avant que la page se ferme, passe en arrière-plan ou s'endorme.
+function saveEverything() {
+  saveState();
+  saveSettings();
+  saveAudio();
+}
+window.addEventListener('pagehide', saveEverything);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveEverything(); });
+setInterval(saveAudio, 5000); // la position dans le morceau, au cas où la page serait tuée
+
 function tick() {
   if (T.phase === 'focus' && T.pausedRemaining == null && remaining() <= 0) startBreak(true);
   else if (T.phase === 'break' && !T.breakEnded && remaining() <= 0) breakTimeUp();
+  else if (T.phase === 'break' && T.resumeAt && Date.now() >= T.resumeAt) resumeFromBreak();
   messagesTick();
   render(false);
 }
@@ -950,8 +1020,9 @@ document.addEventListener('visibilitychange', () => {
 
 buildForm();
 syncForm();
-fillSelect(selNoise, NOISES, S.defaultNoise);
-selStation.value = [...selStation.options].some((o) => o.value === S.defaultRadio) ? S.defaultRadio : 'none';
+fillSelect(selNoise, NOISES, savedAudio.noise ?? S.defaultNoise);
+const firstStation = savedAudio.station ?? S.defaultRadio;
+selStation.value = [...selStation.options].some((o) => o.value === firstStation) ? firstStation : 'none';
 restoreState();
 applySettings();
 if (T.phase === 'focus') startMessages();

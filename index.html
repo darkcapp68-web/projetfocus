@@ -100,6 +100,8 @@
       <label>… après combien de cycles<input type="number" min="1" max="12" data-k="longBreakEvery"></label>
       <label>… durée (minutes)<input type="number" min="1" max="60" data-k="longBreakMin"></label>
       <label>Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
+      <label>… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>
+      <label>« Ding » à la fin de la pause<input type="number" min="1" max="5" data-k="endDings"></label>
     </section>
 
     <section>
@@ -107,7 +109,8 @@
       <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
       <div id="day-colors"></div>
       <label>Couleur fixe (si le dégradé est coupé)<input type="color" data-k="fixedColor"></label>
-      <label>Couleur de la pause<input type="color" data-k="breakColor"></label>
+      <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
+      <label>Couleur de la pause (si pas au hasard)<input type="color" data-k="breakColor"></label>
       <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
       <label>Couleur du texte<input type="color" data-k="textColor"></label>
     </section>
@@ -142,6 +145,7 @@
       <label>Signal de changement de phase<span class="pair"><select data-k="chime" id="sel-chime"></select><button type="button" id="btn-test-chime" class="link">Écouter</button></span></label>
       <label>Volume du signal (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="chimeVol"><output></output></span></label>
       <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
+      <label>En pause, la musique<select data-k="breakMusic"><option value="calme">laisse place à une musique douce</option><option value="same">continue, plus bas</option><option value="silence">s'arrête</option></select></label>
       <label>Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
       <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
       <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>

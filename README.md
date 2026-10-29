@@ -18,9 +18,17 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
    nombre de cycles, sont en haut à gauche.
 2. **Démarrer**. Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la
    souris pour les faire revenir.
-3. À la fin du focus, l'écran passe **en rouge et respire doucement**, avec une action à faire.
-   La musique baisse. Pour reprendre avant la fin, **maintiens** le bouton 3 secondes.
-4. À la fin de la pause : « Fait, je reprends ».
+3. À la fin du focus, l'écran prend **une couleur tirée au hasard et respire doucement**, avec
+   une action à faire. Ta musique s'efface en fondu et laisse place à une **musique douce**
+   (façon ascenseur). Pour reprendre avant la fin, **maintiens** le bouton 3 secondes.
+4. À la fin de la pause : **3 « ding »**, puis le focus repart tout seul après 5 secondes, et ta
+   musique reprend là où elle s'était arrêtée. « Fait, je reprends » permet de ne pas attendre.
+
+L'appli se souvient de tout, même si tu fermes ou recharges la page : la phase et le temps
+restant, la couleur de la pause, la musique choisie (avec le morceau et la seconde exacte de la
+playlist) et le bruit de fond. Le navigateur exige un geste pour lancer du son : après un
+rechargement, la musique repart au premier toucher. Choisir une musique dans le menu la lance
+tout de suite.
 
 Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent).
 Les réglages restent sur l'appareil. Pour avoir les mêmes ailleurs : Paramètres → Exporter,
@@ -46,11 +54,15 @@ Il faut seulement Python (déjà installé chez toi).
    - Le fond a une couleur qui correspond au moment de la journée (le nom est écrit en bas).
    - Tourne le cadran : les graduations apparaissent, le temps change minute par minute.
    - Règle un focus de **1 minute** et une pause de **1 minute**, puis Démarrer.
-   - Après 1 minute : petit son, fond rouge qui respire, une action du coach.
+   - Après 1 minute : petit son, fond coloré qui respire, une action du coach, et si une
+     musique jouait, elle laisse place à la musique douce.
+   - À la fin de la pause : 3 « ding », « reprise dans 5 s », puis le focus repart et ta
+     musique reprend au même endroit.
    - Maintiens « maintenir pour reprendre » : un appui court ne fait rien, 3 secondes relancent
      le focus (en bas : « focus · 2/4 »).
    - Ouvre Paramètres, change une couleur ou la pulsation : l'effet est immédiat.
-   - Choisis « Pluie » dans le menu des bruits : tu dois entendre la pluie.
+   - Essaie les bruits de fond : pluie, orage lointain (un grondement de temps en temps),
+     vent, neige, café.
    - Lance la musique (bouton ▶ en bas) : « Lofi hors ligne » joue un morceau, le titre
      s'affiche avec « suivant ». Essaie aussi une radio, par exemple « I♥Chillhop ».
 4. Pour voir la version téléphone sur le PC : touche `F12`, puis l'icône téléphone.
@@ -115,9 +127,10 @@ Au premier démarrage d'un focus, le navigateur demande l'autorisation d'affiche
 Fait : écran unique minimal, couleur sur 24 h (6 moments réglables), cadran à tourner
 (1 à 60 min) qui se vide dans le sens des aiguilles d'une montre, préréglages 25/5 et 50/10,
 cycles et pause longue, messages bienveillants (40 au départ, selon le moment, fréquence et
-catégories réglables, liste modifiable), pause rouge qui respire, une action du coach à la
+catégories réglables, liste modifiable), pause colorée qui respire, une action du coach à la
 fois, maintenir pour reprendre, son, notification, plein écran, musique baissée en pause,
-bruits de fond générés (pluie, café, bruit blanc, rose, brun), liens personnels, contrôles
+bruits de fond générés (pluie, orage lointain, vent, neige, café), musique douce de pause
+générée, reprise automatique avec 3 « ding », mémoire de tout l'état, liens personnels, contrôles
 qui s'effacent, Paramètres complets avec valeurs par défaut, export / import JSON,
 enregistrement sur l'appareil, hors ligne, écran gardé allumé pendant une série.
 Une série en cours survit à un rechargement de la page.
@@ -138,7 +151,8 @@ Une série en cours survit à un rechargement de la page.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.
 - **Cadran** : le style minimal (arc blanc fin) remplace le secteur violet / rouge du premier
-  jet ; la pause reste reconnaissable à son fond rouge. Les couleurs du cadran et du texte
+  jet. La pause prend une couleur au hasard parmi dix (à ta demande, à la place du rouge
+  fixe ; réglable dans Paramètres → Couleurs). Les couleurs du cadran et du texte
   sont réglables.
 - **Coach** : une action affichée à la fois (décision de style) ; deux autres idées sont
   proposées au toucher, et on peut les choisir à la place.

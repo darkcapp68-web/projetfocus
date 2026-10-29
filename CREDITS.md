@@ -29,8 +29,9 @@ Merci à HoliznaCC0. Pour le soutenir : https://holiznacc0.bandcamp.com/
 
 ## Bruits de fond et signaux sonores
 
-Aucun fichier audio. Pluie, café, bruit blanc, rose et brun, ainsi que les signaux de
-changement de phase, sont **calculés dans le navigateur** (Web Audio) au moment où on les lance.
+Aucun fichier audio. Pluie, orage lointain, vent, neige et café, la musique douce de pause
+(accords et piano électrique) et les signaux de changement de phase sont **calculés dans le
+navigateur** (Web Audio) au moment où on les lance.
 
 ## Radios (non embarquées)
 

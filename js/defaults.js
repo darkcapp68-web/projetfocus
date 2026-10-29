@@ -30,10 +30,24 @@ export const STATIONS = [
 export const NOISES = [
   { id: 'none', name: 'Aucun bruit' },
   { id: 'pluie', name: 'Pluie' },
+  { id: 'orage', name: 'Orage lointain' },
+  { id: 'vent', name: 'Vent' },
+  { id: 'neige', name: 'Neige' },
   { id: 'cafe', name: 'Café' },
-  { id: 'blanc', name: 'Bruit blanc' },
-  { id: 'rose', name: 'Bruit rose' },
-  { id: 'brun', name: 'Bruit brun' },
+];
+
+// Couleurs tirées au hasard pour la pause : vives, mais assez sombres pour le texte blanc.
+export const BREAK_COLORS = [
+  '#b3261e', // rouge
+  '#c2410c', // orange brûlé
+  '#be185d', // framboise
+  '#9f1239', // grenat
+  '#7e22ce', // violet
+  '#4338ca', // indigo
+  '#1d4ed8', // bleu vif
+  '#0f766e', // sarcelle
+  '#15803d', // vert
+  '#a16207', // moutarde
 ];
 
 export const CHIMES = [
@@ -55,7 +69,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 1,
+  version: 3,
 
   // Temps
   focusMin: 25,
@@ -64,7 +78,9 @@ export const DEFAULTS = {
   longBreakOn: true,
   longBreakEvery: 4,
   longBreakMin: 15,
-  autoChain: false,
+  autoChain: true,
+  autoChainDelay: 5, // secondes entre la fin de la pause et la reprise du focus
+  endDings: 3, // nombre de « ding » à la fin de la pause
 
   // Couleurs
   dayGradient: true,
@@ -77,7 +93,8 @@ export const DEFAULTS = {
     { name: 'Après-midi', hour: '14:30', color: '#a2671c' },
     { name: 'Soirée', hour: '18:30', color: '#6a2b5d' },
   ],
-  breakColor: '#b3261e',
+  breakColorRandom: true,
+  breakColor: '#b3261e', // utilisée si la couleur au hasard est coupée
   dialColor: '#ffffff',
   textColor: '#ffffff',
 
@@ -171,7 +188,8 @@ export const DEFAULTS = {
   chime: 'cloche',
   chimeVol: 60,
   musicVolWork: 40,
-  musicVolBreak: 10,
+  musicVolBreak: 25,
+  breakMusic: 'calme', // en pause : 'calme' (musique douce), 'same' (même musique plus bas), 'silence'
   noiseVol: 30,
   duckNoise: true,
   defaultRadio: 'lofi',

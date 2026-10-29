@@ -14,17 +14,18 @@ function shuffled(list) {
   return a;
 }
 
-// Remplit un canal de `len` échantillons ; `gen` reçoit (tableau, fréquence).
-function makeLoop(ctx, gen, channels = 2) {
+// Remplit chaque canal ; `gen` reçoit (tableau, fréquence, objet partagé entre les canaux).
+function makeLoop(ctx, gen, seconds = LOOP_SECONDS, channels = 2) {
   const rate = ctx.sampleRate;
-  const n = Math.floor(LOOP_SECONDS * rate);
+  const n = Math.floor(seconds * rate);
   const f = Math.floor(FADE_SECONDS * rate);
   const buf = ctx.createBuffer(channels, n, rate);
   let sum = 0;
   const raw = [];
+  const shared = {};
   for (let c = 0; c < channels; c++) {
     const data = new Float32Array(n + f);
-    gen(data, rate);
+    gen(data, rate, shared);
     // La fin de la boucle se fond dans son début : pas de clic à la jonction.
     for (let i = 0; i < f; i++) {
       const t = i / f;
@@ -81,12 +82,25 @@ function highpass(data, rate, hz) {
   }
 }
 
+// Courbe lente et irrégulière entre 0 et 1 (somme de sinus), la même pour les deux canaux.
+function slowCurve(shared, key, count, fMin, fMax) {
+  const lfo = shared[key] ||= Array.from({ length: count }, () => ({
+    f: fMin + Math.random() * (fMax - fMin), p: Math.random() * 2 * Math.PI,
+  }));
+  return (t) => {
+    let s = 0;
+    for (const o of lfo) s += Math.sin(2 * Math.PI * o.f * t + o.p);
+    return Math.max(0, Math.min(1, 0.5 + 0.8 * s / count));
+  };
+}
+
 // Pluie : un fond doux + des milliers de petites gouttes.
-function rain(data, rate) {
+// `perSec` gouttes par seconde ; `bright` coupe les aigus (pluie lointaine si bas).
+const rain = (perSec, bright) => (data, rate) => {
   pink(data);
-  lowpass(data, rate, 5000);
+  lowpass(data, rate, bright);
   for (let i = 0; i < data.length; i++) data[i] *= 0.35;
-  const drops = Math.floor((data.length / rate) * 450);
+  const drops = Math.floor((data.length / rate) * perSec);
   for (let d = 0; d < drops; d++) {
     const start = Math.floor(Math.random() * data.length);
     const len = Math.floor(rate * (0.003 + Math.random() * 0.025));
@@ -99,6 +113,86 @@ function rain(data, rate) {
       data[start + j] += y * amp * Math.exp(-j / tau);
     }
   }
+  if (bright < 4000) lowpass(data, rate, bright);
+};
+
+// Vent : un souffle filtré dont la hauteur et la force montent et descendent par rafales.
+function wind(data, rate, shared) {
+  const gust = slowCurve(shared, 'gust', 4, 0.02, 0.12);
+  let low = 0, band = 0, body = 0;
+  for (let i = 0; i < data.length; i++) {
+    const g = gust(i / rate);
+    const fc = 170 + 620 * g;
+    const f = 2 * Math.sin(Math.PI * fc / rate);
+    const x = whiteSample();
+    // Filtre passe-bande à état variable : la fréquence peut bouger à chaque échantillon.
+    low += f * band;
+    band += f * (x - low - 0.65 * band);
+    body += 0.01 * (x - body);
+    data[i] = (band * 0.8 + body * 2.5) * (0.2 + 0.8 * g ** 1.6);
+  }
+  // Sans ça, il reste un souffle aigu qui ressemble au bruit blanc.
+  lowpass(data, rate, 1100);
+  lowpass(data, rate, 1100);
+}
+
+// Neige : le silence feutré d'un paysage enneigé, un souffle très doux,
+// et de rares tintements cristallins au loin.
+function snow(data, rate, shared) {
+  brown(data);
+  lowpass(data, rate, 380);
+  const breath = slowCurve(shared, 'breath', 3, 0.03, 0.1);
+  const air = slowCurve(shared, 'air', 3, 0.02, 0.08);
+  let y = 0;
+  for (let i = 0; i < data.length; i++) {
+    const t = i / rate;
+    const w = whiteSample();
+    y += 0.45 * (w - y);
+    const hiss = w - y; // seulement les aigus : le froissement des flocons
+    data[i] = data[i] * (0.65 + 0.35 * breath(t)) + hiss * 0.025 * air(t);
+  }
+  const pings = 3 + Math.floor(Math.random() * 3);
+  for (let p = 0; p < pings; p++) {
+    const start = Math.floor(Math.random() * data.length);
+    const f = 2600 + Math.random() * 2400;
+    const tau = rate * (0.4 + Math.random() * 0.5);
+    const amp = 0.006 + Math.random() * 0.008;
+    for (let j = 0; j < tau * 5 && start + j < data.length; j++) {
+      data[start + j] += amp * Math.exp(-j / tau) * Math.sin(2 * Math.PI * f * j / rate) * Math.min(1, j / (rate * 0.02));
+    }
+  }
+}
+
+// Un grondement d'orage lointain (quelques roulements graves qui s'éteignent lentement).
+function thunderBuffer(ctx) {
+  const rate = ctx.sampleRate;
+  const n = Math.floor(rate * 9);
+  const buf = ctx.createBuffer(2, n, rate);
+  const rolls = Array.from({ length: 2 + Math.floor(Math.random() * 3) }, () => ({
+    at: Math.random() * 3, tau: 1.2 + Math.random() * 2, amp: 0.4 + Math.random() * 0.6,
+  }));
+  const chans = [0, 1].map(() => {
+    const data = new Float32Array(n);
+    brown(data);
+    lowpass(data, rate, 160);
+    lowpass(data, rate, 160);
+    for (let i = 0; i < n; i++) {
+      const t = i / rate;
+      let env = 0;
+      for (const r of rolls) if (t > r.at) env += r.amp * (1 - Math.exp(-(t - r.at) / 0.3)) * Math.exp(-(t - r.at) / r.tau);
+      data[i] *= env;
+    }
+    return data;
+  });
+  let peak = 0;
+  for (const d of chans) for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(d[i]));
+  const side = Math.random() < 0.5 ? 0 : 1; // vient plutôt d'un côté
+  chans.forEach((d, c) => {
+    const k = (0.5 / (peak || 1)) * (c === side ? 1 : 0.6);
+    const out = buf.getChannelData(c);
+    for (let i = 0; i < n; i++) out[i] = d[i] * k;
+  });
+  return buf;
 }
 
 // Café : un murmure de voix lointaines + quelques tintements de tasses.
@@ -128,12 +222,99 @@ function cafe(data, rate) {
   }
 }
 
+// Musique douce de pause, façon « ascenseur » : accords jazzy tenus, une basse ronde
+// et quelques notes de piano électrique. Calculée une fois (64 s), puis jouée en boucle.
+const midi = (m) => 440 * 2 ** ((m - 69) / 12);
+const LIFT_CHORDS = [
+  { bass: 41, notes: [53, 57, 60, 64, 67] }, // Fa maj9
+  { bass: 40, notes: [52, 55, 59, 62] }, // Mi m7
+  { bass: 38, notes: [50, 53, 57, 60, 64] }, // Ré m9
+  { bass: 43, notes: [55, 60, 65, 69] }, // Sol 9sus
+];
+const LIFT_BAR = 8; // secondes par accord
+
+async function renderLift(rate) {
+  const chords = [...LIFT_CHORDS, ...LIFT_CHORDS]; // deux tours, avec des notes de piano différentes
+  const loop = chords.length * LIFT_BAR, tail = 4;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const oc = new OAC(2, Math.ceil((loop + tail) * rate), rate);
+  const lp = oc.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 1800;
+  lp.connect(oc.destination);
+  const out = (node, pan) => {
+    const p = oc.createStereoPanner();
+    p.pan.value = pan;
+    node.connect(p).connect(lp);
+  };
+  const voice = (freq, type, at, dur, level, attack, release, pan) => {
+    const o = oc.createOscillator();
+    const g = oc.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, at);
+    g.gain.linearRampToValueAtTime(level, at + attack);
+    g.gain.setValueAtTime(level, at + dur);
+    g.gain.linearRampToValueAtTime(0, at + dur + release);
+    o.connect(g);
+    out(g, pan);
+    o.start(at);
+    o.stop(at + dur + release + 0.1);
+  };
+  const piano = (freq, at, level, pan) => {
+    for (const [mult, lv, dec] of [[1, 1, 1.8], [2, 0.25, 0.6], [3, 0.08, 0.3]]) {
+      const o = oc.createOscillator();
+      const g = oc.createGain();
+      o.frequency.value = freq * mult;
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(level * lv, at + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dec * 2);
+      o.connect(g);
+      out(g, pan);
+      o.start(at);
+      o.stop(at + dec * 2 + 0.05);
+    }
+  };
+  chords.forEach((ch, i) => {
+    const at = i * LIFT_BAR;
+    ch.notes.forEach((n, k) => {
+      const pan = (k / (ch.notes.length - 1)) * 1.2 - 0.6;
+      voice(midi(n), 'triangle', at, LIFT_BAR - 1, 0.035, 1.5, 2, pan);
+      voice(midi(n) * 1.004, 'sine', at, LIFT_BAR - 1, 0.03, 1.8, 2, -pan);
+    });
+    voice(midi(ch.bass), 'sine', at, LIFT_BAR - 1.5, 0.12, 0.08, 1.5, 0);
+    for (let s = 0; s < LIFT_BAR * 2; s++) {
+      if (Math.random() < 0.4) {
+        const n = ch.notes[Math.floor(Math.random() * ch.notes.length)] + 12;
+        piano(midi(n), at + s * 0.5 + Math.random() * 0.03, 0.05 + Math.random() * 0.04, Math.random() * 0.8 - 0.4);
+      }
+    }
+  });
+  const rendered = await oc.startRendering();
+  // La traîne du dernier accord revient sur le début : la boucle ne s'entend pas.
+  const n = Math.floor(loop * rate);
+  const buf = new AudioBuffer({ numberOfChannels: 2, length: n, sampleRate: rate });
+  let peak = 0;
+  const chans = [0, 1].map((c) => {
+    const src = rendered.getChannelData(c);
+    const d = src.slice(0, n);
+    for (let i = n; i < src.length; i++) d[i - n] += src[i];
+    for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(d[i]));
+    return d;
+  });
+  chans.forEach((d, c) => {
+    const o = buf.getChannelData(c);
+    for (let i = 0; i < n; i++) o[i] = d[i] * (0.8 / (peak || 1));
+  });
+  return buf;
+}
+
 const GENERATORS = {
-  blanc: (d) => { for (let i = 0; i < d.length; i++) d[i] = whiteSample(); },
-  rose: pink,
-  brun: brown,
-  pluie: rain,
-  cafe,
+  pluie: { gen: rain(450, 5000) },
+  orage: { gen: rain(140, 2200), thunder: true },
+  vent: { gen: wind, seconds: 30 },
+  neige: { gen: snow, seconds: 24 },
+  cafe: { gen: cafe },
 };
 
 export class AudioEngine {
@@ -192,16 +373,24 @@ export class AudioEngine {
   }
 
   /* ---------- Radio et playlist embarquée ---------- */
-  playStation(station) {
+  // `resume` : { file, time } pour reprendre la playlist au morceau et à la seconde près.
+  playStation(station, resume) {
+    this.held = false;
+    this._stopLift();
     this.station = station;
     this.queue = null;
     this.track = null;
     if (station.kind === 'tracks') {
       this.queue = shuffled(station.tracks);
+      const k = resume?.file ? this.queue.findIndex((t) => t.file === resume.file) : -1;
+      if (k > 0) this.queue.unshift(...this.queue.splice(k, 1));
       this.qi = 0;
       this.skips = 0;
       this.track = this.queue[0];
       this.music.src = this.track.file;
+      if (k >= 0 && resume.time > 0) {
+        this.music.addEventListener('loadedmetadata', () => { this.music.currentTime = resume.time; }, { once: true });
+      }
     } else {
       this.music.src = station.url;
     }
@@ -222,6 +411,8 @@ export class AudioEngine {
   }
 
   stopMusic() {
+    this.held = false;
+    this._stopLift();
     this.music.pause();
     // Un flux en direct mis en pause continue de télécharger : on le coupe vraiment.
     this.music.removeAttribute('src');
@@ -231,17 +422,74 @@ export class AudioEngine {
 
   get musicOn() { return this.musicState === 'playing' || this.musicState === 'loading'; }
 
-  setMusicLevel(v, fadeMs = 1500) {
+  setMusicLevel(v, fadeMs = 1500, done = null) {
     this.musicLevel = Math.max(0, Math.min(1, v));
     clearInterval(this._fadeTimer);
     const from = this.music.volume, to = this.musicLevel;
-    if (fadeMs <= 0 || from === to) { this.music.volume = to; return; }
+    if (fadeMs <= 0 || from === to) { this.music.volume = to; done?.(); return; }
     const t0 = performance.now();
     this._fadeTimer = setInterval(() => {
       const t = Math.min(1, (performance.now() - t0) / fadeMs);
       this.music.volume = from + (to - from) * t;
-      if (t >= 1) clearInterval(this._fadeTimer);
+      if (t >= 1) { clearInterval(this._fadeTimer); done?.(); }
     }, 50);
+  }
+
+  /* ---------- Pause : fondu vers la musique douce, puis retour ---------- */
+  // mode 'calme' : musique douce ; 'silence' : on coupe ; 'same' : même musique, plus bas.
+  enterBreak(mode, level) {
+    if (mode === 'same' || !this.musicOn) { this.setMusicLevel(level); return; }
+    this.held = true;
+    this.setMusicLevel(0, 2500, () => { if (this.held) this.music.pause(); });
+    if (mode === 'calme') this._startLift(level);
+  }
+
+  leaveBreak(level) {
+    this._stopLift();
+    if (this.held) {
+      this.held = false;
+      this.music.volume = 0;
+      // La playlist reprend où elle en était ; une radio repart en direct.
+      this.music.play().catch(() => {});
+    }
+    this.setMusicLevel(level, 2500);
+  }
+
+  get liftOn() { return !!this.liftGain; }
+
+  setLiftLevel(v) {
+    this.liftLevel = v;
+    if (this.liftGain) this.liftGain.gain.setTargetAtTime(v, this.ctx.currentTime, 0.3);
+  }
+
+  async _startLift(level) {
+    const ctx = this.ensure();
+    if (!ctx || this.liftGain) return;
+    this.liftLevel = level;
+    const g = ctx.createGain();
+    g.gain.value = 0;
+    g.connect(ctx.destination);
+    this.liftGain = g;
+    try {
+      this.liftBuf ||= await renderLift(ctx.sampleRate);
+    } catch { this.liftGain = null; return; }
+    if (this.liftGain !== g) return; // la pause est déjà finie
+    const src = ctx.createBufferSource();
+    src.buffer = this.liftBuf;
+    src.loop = true;
+    src.connect(g);
+    src.start();
+    this.liftSrc = src;
+    g.gain.setTargetAtTime(this.liftLevel, ctx.currentTime + 1, 1);
+  }
+
+  _stopLift() {
+    const g = this.liftGain, src = this.liftSrc;
+    this.liftGain = null;
+    this.liftSrc = null;
+    if (!g) return;
+    g.gain.setTargetAtTime(0, this.ctx.currentTime, 0.6);
+    setTimeout(() => { try { src?.stop(); } catch { /* déjà arrêté */ } g.disconnect(); }, 3000);
   }
 
   /* ---------- Bruits de fond ---------- */
@@ -259,7 +507,8 @@ export class AudioEngine {
     if (id === 'none' || !GENERATORS[id]) { this.onchange(); return; }
     const start = () => {
       if (this.noiseId !== id) return;
-      if (!this.buffers[id]) this.buffers[id] = makeLoop(ctx, GENERATORS[id]);
+      const def = GENERATORS[id];
+      if (!this.buffers[id]) this.buffers[id] = makeLoop(ctx, def.gen, def.seconds);
       const src = ctx.createBufferSource();
       src.buffer = this.buffers[id];
       src.loop = true;
@@ -268,9 +517,27 @@ export class AudioEngine {
       this.noiseSrc = src;
       this.noiseGain.gain.cancelScheduledValues(ctx.currentTime);
       this.noiseGain.gain.setTargetAtTime(this.noiseLevel, ctx.currentTime, 0.5);
+      if (def.thunder) this._thunderLater(true);
       this.onchange();
     };
+    clearTimeout(this.thunderTimer);
     setTimeout(start, old ? 700 : 0);
+  }
+
+  // Les grondements arrivent à des moments imprévisibles, jamais en boucle.
+  _thunderLater(first) {
+    const wait = first ? 4000 + Math.random() * 6000 : 18000 + Math.random() * 30000;
+    clearTimeout(this.thunderTimer);
+    this.thunderTimer = setTimeout(() => {
+      if (!this.noiseSrc || !GENERATORS[this.noiseId]?.thunder) return;
+      this.thunders ||= [0, 1, 2].map(() => thunderBuffer(this.ctx));
+      const src = this.ctx.createBufferSource();
+      src.buffer = this.thunders[Math.floor(Math.random() * this.thunders.length)];
+      src.playbackRate.value = 0.8 + Math.random() * 0.35;
+      src.connect(this.noiseGain);
+      src.start();
+      this._thunderLater(false);
+    }, wait);
   }
 
   setNoiseLevel(v) {
@@ -279,11 +546,16 @@ export class AudioEngine {
   }
 
   /* ---------- Signal de changement de phase ---------- */
-  chime(type, volume = 0.6) {
+  chime(type, volume = 0.6, times = 1) {
     if (type === 'aucun' || volume <= 0) return;
     const ctx = this.ensure();
     if (!ctx) return;
-    const t0 = ctx.currentTime + 0.05;
+    // Plusieurs « ding » : on rejoue le signal, un peu espacé.
+    const gap = type === 'bol' ? 1.6 : type === 'douce' ? 1.1 : 0.8;
+    for (let k = 0; k < Math.max(1, times); k++) this._ding(ctx, type, volume, ctx.currentTime + 0.05 + k * gap);
+  }
+
+  _ding(ctx, type, volume, t0) {
     const out = ctx.createGain();
     out.gain.value = volume * 0.5;
     out.connect(ctx.destination);

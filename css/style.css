@@ -138,7 +138,7 @@ body.phase-done #time::after { content: none; }
   opacity: 0;
   transition: opacity 0.6s;
 }
-body.ui #sub, body.phase-idle #sub, body.paused #sub { opacity: 0.6; }
+body.ui #sub, body.phase-idle #sub, body.paused #sub, body.break-ended #sub { opacity: 0.6; }
 
 #setup { display: flex; gap: 8px; }
 #setup .seg { font-size: 13px; opacity: 0.6; }
