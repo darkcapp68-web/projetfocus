@@ -61,6 +61,22 @@ par Google Drive.
 5. **Optionnel** : abonnement DI.FM Premium un jour → je peux ajouter la saisie de la clé
    d'écoute pour avoir toutes leurs chaînes électro sans pub.
 
+## À faire
+
+- **Alléger les Paramètres** (demande de l'utilisateur, 29/10) : pratique au début, mais il y
+  en a trop. État au 29/10 : 65 réglages et boutons répartis en 8 sections (Temps 12,
+  Pause 14, Couleurs 10, Volumes et sons 9, Sauvegarde 9, Musiques 4, Affichage 4,
+  Messages 3), sans compter les listes de radios et de messages. Pistes, à décider avec lui :
+  - ne laisser visibles qu'une dizaine de réglages essentiels, le reste replié dans
+    « Réglages avancés » ;
+  - n'afficher un réglage que s'il sert : « Forme du mode Rythme » seulement en mode Rythme,
+    « Fondu lent » seulement en mode Normal, couleurs de respiration seulement si « une
+    couleur par étape » est cochée ;
+  - retirer ceux qu'on ne change jamais en gardant une bonne valeur par défaut (ID client
+    Google, intensité sans couleurs, simple pulsation, durée du maintien, délai des
+    contrôles…) ;
+  - regrouper : Couleurs et Affichage en une section « Apparence ».
+
 ## Idées en réserve
 
 - **Cadres du mode Rêveur** : le cadre en engrenages est intégré (29/10). D'autres images
