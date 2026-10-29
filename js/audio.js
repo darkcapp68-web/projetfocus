@@ -375,7 +375,6 @@ export class AudioEngine {
   /* ---------- Radio et playlist embarquée ---------- */
   // `resume` : { file, time } pour reprendre la playlist au morceau et à la seconde près.
   playStation(station, resume) {
-    this.held = false;
     this._stopLift();
     this.station = station;
     this.queue = null;
@@ -411,7 +410,6 @@ export class AudioEngine {
   }
 
   stopMusic() {
-    this.held = false;
     this._stopLift();
     this.music.pause();
     // Un flux en direct mis en pause continue de télécharger : on le coupe vraiment.
@@ -435,28 +433,67 @@ export class AudioEngine {
     }, 50);
   }
 
-  /* ---------- Pause : fondu vers la musique douce, puis retour ---------- */
-  // mode 'calme' : musique douce ; 'silence' : on coupe ; 'same' : même musique, plus bas.
-  enterBreak(mode, level) {
-    if (mode === 'same') { this.setMusicLevel(level); return; }
-    if (this.musicOn) {
-      this.held = true;
-      this.setMusicLevel(0, 2500, () => { if (this.held) this.music.pause(); });
+  /* ---------- Pause : une musique à part, puis retour à celle du focus ---------- */
+  // mode : 'calme' (musique douce générée), 'silence', 'same' (même musique, plus bas)
+  // ou 'station' (une playlist ou une radio choisie pour la pause).
+  // Peut être rappelée pendant la pause pour changer de musique.
+  enterBreak(mode, level, station = null) {
+    // On note la musique du focus une seule fois, au début de la pause.
+    if (!this.memo) {
+      this.memo = {
+        station: this.station, on: this.musicOn,
+        file: this.track?.file || null, time: this.track ? this.music.currentTime : 0,
+      };
     }
-    // La musique douce joue même si rien ne jouait avant la pause.
-    if (mode === 'calme') this._startLift(level);
+    this.breakMode = mode;
+    this._stopLift();
+    const m = this.memo;
+    if (mode === 'same') {
+      if (m.on && (this.station !== m.station || this.music.paused)) this._restoreFocus(level);
+      else this.setMusicLevel(level);
+    } else if (mode === 'station' && station) {
+      if (this.station?.id !== station.id || !this.musicOn || this.music.paused) {
+        this.setMusicLevel(level, 0);
+        this.playStation(station);
+      } else this.setMusicLevel(level);
+    } else {
+      // Silence ou musique douce : la musique du lecteur s'efface puis se met en pause.
+      if (!this.music.paused) this.setMusicLevel(0, 2500, () => { if (this.breakMode === mode) this.music.pause(); });
+      if (mode === 'calme') this._startLift(level); // même si rien ne jouait avant la pause
+    }
+    this.onchange();
   }
 
   leaveBreak(level) {
     this._stopLift();
-    if (this.held) {
-      this.held = false;
-      this.music.volume = 0;
-      // La playlist reprend où elle en était ; une radio repart en direct.
+    const m = this.memo;
+    this.memo = null;
+    this.breakMode = null;
+    if (!m) { this.setMusicLevel(level); return; }
+    if (m.on) {
+      if (this.station === m.station && this.musicOn && !this.music.paused) this.setMusicLevel(level, 2500);
+      else this._restoreFocus(level, m);
+    } else if (this.musicOn || !this.music.paused) {
+      this.stopMusic();
+    }
+    this.onchange();
+  }
+
+  // Relance la musique du focus : la playlist reprend au morceau et à la seconde près,
+  // une radio repart en direct.
+  _restoreFocus(level, m = this.memo) {
+    this.music.volume = 0;
+    if (this.station === m.station && this.musicState !== 'stopped') {
       this.music.play().catch(() => {});
+    } else {
+      this.musicLevel = 0;
+      this.playStation(m.station, { file: m.file, time: m.time });
     }
     this.setMusicLevel(level, 2500);
   }
+
+  // Ce que le lecteur doit afficher et enregistrer comme musique « du focus ».
+  get focusTrack() { return this.memo ? { file: this.memo.file, time: this.memo.time, on: this.memo.on } : null; }
 
   get liftOn() { return !!this.liftGain; }
 

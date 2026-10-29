@@ -356,3 +356,7 @@ body.phase-break #pause-vol { display: flex; }
 #settings details.more > summary::before { content: "▸ "; opacity: 0.6; }
 #settings details.more[open] > summary::before { content: "▾ "; }
 #settings details.more > summary small { display: inline; margin-left: 6px; }
+
+/* ---------- Lecteur pendant la pause : son propre menu ---------- */
+body:not(.phase-break) #sel-pause { display: none; }
+body.phase-break #sel-station, body.phase-break #btn-music { display: none; }

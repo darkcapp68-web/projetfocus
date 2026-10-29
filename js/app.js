@@ -406,8 +406,8 @@ function onBreak() { return T.phase === 'break'; }
 
 function applyAudioLevels(fadeMs = 1500) {
   const brk = onBreak();
-  if (brk && audio.liftOn) audio.setLiftLevel(S.musicVolBreak / 100);
-  else if (!audio.held) audio.setMusicLevel((brk ? S.musicVolBreak : S.musicVolWork) / 100, fadeMs);
+  if (brk && audio.breakMode === 'calme') audio.setLiftLevel(S.musicVolBreak / 100);
+  else if (!(brk && audio.breakMode === 'silence')) audio.setMusicLevel((brk ? S.musicVolBreak : S.musicVolWork) / 100, fadeMs);
   let noise = S.noiseVol / 100;
   if (brk && S.duckNoise) noise *= S.musicVolWork > 0 ? Math.min(1, S.musicVolBreak / S.musicVolWork) : 0;
   audio.setNoiseLevel(noise);
@@ -429,14 +429,41 @@ function playSelectedStation(resume) {
   applyAudioLevels(0);
 }
 
+// Musique de pause : 'calme', 'same', 'silence', ou l'identifiant d'une playlist / radio.
+const PAUSE_MODES = [
+  { id: 'calme', name: 'Musique douce (générée)', desc: 'générée par l’appli, sans Internet' },
+  { id: 'same', name: 'Même musique que le focus', desc: 'ta musique du focus, plus bas' },
+  { id: 'silence', name: 'Silence', desc: 'pas de musique pendant la pause' },
+];
+const pauseChoices = () => [
+  ...PAUSE_MODES.map((m) => ({ ...m, group: 'Pendant la pause' })),
+  ...shownStations().filter((st) => kindOf(st) !== 'link'),
+];
+
+function pauseAudio() {
+  const v = S.breakMusic;
+  const level = S.musicVolBreak / 100;
+  if (PAUSE_MODES.some((m) => m.id === v)) { audio.enterBreak(v, level); return; }
+  const st = allStations().find((x) => x.id === v && kindOf(x) !== 'link');
+  if (st) audio.enterBreak('station', level, { ...st, kind: kindOf(st) });
+  else audio.enterBreak('calme', level);
+}
+
 function renderPlayer() {
   const on = audio.musicOn;
+  const brk = onBreak();
+  if ($('#sel-pause').value !== S.breakMusic) $('#sel-pause').value = S.breakMusic;
   $('#btn-music').classList.toggle('playing', on);
   $('#btn-music').setAttribute('aria-label', on ? 'Couper la musique' : 'Lancer la musique');
   const st = audio.station;
   const np = $('#now-playing');
   np.innerHTML = '';
-  if (audio.musicState === 'error') np.textContent = st?.kind === 'tracks' ? 'Morceaux indisponibles hors ligne.' : 'Radio injoignable (hors ligne ?)';
+  const mode = brk ? audio.breakMode : null;
+  if (mode === 'calme' || mode === 'silence' || (mode === 'same' && !audio.memo?.on)) {
+    np.textContent = mode === 'calme' ? 'Musique douce, générée par l’appli · ta musique reprend après la pause'
+      : mode === 'silence' ? 'Silence · ta musique reprend après la pause'
+        : 'Rien ne jouait pendant le focus';
+  } else if (audio.musicState === 'error') np.textContent = st?.kind === 'tracks' ? 'Morceaux indisponibles hors ligne.' : 'Radio injoignable (hors ligne ?)';
   else if (audio.musicState === 'loading') np.textContent = 'Connexion…';
   else if (on && audio.track) {
     np.append(`${audio.track.title} · HoliznaCC0 `);
@@ -465,11 +492,12 @@ function saveAudio() {
   try {
     localStorage.setItem(LS_AUDIO, JSON.stringify({
       station: selStation.value,
-      playing: audio.musicOn,
       noise: selNoise.value,
       // Morceau de la playlist et position, pour reprendre exactement au même endroit.
-      track: audio.track?.file || null,
-      time: audio.track ? Math.floor(audio.music.currentTime) : 0,
+      // En pause, on garde la musique du focus, pas celle de la pause.
+      ...(audio.focusTrack
+        ? { playing: audio.focusTrack.on, track: audio.focusTrack.file, time: Math.floor(audio.focusTrack.time) }
+        : { playing: audio.musicOn, track: audio.track?.file || null, time: audio.track ? Math.floor(audio.music.currentTime) : 0 }),
     }));
   } catch { /* stockage indisponible */ }
 }
@@ -482,7 +510,7 @@ function resumeSavedAudio(e) {
   audio.ensure();
   if (savedAudio.playing && selStation.value !== 'none') playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
   // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
-  if (onBreak()) audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
+  if (onBreak()) pauseAudio();
   if (selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
 }
 
@@ -497,6 +525,16 @@ selStation.addEventListener('change', () => {
   audioTouched = true;
   audio.ensure();
   if (selStation.value === 'none') audio.stopMusic(); else playSelectedStation();
+  renderPlayer();
+});
+
+// Menu du lecteur pendant la pause : choisit la musique de pause (retenue pour les suivantes).
+$('#sel-pause').addEventListener('change', (e) => {
+  audioTouched = true;
+  audio.ensure();
+  S.breakMusic = e.target.value;
+  saveSettings(); syncForm();
+  if (onBreak()) { pauseAudio(); applyAudioLevels(0); }
   renderPlayer();
 });
 
@@ -519,7 +557,7 @@ $('#vol-break').addEventListener('input', (e) => {
 volMusic.addEventListener('input', () => {
   const v = Number(volMusic.value);
   if (onBreak()) S.musicVolBreak = v; else S.musicVolWork = v;
-  if (onBreak() && audio.liftOn) audio.setLiftLevel(v / 100); else audio.setMusicLevel(v / 100, 0);
+  applyAudioLevels(0);
   saveSettings(); syncForm();
 });
 
@@ -626,7 +664,7 @@ function startBreak(fromTimer) {
   T.resumeAt = 0;
   T.breakColor = S.breakColorRandom ? pick(BREAK_COLORS, T.breakColor) : S.breakColor;
   pickCoach();
-  audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
+  pauseAudio();
   applyAudioLevels();
   enterFullscreen();
   if (fromTimer) {
@@ -881,6 +919,8 @@ function fillStationSelects() {
   fillSelect($('#sel-default-radio'), shownStations(), S.defaultRadio, 'Aucune');
   const cur = selStation.value || S.defaultRadio;
   fillSelect(selStation, shownStations(), cur, 'Pas de radio');
+  fillSelect($('#sel-pause'), pauseChoices(), S.breakMusic);
+  fillSelect($('#sel-pause-default'), pauseChoices(), S.breakMusic);
   buildStationPicks();
 }
 
@@ -904,6 +944,8 @@ $('#station-picks').addEventListener('change', (e) => {
   const cur = selStation.value;
   fillSelect($('#sel-default-radio'), shownStations(), S.defaultRadio, 'Aucune');
   fillSelect(selStation, shownStations(), cur, 'Pas de radio');
+  fillSelect($('#sel-pause'), pauseChoices(), S.breakMusic);
+  fillSelect($('#sel-pause-default'), pauseChoices(), S.breakMusic);
   // Une musique décochée qui jouait continue jusqu'au prochain choix.
   if (audio.musicOn && audio.station && !e.target.checked && audio.station.id === id) {
     selStation.add(new Option(audio.station.name, id), 1);
@@ -948,6 +990,7 @@ function onField(el, committed) {
   saveSettings();
   if (el.dataset.k === 'customLinks') fillStationSelects();
   if (el.dataset.k === 'notifyOn' && v) askNotifyPermission();
+  if (el.dataset.k === 'breakMusic' && onBreak()) pauseAudio();
   applySettings();
 }
 

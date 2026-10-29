@@ -19,9 +19,12 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
 2. **Démarrer**. Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la
    souris pour les faire revenir.
 3. À la fin du focus, l'écran prend **une couleur tirée au hasard et respire doucement**, avec
-   une action à faire. Ta musique s'efface en fondu et laisse place à une **musique douce**
-   (façon ascenseur), même si rien ne jouait avant. Le curseur « musique » de l'écran de pause
-   règle son volume. Pour reprendre avant la fin, **maintiens** le bouton 3 secondes.
+   une action à faire. Ta musique du focus se met en pause et le lecteur passe sur la
+   **musique de la pause** : par défaut une musique douce générée par l'appli (façon ascenseur),
+   ou ce que tu choisis dans le menu du lecteur pendant la pause (même musique plus bas,
+   silence, une playlist ou une radio) ; ce choix est retenu pour les pauses suivantes.
+   Le curseur « musique » de l'écran de pause règle son volume. Pour reprendre avant la fin,
+   **maintiens** le bouton 3 secondes.
 4. À la fin de la pause : **3 « ding »**, puis le focus repart tout seul après 5 secondes, et ta
    musique reprend là où elle s'était arrêtée. « Fait, je reprends » permet de ne pas attendre.
 

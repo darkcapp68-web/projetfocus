@@ -74,7 +74,8 @@
         <button type="button" id="btn-music" class="round" aria-label="Lancer la radio">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
         </button>
-        <select id="sel-station" aria-label="Radio"></select>
+        <select id="sel-station" aria-label="Musique du focus"></select>
+        <select id="sel-pause" aria-label="Musique de la pause"></select>
         <input type="range" id="vol-music" min="0" max="100" aria-label="Volume de la musique">
       </div>
       <div class="group">
@@ -123,7 +124,7 @@
     <details class="sec">
       <summary>Volumes et sons <small>musique, pause, bruit de fond, signal</small></summary>
       <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
-      <label>En pause, la musique<select data-k="breakMusic"><option value="calme">laisse place à une musique douce</option><option value="same">continue, plus bas</option><option value="silence">s'arrête</option></select></label>
+      <label>Musique de la pause<select data-k="breakMusic" id="sel-pause-default"></select></label>
       <label>Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
       <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
       <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>
