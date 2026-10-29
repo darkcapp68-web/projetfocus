@@ -1,5 +1,8 @@
 # projetfocus — point de chantier (29/10/2026)
 
+Toutes les règles de fonctionnement et les décisions sont dans **REGLES.md** (à lire en
+premier pour reprendre le travail).
+
 ## Fait (tout est commité en local, rien n'est publié)
 
 **L'appli (site / PWA)**
@@ -7,7 +10,7 @@
   temps au centre, contrôles qui apparaissent au toucher. Démo « journée en accéléré ».
 - Focus / pause / cycles / pause longue, préréglages 25/5 et 50/10.
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
-  apaisante, carrée, 4-7-8), une action du coach, maintenir pour reprendre,
+  apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
   reprise automatique du focus après 5 s.
 - Messages bienveillants (40), coach, notifications, plein écran (désactivé par défaut).
@@ -50,6 +53,7 @@
    - pour enlever la barre d'adresse : créer le dépôt **`TON-COMPTE.github.io`** avec
      `.well-known/assetlinks.json` (je prépare le fichier avec l'empreinte SHA-256).
 4. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
+   - teintes de la respiration (bleu ciel / doré / sombre) : visibles mais pas trop ?
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
    - radios classiques : lesquelles garder ;
