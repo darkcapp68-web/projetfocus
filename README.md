@@ -31,6 +31,8 @@ rechargement, la musique repart au premier toucher. Choisir une musique dans le 
 tout de suite.
 
 Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent).
+Dans Paramètres → Son → « Musiques du menu », décoche les radios et playlists qui ne te
+plaisent pas : elles disparaissent du lecteur (tu peux les recocher quand tu veux).
 Les réglages restent sur l'appareil. Pour avoir les mêmes ailleurs : Paramètres → Exporter,
 puis Importer sur l'autre appareil.
 

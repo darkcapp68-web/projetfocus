@@ -32,6 +32,7 @@ function sanitize(s) {
   if (!okDay) s.dayColors = clone(DEFAULTS.dayColors);
   s.coachActions = s.coachActions.filter((x) => typeof x === 'string' && x.trim());
   s.customLinks = s.customLinks.filter((x) => typeof x === 'string' && x.trim());
+  s.hiddenStations = s.hiddenStations.filter((x) => typeof x === 'string');
   for (const k of Object.keys(s.messages)) s.messages[k] = s.messages[k].filter((x) => typeof x === 'string' && x.trim());
   // Version 2 : la pause enchaîne toute seule sur le focus (3 « ding », puis 5 s).
   if (s.version < 2) { s.autoChain = true; s.version = 2; }
@@ -858,11 +859,42 @@ function buildForm() {
   fillStationSelects();
 }
 
+// Seules les musiques cochées dans Paramètres apparaissent dans les menus.
+const shownStations = () => allStations().filter((st) => !S.hiddenStations.includes(st.id));
+
 function fillStationSelects() {
-  fillSelect($('#sel-default-radio'), allStations(), S.defaultRadio, 'Aucune');
+  fillSelect($('#sel-default-radio'), shownStations(), S.defaultRadio, 'Aucune');
   const cur = selStation.value || S.defaultRadio;
-  fillSelect(selStation, allStations(), cur, 'Pas de radio');
+  fillSelect(selStation, shownStations(), cur, 'Pas de radio');
+  buildStationPicks();
 }
+
+function buildStationPicks() {
+  const box = $('#station-picks');
+  let html = '', group = null;
+  for (const st of allStations()) {
+    if (st.group !== group) { group = st.group; html += `<p class="pick-group">${group || ''}</p>`; }
+    const name = st.name.replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+    html += `<label class="pick">${name}<small>${st.desc || ''}</small><input type="checkbox" data-station="${st.id}"${S.hiddenStations.includes(st.id) ? '' : ' checked'}></label>`;
+  }
+  box.innerHTML = html;
+}
+
+$('#station-picks').addEventListener('change', (e) => {
+  const id = e.target.dataset.station;
+  if (!id) return;
+  S.hiddenStations = S.hiddenStations.filter((x) => x !== id);
+  if (!e.target.checked) S.hiddenStations.push(id);
+  saveSettings();
+  const cur = selStation.value;
+  fillSelect($('#sel-default-radio'), shownStations(), S.defaultRadio, 'Aucune');
+  fillSelect(selStation, shownStations(), cur, 'Pas de radio');
+  // Une musique décochée qui jouait continue jusqu'au prochain choix.
+  if (audio.musicOn && audio.station && !e.target.checked && audio.station.id === id) {
+    selStation.add(new Option(audio.station.name, id), 1);
+    selStation.value = id;
+  }
+});
 
 function syncForm() {
   for (const el of $$('[data-k]', sheet)) {

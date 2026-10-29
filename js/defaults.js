@@ -220,6 +220,7 @@ export const DEFAULTS = {
   defaultNoise: 'none',
   autoStartAudio: true,
   customLinks: [], // une ligne par lien : « Nom | https://… »
+  hiddenStations: [], // musiques décochées dans Paramètres : absentes du menu du lecteur
 
   // Affichage
   timeFormat: 'mmss', // 'mmss' | 'min'
