@@ -120,9 +120,11 @@ body.adjusting #arc, body.adjusting #knob { transition: none; }
 body.dial-liquide #liquid, body.dial-orbites #orbits { display: inline; }
 body.dial-liquide #arc, body.dial-liquide #knob { display: none; }
 body.dial-liquide #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
-#liquid path { fill: var(--dial); }
-#liquid .w1 { opacity: 0.24; }
-#liquid .w2 { opacity: 0.14; }
+/* Le liquide inverse la couleur du fond (orangé → bleu clair, indigo → jaune pâle…). */
+#liquid { mix-blend-mode: difference; }
+#liquid path { fill: #fff; }
+#liquid .w1 { opacity: 0.55; }
+#liquid .w2 { opacity: 0.45; }
 #liquid-level { transition: transform 1.2s ease; }
 body.adjusting #liquid-level { transition: none; }
 #liquid .wave { animation: dial-wave 6s ease-in-out infinite alternate; }
@@ -276,7 +278,7 @@ footer {
 @media (max-width: 680px) {
   #player { flex-direction: column; gap: 8px; }
   #player .group { width: 100%; }
-  #player input[type="range"] { height: 22px; }
+  #player input[type="range"] { height: 24px; width: min(180px, 45vw); }
 }
 
 /* Téléphone à la verticale : tout remonte sous la barre du haut, le cadran prend la hauteur
