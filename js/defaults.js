@@ -87,6 +87,7 @@ export const CHIMES = [
   { id: 'cloche', name: 'Clochette' },
   { id: 'bol', name: 'Bol chantant' },
   { id: 'douce', name: 'Deux notes' },
+  { id: 'tictac', name: 'Tic-tac' },
   { id: 'aucun', name: 'Aucun son' },
 ];
 
@@ -114,6 +115,7 @@ export const DEFAULTS = {
   autoChain: true,
   autoChainDelay: 5, // secondes entre la fin de la pause et la reprise du focus
   endDings: 3, // nombre de « ding » à la fin de la pause
+  countdownSound: 'tictac', // son du compte à rebours : 'tictac' ou 'ding'
   countdownBreak: true, // dings de plus en plus rapprochés dans les 10 dernières secondes de la pause
   countdownFocus: false, // … et du focus
 

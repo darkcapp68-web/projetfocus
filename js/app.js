@@ -1201,7 +1201,8 @@ function countdownTick() {
   // On ne rattrape pas un ding manqué (onglet endormi) : seulement si on est pile dans la seconde.
   if (remaining() < left - 0.6) return;
   lastCountdown = left;
-  audio.countdownDing(S.chimeVol / 100, (10 - left) / 9);
+  if (S.countdownSound === 'ding') audio.countdownDing(S.chimeVol / 100, (10 - left) / 9);
+  else audio.tick(S.chimeVol / 100, COUNTDOWN_AT.indexOf(left) % 2 === 0); // tic, tac, tic…
 }
 
 function tick() {

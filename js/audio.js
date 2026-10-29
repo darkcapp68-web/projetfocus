@@ -598,9 +598,47 @@ export class AudioEngine {
     if (type === 'aucun' || volume <= 0) return;
     const ctx = this.ensure();
     if (!ctx) return;
+    if (type === 'tictac') {
+      // « tic tac tic tac », une fois par signal demandé.
+      for (let k = 0; k < Math.max(1, times) * 4; k++) this._tick(ctx, volume, k % 2 === 0, ctx.currentTime + 0.05 + k * 0.5);
+      return;
+    }
     // Plusieurs « ding » : on rejoue le signal, un peu espacé.
     const gap = type === 'bol' ? 1.6 : type === 'douce' ? 1.1 : 0.8;
     for (let k = 0; k < Math.max(1, times); k++) this._ding(ctx, type, volume, ctx.currentTime + 0.05 + k * gap);
+  }
+
+  // Un « tic » (aigu) ou un « tac » (plus grave) d'horloge : un petit claquement de bois.
+  tick(volume = 0.6, high = true) {
+    if (volume <= 0) return;
+    const ctx = this.ensure();
+    if (ctx) this._tick(ctx, volume, high, ctx.currentTime + 0.02);
+  }
+
+  _tick(ctx, volume, high, t0) {
+    const len = Math.floor(ctx.sampleRate * 0.05);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.006));
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = high ? 3200 : 2000;
+    bp.Q.value = 6;
+    const g = ctx.createGain();
+    g.gain.value = volume * 2.2;
+    src.connect(bp).connect(g).connect(ctx.destination);
+    // Le corps de l'horloge : une note sourde très brève sous le claquement.
+    const o = ctx.createOscillator();
+    const og = ctx.createGain();
+    o.frequency.value = high ? 900 : 620;
+    og.gain.setValueAtTime(volume * 0.12, t0);
+    og.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.04);
+    o.connect(og).connect(ctx.destination);
+    src.start(t0);
+    o.start(t0);
+    o.stop(t0 + 0.06);
   }
 
   // Petit « ding » court du compte à rebours ; `urgency` (0 à 1) le fait monter un peu.
