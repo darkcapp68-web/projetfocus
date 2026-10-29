@@ -39,8 +39,9 @@ premier pour reprendre le travail).
 
 1. **Publication** : fait. Site en ligne sur https://darkcapp68-web.github.io/projetfocus/
    (dépôt `darkcapp68-web/projetfocus`, GitHub Pages sur `main` / root).
-2. **Synchronisation Google** : ID client mis dans le code. Reste à essayer la connexion avec
-   le vrai Google (Paramètres → Sauvegarde → Se connecter à Google Drive) sur le site publié.
+2. **Synchronisation Google** : fait. ID client dans le code, testé avec le vrai Google sur
+   `localhost:8417` (fichier `projetfocus-parametres.json` créé dans le Drive). À faire une fois
+   sur chaque appareil : Paramètres → Sauvegarde → Se connecter à Google Drive.
 3. **APK** (après la publication) :
    - fait : l'adresse du site est réglée sur `darkcapp68-web.github.io` ;
    - créer la **clé de signature** dans Android Studio et la garder hors du dépôt ;
@@ -63,4 +64,3 @@ premier pour reprendre le travail).
   (voulu).
 - Onglet caché sans son : les notifications peuvent arriver jusqu'à une minute en retard.
 - iPhone : pas de réglage de volume de la radio par la page (sans objet, tout est Android).
-- La synchronisation Google n'a pas encore été testée avec le vrai Google (attend l'ID).
