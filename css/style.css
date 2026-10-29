@@ -167,7 +167,8 @@ body.phase-focus #btn-skip, body.phase-focus #btn-stop { display: inline-block; 
 body.phase-break #actions { display: none; }
 
 #break-actions { display: none; }
-body.phase-break #break-actions { display: flex; }
+body.phase-break #break-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#btn-stop-break { font-size: 12px; padding: 0.5em 1.2em; }
 #btn-done { display: none; }
 body.break-ended #btn-done { display: inline-block; }
 body.break-ended #btn-hold { display: none; }

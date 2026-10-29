@@ -27,7 +27,7 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
    ou ce que tu choisis dans le menu du lecteur pendant la pause (même musique plus bas,
    silence, une playlist ou une radio) ; ce choix est retenu pour les pauses suivantes.
    Le curseur « musique » de l'écran de pause règle son volume. Pour reprendre avant la fin,
-   **maintiens** le bouton 3 secondes.
+   **maintiens** le bouton 3 secondes ; « Arrêter » (au toucher) met fin à la série.
 4. Dans les 10 dernières secondes de la pause, un petit « ding » toutes les 2 secondes, puis
    chaque seconde (réglable, et possible aussi pour le focus dans Paramètres → Temps).
    À la fin de la pause : **3 « ding »**, puis le focus repart tout seul après 5 secondes, et ta

@@ -787,6 +787,7 @@ $('#btn-start').addEventListener('click', () => {
 
 $('#btn-skip').addEventListener('click', () => { if (T.phase === 'focus') startBreak(false); });
 $('#btn-stop').addEventListener('click', resetAll);
+$('#btn-stop-break').addEventListener('click', resetAll);
 $('#btn-done').addEventListener('click', resumeFromBreak);
 
 $('#edit-focus').addEventListener('click', () => { T.editing = 'focus'; render(true); });
