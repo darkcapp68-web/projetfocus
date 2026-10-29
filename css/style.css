@@ -275,9 +275,11 @@ footer {
 #player select { max-width: 14em; }
 #player input[type="range"] { grid-column: 1 / -1; justify-self: center; width: 124px; }
 @media (max-width: 680px) {
-  #player { flex-direction: column; gap: 8px; }
-  #player .group { width: 100%; }
-  #player input[type="range"] { height: 24px; width: min(180px, 45vw); }
+  /* Le lecteur prend toute la largeur : menu étiré, curseur sur toute la ligne. */
+  #player { flex-direction: column; gap: 8px; width: 100%; }
+  #player .group { width: 100%; max-width: 460px; grid-template-columns: auto minmax(0, 1fr); }
+  #player select { max-width: none; width: 100%; }
+  #player input[type="range"] { height: 24px; width: 100%; }
 }
 
 /* Téléphone à la verticale : tout remonte sous la barre du haut, le cadran prend la hauteur
