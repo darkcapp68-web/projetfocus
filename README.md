@@ -16,8 +16,11 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
 1. **Tourne le cadran** (doigt ou souris) pour choisir la durée du focus. Touche « pause »
    sous le cadran pour régler la pause de la même façon. Les raccourcis 25/5 et 50/10, et le
    nombre de cycles, sont en haut à gauche.
-2. **Démarrer**. Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la
-   souris pour les faire revenir.
+2. **Démarrer** : le minuteur, ta musique et ton bruit de fond se lancent. **Arrêter** coupe
+   tout (minuteur, musique, bruit) en gardant tes choix pour le prochain Démarrer.
+   L'interrupteur à côté du bruit de fond le coupe ou le remet sans perdre le bruit choisi.
+   Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la souris pour
+   les faire revenir.
 3. À la fin du focus, l'écran prend **une couleur tirée au hasard et respire doucement**, avec
    une action à faire. Ta musique du focus se met en pause et le lecteur passe sur la
    **musique de la pause** : par défaut une musique douce générée par l'appli (façon ascenseur),

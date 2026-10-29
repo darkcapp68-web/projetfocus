@@ -492,6 +492,14 @@ export class AudioEngine {
     this.setMusicLevel(level, 2500);
   }
 
+  // Bouton « Arrêter » : plus aucun son (musique, musique de pause, bruit de fond).
+  stopAll() {
+    this.memo = null;
+    this.breakMode = null;
+    this.stopMusic();
+    this.setNoise('none');
+  }
+
   // Ce que le lecteur doit afficher et enregistrer comme musique « du focus ».
   get focusTrack() { return this.memo ? { file: this.memo.file, time: this.memo.time, on: this.memo.on } : null; }
 

@@ -491,6 +491,22 @@ audio.onchange = renderPlayer;
 const LS_AUDIO = 'projetfocus.audio';
 const savedAudio = (() => { try { return JSON.parse(localStorage.getItem(LS_AUDIO)) || {}; } catch { return {}; } })();
 let audioTouched = false; // tant que rien n'a été touché, on ne remplace pas le souvenir
+// Interrupteur du bruit de fond : coupe le bruit sans perdre le bruit choisi.
+let noiseOn = savedAudio.noiseOn ?? true;
+
+function renderNoiseSwitch() {
+  const b = $('#btn-noise');
+  b.classList.toggle('on', noiseOn);
+  b.setAttribute('aria-checked', String(noiseOn));
+  b.setAttribute('aria-label', noiseOn ? 'Couper le bruit de fond' : 'Remettre le bruit de fond');
+}
+
+function applyNoise() {
+  applyAudioLevels(0);
+  audio.setNoise(noiseOn ? selNoise.value : 'none');
+  renderNoiseSwitch();
+  saveAudio();
+}
 
 function saveAudio() {
   if (!audioTouched) return;
@@ -498,6 +514,7 @@ function saveAudio() {
     localStorage.setItem(LS_AUDIO, JSON.stringify({
       station: selStation.value,
       noise: selNoise.value,
+      noiseOn,
       // Morceau de la playlist et position, pour reprendre exactement au même endroit.
       // En pause, on garde la musique du focus, pas celle de la pause.
       ...(audio.focusTrack
@@ -516,7 +533,7 @@ function resumeSavedAudio(e) {
   if (savedAudio.playing && selStation.value !== 'none') playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
   // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
   if (onBreak()) pauseAudio();
-  if (selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
+  if (noiseOn && selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
 }
 
 $('#btn-music').addEventListener('click', () => {
@@ -545,9 +562,8 @@ $('#sel-pause').addEventListener('change', (e) => {
 
 selNoise.addEventListener('change', () => {
   audioTouched = true;
-  applyAudioLevels(0);
-  audio.setNoise(selNoise.value);
-  saveAudio();
+  if (selNoise.value !== 'none') noiseOn = true; // choisir un bruit le rallume
+  applyNoise();
 });
 
 // Curseur de l'écran de pause : règle le volume de la musique de pause.
@@ -634,8 +650,15 @@ function autoStartAudio() {
     const st = allStations().find((s) => s.id === selStation.value);
     if (st && kindOf(st) !== 'link') playSelectedStation();
   }
-  if (selNoise.value !== 'none' && audio.noiseId !== selNoise.value) audio.setNoise(selNoise.value);
+  if (noiseOn && selNoise.value !== 'none' && audio.noiseId !== selNoise.value) audio.setNoise(selNoise.value);
 }
+
+$('#btn-noise').addEventListener('click', () => {
+  audioTouched = true;
+  audio.ensure();
+  noiseOn = !noiseOn;
+  applyNoise();
+});
 
 /* =========================================================
    Phases
@@ -725,7 +748,7 @@ function resetAll() {
   T.afterBreak = false;
   leaveFullscreen();
   keepAwake(false);
-  audio.leaveBreak(S.musicVolWork / 100);
+  audio.stopAll(); // « Arrêter » coupe tout ; « Démarrer » relancera musique et bruit
   applyAudioLevels();
   showText('');
   saveState();
@@ -1169,6 +1192,7 @@ buildForm();
 buildLibrary();
 syncForm();
 fillSelect(selNoise, NOISES, savedAudio.noise ?? S.defaultNoise);
+renderNoiseSwitch();
 const firstStation = savedAudio.station ?? S.defaultRadio;
 selStation.value = [...selStation.options].some((o) => o.value === firstStation) ? firstStation : 'none';
 restoreState();
