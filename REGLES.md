@@ -138,7 +138,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   la première connexion d'un appareil : le Drive gagne toujours** (sinon un appareil neuf,
   juste touché, écrase les réglages des autres). Avant chaque récupération, les réglages de
   l'appareil sont gardés (`projetfocus.settings.avant-drive`) : bouton « Remettre mes réglages
-  d'avant » dans Sauvegarde. ID client
+  d'avant » dans Sauvegarde.
+  Connexion Google expirée (environ 1 h) : **une seule** fenêtre Google ouverte d'office (au
+  premier toucher) ; si elle est fermée, plus de demande automatique, la synchronisation
+  attend « Synchroniser maintenant » ou la prochaine ouverture. ID client
   Google dans `js/defaults.js` (projet Google Cloud `projetfocus`, client **Application Web**,
   origines `http://localhost:8417` et `https://darkcapp68-web.github.io`, en test). Le code
   secret du client n'est **jamais** utilisé ni écrit dans le dépôt. Non synchronisés : musique hors ligne, phase en cours.

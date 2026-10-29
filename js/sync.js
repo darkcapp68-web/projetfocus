@@ -17,7 +17,8 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
   let state = (() => { try { return JSON.parse(localStorage.getItem(LS_SYNC)) || {}; } catch { return {}; } })();
   let token = null, tokenExp = 0, client = null, clientFor = '';
   let onToken = null, onTokenError = null;
-  let pushTimer = 0, pending = false, busy = false, lastAsk = 0;
+  let pushTimer = 0, pending = false, busy = false;
+  let autoAsked = false; // une seule fenêtre Google ouverte d'office tant qu'elle n'aboutit pas
 
   const save = () => { try { localStorage.setItem(LS_SYNC, JSON.stringify(state)); } catch { /* rien */ } };
   const status = (text, kind = '') => onStatus({ text, kind, connected: !!state.connected });
@@ -144,7 +145,7 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
       pending = true;
       status(tokenOk()
         ? `Pas de synchronisation (${e.message}) : nouvel essai plus tard.`
-        : 'Connexion à renouveler : touche l’écran ou clique « Synchroniser maintenant ».', 'warn');
+        : 'Connexion à renouveler : clique « Synchroniser maintenant ».', 'warn');
     } finally {
       busy = false;
     }
@@ -152,16 +153,16 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
   }
 
   async function withToken(firstTime) {
-    lastAsk = Date.now();
     try {
       await getToken(firstTime);
     } catch (e) {
       pending = true;
       status(e.message === 'sans identifiant'
         ? 'Ajoute d’abord l’ID client Google (voir le README).'
-        : `Connexion Google impossible (${e.message}).`, 'warn');
+        : `Synchronisation en pause (${e.message}) : clique « Synchroniser maintenant » quand tu veux.`, 'warn');
       return;
     }
+    autoAsked = false; // connexion rétablie : à la prochaine expiration, on pourra redemander une fois
     await syncNow();
   }
 
@@ -200,13 +201,15 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
       clearTimeout(pushTimer);
       pushTimer = setTimeout(() => {
         if (tokenOk()) syncNow();
-        else status('Changement à envoyer : touche l’écran pour renouveler la connexion.', 'warn');
+        else status('Changement à envoyer : clique « Synchroniser maintenant » pour renouveler la connexion.', 'warn');
       }, PUSH_DELAY);
     },
 
     // Premier toucher, page revenue au premier plan, retour du réseau.
     gesture() {
-      if (state.connected && pending && !tokenOk() && Date.now() - lastAsk > 60000) withToken(false);
+      // Une seule demande d'office ; si la fenêtre est fermée, on ne harcèle pas :
+      // la suite se fera par « Synchroniser maintenant » (ou à la prochaine ouverture).
+      if (state.connected && pending && !tokenOk() && !autoAsked) { autoAsked = true; withToken(false); }
     },
     wake() {
       if (state.connected && tokenOk()) syncNow(); // récupère ce qui a changé sur un autre appareil
