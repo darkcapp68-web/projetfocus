@@ -218,9 +218,10 @@ footer {
   font-size: 13px;
 }
 #player .group { display: flex; align-items: center; gap: 8px; }
-#btn-music svg { width: 14px; height: 14px; fill: currentColor; }
-#btn-music .i-pause, #btn-music.playing .i-play { display: none; }
-#btn-music.playing .i-pause { display: inline; }
+/* Boutons lecture / pause (musique et bruit de fond) */
+button.play svg { width: 14px; height: 14px; fill: currentColor; }
+button.play .i-pause, button.play.playing .i-play { display: none; }
+button.play.playing .i-pause { display: inline; }
 #now-playing { width: 100%; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
 #now-playing button.link { font-size: inherit; padding: 0 0.3em; text-decoration: underline; text-underline-offset: 3px; }
 .lib-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
@@ -361,28 +362,3 @@ body.phase-break #pause-vol { display: flex; }
 /* ---------- Lecteur pendant la pause : son propre menu ---------- */
 body:not(.phase-break) #sel-pause { display: none; }
 body.phase-break #sel-station, body.phase-break #btn-music { display: none; }
-
-/* ---------- Interrupteur du bruit de fond ---------- */
-button.switch {
-  position: relative;
-  width: 34px;
-  height: 20px;
-  padding: 0;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: transparent;
-  flex: none;
-}
-button.switch span {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.45;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-button.switch.on { background: rgba(255, 255, 255, 0.22); border-color: transparent; }
-button.switch.on span { transform: translateX(14px); opacity: 1; }

@@ -18,7 +18,8 @@ La référence complète est dans [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md)
    nombre de cycles, sont en haut à gauche.
 2. **Démarrer** : le minuteur, ta musique et ton bruit de fond se lancent. **Arrêter** coupe
    tout (minuteur, musique, bruit) en gardant tes choix pour le prochain Démarrer.
-   L'interrupteur à côté du bruit de fond le coupe ou le remet sans perdre le bruit choisi.
+   Le bouton ▶ à côté du bruit de fond (le même que pour la musique) le coupe ou le relance
+   sans perdre le bruit choisi.
    Les boutons s'effacent après quelques secondes ; touche l'écran ou bouge la souris pour
    les faire revenir.
 3. À la fin du focus, l'écran prend **une couleur tirée au hasard et respire doucement**, avec

@@ -72,7 +72,7 @@
   <footer>
     <div id="player" class="ctl">
       <div class="group">
-        <button type="button" id="btn-music" class="round" aria-label="Lancer la radio">
+        <button type="button" id="btn-music" class="round play" aria-label="Lancer la radio">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
         </button>
         <select id="sel-station" aria-label="Musique du focus"></select>
@@ -80,7 +80,9 @@
         <input type="range" id="vol-music" min="0" max="100" aria-label="Volume de la musique">
       </div>
       <div class="group">
-        <button type="button" id="btn-noise" class="switch" role="switch" aria-checked="true" aria-label="Couper le bruit de fond"><span></span></button>
+        <button type="button" id="btn-noise" class="round play" aria-label="Lancer le bruit de fond">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
+        </button>
         <select id="sel-noise" aria-label="Bruit de fond"></select>
         <input type="range" id="vol-noise" min="0" max="100" aria-label="Volume du bruit de fond">
       </div>

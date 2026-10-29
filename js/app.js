@@ -485,6 +485,7 @@ function renderPlayer() {
     const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
   }
+  renderNoiseSwitch();
   saveAudio();
 }
 audio.onchange = renderPlayer;
@@ -496,11 +497,12 @@ let audioTouched = false; // tant que rien n'a été touché, on ne remplace pas
 // Interrupteur du bruit de fond : coupe le bruit sans perdre le bruit choisi.
 let noiseOn = savedAudio.noiseOn ?? true;
 
+// Même bouton lecture / pause que la musique : il montre si le bruit joue vraiment.
 function renderNoiseSwitch() {
   const b = $('#btn-noise');
-  b.classList.toggle('on', noiseOn);
-  b.setAttribute('aria-checked', String(noiseOn));
-  b.setAttribute('aria-label', noiseOn ? 'Couper le bruit de fond' : 'Remettre le bruit de fond');
+  const playing = audio.noiseId !== 'none';
+  b.classList.toggle('playing', playing);
+  b.setAttribute('aria-label', playing ? 'Couper le bruit de fond' : 'Lancer le bruit de fond');
 }
 
 function applyNoise() {
@@ -658,7 +660,7 @@ function autoStartAudio() {
 $('#btn-noise').addEventListener('click', () => {
   audioTouched = true;
   audio.ensure();
-  noiseOn = !noiseOn;
+  noiseOn = audio.noiseId === 'none'; // en lecture : on coupe ; coupé : on relance
   applyNoise();
 });
 
