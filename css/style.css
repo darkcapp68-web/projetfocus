@@ -61,6 +61,7 @@ body.ui .ctl { opacity: 1; pointer-events: auto; }
 #pulse { transition-property: opacity, background-color; transition-timing-function: ease-in-out; }
 #breath {
   margin-top: 0.8em;
+  font-weight: 600;
   min-height: 1.2em;
   font-size: 13px;
   letter-spacing: 0.3em;
@@ -132,7 +133,7 @@ body.adjusting #ticks, body.phase-idle.ui #ticks { opacity: 1; }
 }
 #time {
   font-size: calc(var(--dial-size) * 0.22);
-  font-weight: 200;
+  font-weight: 400;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -142,6 +143,7 @@ body.phase-done #time { font-size: calc(var(--dial-size) * 0.11); }
 body.phase-done #time::after { content: none; }
 #sub {
   margin-top: 0.6em;
+  font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -162,21 +164,18 @@ body:not(.phase-idle) #setup { display: none; }
   min-height: 2.9em;
   text-align: center;
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 500;
   opacity: 0.82;
   transition: opacity 1.5s ease;
   text-wrap: balance;
 }
 #message.coach { font-size: 19px; opacity: 0.95; }
 
-/* Respiration sur une teinte claire : texte sombre, plus gras et plus opaque
-   (un trait fin s'efface sur le bleu ciel ou le doré). */
-body.ink-dark #time { font-weight: 400; }
-body.ink-dark #message { font-weight: 500; opacity: 1; }
-body.ink-dark #sub, body.ink-dark #breath { font-weight: 600; }
+/* Respiration sur une teinte claire : texte sombre, plus opaque, cadran plus marqué
+   (la graisse de la police reste la même partout). */
+body.ink-dark #message { opacity: 1; }
 body.ink-dark #breath.on { opacity: 0.9; }
-body.ink-dark #info, body.ink-dark #now-playing { font-weight: 500; }
-body.ink-dark #coach-list button { font-weight: 500; opacity: 0.9; }
+body.ink-dark #coach-list button { opacity: 0.9; }
 body.ink-dark button:not(#settings button) { border-color: rgba(0, 0, 0, 0.35); }
 body.ink-dark #dial .track { fill: rgba(0, 0, 0, 0.04); stroke: rgba(0, 0, 0, 0.25); }
 body.ink-dark #arc { stroke-width: 3; }
@@ -218,7 +217,7 @@ body.break-ended #btn-hold { display: none; }
 
 #coach-list { list-style: none; margin: 0; padding: 0; display: none; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 640px; }
 body.phase-break:not(.break-ended) #coach-list { display: flex; }
-#coach-list button { font-size: 12px; opacity: 0.7; padding: 0.25em 0.9em; }
+#coach-list button { font-size: 12px; font-weight: 500; opacity: 0.7; padding: 0.25em 0.9em; }
 #coach-list button:hover { opacity: 1; }
 
 /* ---------- Bas ---------- */
@@ -244,7 +243,7 @@ footer {
 button.play svg { width: 14px; height: 14px; fill: currentColor; }
 button.play .i-pause, button.play.playing .i-play { display: none; }
 button.play.playing .i-pause { display: inline; }
-#now-playing { width: 100%; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
+#now-playing { width: 100%; font-weight: 500; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
 #now-playing button.link { font-size: inherit; padding: 0 0.3em; text-decoration: underline; text-underline-offset: 3px; }
 .lib-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
 .lib-row small { display: block; }
@@ -264,7 +263,7 @@ select optgroup option { font-weight: 400; color: #fff; }
 
 input[type="range"] { width: 88px; accent-color: var(--fg); cursor: pointer; }
 
-#info { font-size: 12px; letter-spacing: 0.06em; opacity: 0.55; min-height: 1.4em; }
+#info { font-size: 12px; font-weight: 500; letter-spacing: 0.06em; opacity: 0.55; min-height: 1.4em; }
 body.no-info #info { visibility: hidden; }
 
 /* ---------- Panneau Paramètres ---------- */
