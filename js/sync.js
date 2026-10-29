@@ -1,6 +1,7 @@
 // Synchronisation des Paramètres avec Google Drive.
 // Un fichier visible « projetfocus-parametres.json » dans ton Drive : à l'ouverture on le lit,
-// à chaque changement on le réécrit ; la version la plus récente (updatedAt) gagne.
+// à chaque changement on le réécrit ; la version la plus récente (updatedAt) gagne, sauf à la
+// première connexion d'un appareil, où le Drive gagne toujours.
 // L'accès (portée drive.file) se limite aux fichiers créés par l'appli.
 
 const FILE_NAME = 'projetfocus-parametres.json';
@@ -129,7 +130,9 @@ export function createSync({ getSettings, applyRemote, onStatus }) {
       if (state.fileId) {
         const remote = await (await drive(`${API}/${state.fileId}?alt=media`)).json();
         const r = Number(remote.updatedAt) || 0, l = Number(local.updatedAt) || 0;
-        if (r > l) applyRemote(remote);
+        // Première synchronisation de cet appareil : le Drive gagne toujours (sinon un
+        // appareil neuf, juste touché, écraserait les réglages de tous les autres).
+        if (!state.lastSync || r > l) applyRemote(remote);
         else if (r < l) await writeFile(local);
       } else {
         await writeFile(local);

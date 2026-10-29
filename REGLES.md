@@ -134,7 +134,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Synchronisation Google Drive** : fichier visible `projetfocus-parametres.json` dans
   « Mon Drive » (portée `drive.file`), lu au premier toucher et au retour sur l'appli,
-  réécrit 3 s après chaque changement, la plus récente version gagne (`updatedAt`). ID client
+  réécrit 3 s après chaque changement, la plus récente version gagne (`updatedAt`), **sauf à
+  la première connexion d'un appareil : le Drive gagne toujours** (sinon un appareil neuf,
+  juste touché, écrase les réglages des autres). Avant chaque récupération, les réglages de
+  l'appareil sont gardés (`projetfocus.settings.avant-drive`) : bouton « Remettre mes réglages
+  d'avant » dans Sauvegarde. ID client
   Google dans `js/defaults.js` (projet Google Cloud `projetfocus`, client **Application Web**,
   origines `http://localhost:8417` et `https://darkcapp68-web.github.io`, en test). Le code
   secret du client n'est **jamais** utilisé ni écrit dans le dépôt. Non synchronisés : musique hors ligne, phase en cours.

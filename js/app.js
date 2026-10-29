@@ -9,6 +9,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const body = document.body;
 
 const LS_SETTINGS = 'projetfocus.settings';
+const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
 /* =========================================================
    Paramètres (localStorage)
@@ -1174,6 +1175,8 @@ var sync = createSync({
   getSettings: () => S,
   // Paramètres plus récents trouvés sur le Drive : on les applique ici.
   applyRemote: (remote) => {
+    try { localStorage.setItem(LS_BEFORE_SYNC, JSON.stringify(S)); } catch { /* stockage indisponible */ }
+    if (undoBtn) undoBtn.hidden = false;
     S = sanitize(merge(DEFAULTS, remote));
     saveSettings(false);
     buildForm(); syncForm(); applySettings();
@@ -1191,6 +1194,25 @@ $('#btn-sync').addEventListener('click', () => {
   if (sync.connected) sync.disconnect(); else sync.connect();
 });
 $('#btn-sync-now').addEventListener('click', () => sync.syncNow());
+
+// Revenir aux réglages de cet appareil d'avant la dernière récupération depuis le Drive ;
+// ils deviennent les plus récents et repartent vers le Drive.
+// (Absent d'une ancienne page encore en cache : on s'en passe.)
+const undoBtn = $('#btn-undo-sync');
+if (undoBtn) undoBtn.hidden = !localStorage.getItem(LS_BEFORE_SYNC);
+undoBtn?.addEventListener('click', () => {
+  let before;
+  try { before = JSON.parse(localStorage.getItem(LS_BEFORE_SYNC)); } catch { /* copie illisible */ }
+  if (!before) return;
+  if (!confirm('Remettre les réglages de cet appareil d’avant la dernière récupération depuis Google Drive ? Ils seront renvoyés vers le Drive.')) return;
+  const keepId = S.syncClientId;
+  S = sanitize(merge(DEFAULTS, before));
+  S.syncClientId ||= keepId;
+  localStorage.removeItem(LS_BEFORE_SYNC);
+  undoBtn.hidden = true;
+  saveSettings(); buildForm(); syncForm(); applySettings();
+  note('Réglages d’avant remis ; ils partent vers Google Drive.');
+});
 
 $('#btn-day-demo').addEventListener('click', startDayDemo);
 // Un toucher pendant la démo l'arrête (sauf dans la première demi-seconde).
