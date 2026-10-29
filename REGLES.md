@@ -164,7 +164,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   une à deux minutes, sur le PC et le téléphone : on pousse après chaque modification
   (voir section 9).
 - **Version** affichée en bas des Paramètres (`APP_VERSION` dans `js/app.js`) : la changer
-  (date · heure) à chaque envoi. Bouton « Mettre à jour l'appli » à côté : vide le cache du
+  à chaque envoi avec la **vraie** date et heure du PC (`date "+%d/%m/%Y · %Hh%M"`), jamais
+  une heure inventée. Bouton « Mettre à jour l'appli » à côté : vide le cache du
   site (pas la musique) et recharge, pour un appareil resté sur une ancienne version. Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
   CHANTIER.md visibles) : jamais de secret dedans (ni code secret Google, ni clé APK).
 
