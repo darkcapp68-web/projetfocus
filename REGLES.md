@@ -10,7 +10,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 ## 1. Principes
 
 - PWA en HTML / CSS / JavaScript **sans framework ni build** : le dossier se publie tel quel
-  (GitHub Pages, dépôt `projetfocus`, compte perso de l'utilisateur).
+  (GitHub Pages, dépôt public `darkcapp68-web/projetfocus`, branche `main` / racine).
+  Site : https://darkcapp68-web.github.io/projetfocus/
 - **Un seul site à maintenir.** PC : appli installée depuis Chrome / Edge (fenêtre à part).
   Téléphone et tablette (tout Android, pas d'Apple) : APK « coquille » (projet Android Studio
   `android/`, Trusted Web Activity) qui ouvre le site publié. L'APK n'a pas de maintenance.
@@ -146,9 +147,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   ne répond pas en 3 s ou hors ligne) : **un seul F5 suffit** pour voir une nouvelle version.
   Musique en cache séparé (`projetfocus-music-v1`, « cache d'abord »), lecture par morceaux
   (Range) depuis le cache. Augmenter `CACHE` dans `sw.js` quand la liste des fichiers change.
-- Rien n'est publié. Publication sur GitHub Pages **uniquement avec l'accord explicite** de
-  l'utilisateur (dépôt public : CAHIER_DES_CHARGES.md, REGLES.md, CHANTIER.md seront
-  visibles).
+- **Publié** sur GitHub Pages (remote `origin`). Chaque `git push` met le site en ligne en
+  une à deux minutes, sur le PC et le téléphone : **pousser uniquement avec l'accord explicite**
+  de l'utilisateur, à chaque fois. Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
+  CHANTIER.md visibles) : jamais de secret dedans (ni code secret Google, ni clé APK).
 
 ## 9. Conventions de travail (pour Claude)
 

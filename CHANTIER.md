@@ -3,7 +3,7 @@
 Toutes les règles de fonctionnement et les décisions sont dans **REGLES.md** (à lire en
 premier pour reprendre le travail).
 
-## Fait (tout est commité en local, rien n'est publié)
+## Fait (publié sur https://darkcapp68-web.github.io/projetfocus/)
 
 **L'appli (site / PWA)**
 - Un seul écran : fond qui suit l'heure en dégradé continu (OKLab), cadran à tourner,
@@ -23,6 +23,9 @@ premier pour reprendre le travail).
 - Paramètres en 8 sections repliables, export / import JSON.
 - Synchronisation Google Drive des paramètres (codée et testée avec un faux Google).
 
+**En service** : sur le PC et sur le téléphone (installé depuis Chrome), réglages partagés
+par Google Drive.
+
 **Appli Android**
 - Projet Android Studio `android/` (mêmes versions que Frigo) : APK « coquille » qui ouvre
   le site publié. Guide : `android/README.md`.
@@ -33,7 +36,7 @@ premier pour reprendre le travail).
 
 ## En cours
 
-- Rien : tout attend les points ci-dessous.
+- Rien. L'APK est remis à plus tard (décision de l'utilisateur, 29/10).
 
 ## Ce dont j'ai besoin de toi
 
