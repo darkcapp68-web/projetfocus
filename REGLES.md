@@ -152,8 +152,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   Musique en cache séparé (`projetfocus-music-v1`, « cache d'abord »), lecture par morceaux
   (Range) depuis le cache. Augmenter `CACHE` dans `sw.js` quand la liste des fichiers change.
 - **Publié** sur GitHub Pages (remote `origin`). Chaque `git push` met le site en ligne en
-  une à deux minutes, sur le PC et le téléphone : **pousser uniquement avec l'accord explicite**
-  de l'utilisateur, à chaque fois. Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
+  une à deux minutes, sur le PC et le téléphone : on pousse après chaque modification
+  (voir section 9). Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
   CHANTIER.md visibles) : jamais de secret dedans (ni code secret Google, ni clé APK).
 
 ## 9. Conventions de travail (pour Claude)
@@ -161,7 +161,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Répondre en **français**, simplement. Ne rien toucher **en dehors de `C:\projetfocus`**
   (lire un autre projet pour s'aligner est permis, sans le modifier). Projet Solin
   (`C:\spro`) : interdit.
-- Commits locaux, messages en français ; ne jamais pousser sans accord.
+- Commits en français. **Pousser sur GitHub après chaque modification** (accord durable de
+  l'utilisateur, 29/10/2026, pour ce projet : il teste sur PC et téléphone). Exception : tout
+  ce qui touche aux secrets ou au dépôt `darkcapp68-web.github.io` se demande avant.
 - Tester dans le navigateur intégré **sur `http://127.0.0.1:8417`** (mémoire séparée) pour
   ne pas perturber la session de l'utilisateur sur `localhost:8417`. Ne jamais recharger son
   onglet en pleine utilisation. Le navigateur intégré refuse tout service worker (« unknown
