@@ -369,7 +369,15 @@ body.no-info #info { visibility: hidden; }
 #settings details.sec > summary small { display: inline; flex: 1; }
 #settings details.sec > summary::after { content: "+"; opacity: 0.5; font-size: 18px; line-height: 1; }
 #settings details.sec[open] > summary::after { content: "−"; }
-#settings details.sec[open] { padding-bottom: 12px; }
+#settings details.sec[open] { padding-bottom: 12px; box-shadow: inset 3px 0 0 rgba(143, 211, 255, 0.55); }
+/* Section ouverte : sa ligne est surlignée et ses réglages décalés à droite. */
+#settings details.sec[open] > summary {
+  margin: 0 -20px;
+  padding: 14px 20px;
+  background: rgba(143, 211, 255, 0.16);
+  font-weight: 600;
+}
+#settings details.sec[open] > :not(summary) { margin-left: 16px; }
 #settings details.more { margin-top: 6px; }
 #settings details.more > summary { padding: 9px 0; cursor: pointer; opacity: 0.8; font-size: 13px; list-style: none; }
 #settings details.more > summary::before { content: "▸ "; opacity: 0.6; }

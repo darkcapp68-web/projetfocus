@@ -122,7 +122,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 ## 7. Paramètres et sauvegarde
 
 - Bouton « Paramètres » discret, visible avec les contrôles. Panneau en **8 sections
-  repliables**, une seule ouverte à la fois : Temps, Pause, Volumes et sons, Musiques,
+  repliables**, une seule ouverte à la fois (sa ligne est surlignée en bleu clair, ses réglages
+  décalés à droite avec un trait bleu) : Temps, Pause, Volumes et sons, Musiques,
   Messages, Couleurs, Affichage, Sauvegarde. Les longues listes sont repliées dans leur
   section.
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
