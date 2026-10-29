@@ -244,12 +244,14 @@ footer {
 #player button.play svg { width: 18px; height: 18px; }
 #player select { min-height: 44px; padding: 0.4em 0.3em; }
 #player input[type="range"] { width: 100px; height: 30px; zoom: 1.45; }
-/* Téléphone à la verticale : le curseur de volume passe sous son bouton et son menu. */
-@media (max-width: 480px) {
+/* Le curseur de volume passe sous son bouton et son menu (partout) ; sur un écran étroit
+   (téléphone à la verticale), les deux blocs s'empilent. */
+#player .group { flex-wrap: wrap; justify-content: center; gap: 4px 10px; width: 300px; }
+#player select { max-width: 14em; }
+#player input[type="range"] { flex-basis: 100%; width: auto; max-width: 180px; }
+@media (max-width: 680px) {
   #player { flex-direction: column; gap: 14px; }
-  #player .group { flex-wrap: wrap; justify-content: center; gap: 4px 10px; width: 100%; }
-  #player select { max-width: 14em; }
-  #player input[type="range"] { flex-basis: 100%; width: auto; max-width: 180px; }
+  #player .group { width: 100%; }
 }
 /* Boutons lecture / pause (musique et bruit de fond) */
 button.play svg { width: 14px; height: 14px; fill: currentColor; }
