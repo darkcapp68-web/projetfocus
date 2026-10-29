@@ -45,6 +45,11 @@ function sanitize(s) {
   }
   // Version 5 : plus de plein écran automatique en pause (réactivable).
   if (s.version < 5) { s.fullscreenOnBreak = false; s.version = 5; }
+  // Version 6 : nouvelles radios ; celles de Bollywood (pub probable) arrivent décochées.
+  if (s.version < 6) {
+    for (const id of ['bwmirchi', 'bw2010']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
+    s.version = 6;
+  }
   return s;
 }
 

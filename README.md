@@ -165,7 +165,10 @@ Une série en cours survit à un rechargement de la page.
   télécharger ou de retirer une playlist entière.
 - **Style « Work with Paul »** (techno, house, ambient, sans paroles) : trois radios de ce
   style sont ajoutées, testées depuis un autre site : Minimal (laut.fm), Ambient Sleeping
-  Pill et Ambient Radio (laut.fm). La house et la techno vraiment libres de droits sont rares :
+  Pill et Ambient Radio (laut.fm). Puis, trouvées dans l'annuaire radio-browser.info et testées :
+  FIP Electro, Intergalactic FM (techno, et Dream Machine plus planante), NTS 1 et 2 (sans pub),
+  Technolovers Minimal et Deep House, et deux radios Bollywood (Mirchi Top 20, Bollywood 2010s),
+  décochées au départ car probablement avec pub. La house et la techno vraiment libres de droits sont rares :
   il n'y en a pas d'embarquées pour l'instant.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.

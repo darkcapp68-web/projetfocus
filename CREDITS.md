@@ -56,6 +56,13 @@ droit et n'est jamais copiée dans l'appli.
 | Minimal (laut.fm) | https://stream.laut.fm/minimal | https://laut.fm/minimal |
 | Ambient Sleeping Pill | https://radio.stereoscenic.com/asp-h | https://ambientsleepingpill.com/ |
 | Ambient Radio (laut.fm) | https://stream.laut.fm/ambient | https://laut.fm/ambient |
+| FIP Electro (Radio France) | https://icecast.radiofrance.fr/fipelectro-midfi.mp3 | https://www.radiofrance.fr/fip |
+| Intergalactic FM – Broadcasting System | https://radio.intergalactic.fm/1 | https://www.intergalactic.fm/ |
+| Intergalactic FM – Dream Machine | https://radio.intergalactic.fm/3 | https://www.intergalactic.fm/ |
+| NTS 1 et 2 | https://stream-relay-geo.ntslive.net/stream (et stream2) | https://www.nts.live/ |
+| Technolovers Minimal / Deep House | https://stream.technolovers.fm/minimal (et deep-house) | https://www.technolovers.fm/ |
+| Radio Mirchi Top 20 (pub probable) | https://drive.uber.radio/uber/bollywoodnow/icecast.audio | https://www.radiomirchi.com/ |
+| Bollywood 2010s (pub probable) | https://drive.uber.radio/uber/bollywood2010s/icecast.audio | https://uber.radio/ |
 
 Ces flux acceptent d'être lus depuis un autre site (testé le 29/10/2026).
 

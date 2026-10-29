@@ -46,6 +46,15 @@ export const STATIONS = [
   { id: 'lautminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio minimal (laut.fm, avec pub)', desc: 'laut.fm · minimal techno, microhouse · avec publicité', url: 'https://stream.laut.fm/minimal' },
   { id: 'sleepingpill', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Ambient Sleeping Pill', desc: 'stereoscenic.com · ambient sans rythme', url: 'https://radio.stereoscenic.com/asp-h' },
   { id: 'lautambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio ambient (laut.fm, avec pub)', desc: 'laut.fm · ambient, chillout · avec publicité', url: 'https://stream.laut.fm/ambient' },
+  { id: 'fipelectro', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio FIP Electro', desc: 'Radio France · électro, house, downtempo · sans pub', url: 'https://icecast.radiofrance.fr/fipelectro-midfi.mp3' },
+  { id: 'igfm', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Intergalactic FM (techno)', desc: 'Intergalactic FM · techno, électro · sans pub', url: 'https://radio.intergalactic.fm/1' },
+  { id: 'igfmdream', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Intergalactic FM Dream Machine', desc: 'Intergalactic FM · électronique planante · sans pub', url: 'https://radio.intergalactic.fm/3' },
+  { id: 'nts1', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio NTS 1', desc: 'NTS · sélections électro et expérimentales · sans pub', url: 'https://stream-relay-geo.ntslive.net/stream' },
+  { id: 'nts2', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio NTS 2', desc: 'NTS · sélections électro et expérimentales · sans pub', url: 'https://stream-relay-geo.ntslive.net/stream2' },
+  { id: 'tlminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Minimal', desc: 'technolovers.fm · minimal techno', url: 'https://stream.technolovers.fm/minimal' },
+  { id: 'tldeephouse', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Deep House', desc: 'technolovers.fm · deep house', url: 'https://stream.technolovers.fm/deep-house' },
+  { id: 'bwmirchi', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Mirchi Top 20 (pub probable)', desc: 'Radio Mirchi · tubes Bollywood du moment', url: 'https://drive.uber.radio/uber/bollywoodnow/icecast.audio' },
+  { id: 'bw2010', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Bollywood 2010s (pub probable)', desc: 'uber.radio · Bollywood des années 2010', url: 'https://drive.uber.radio/uber/bollywood2010s/icecast.audio' },
   { id: 'groovesalad', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Groove Salad ↗', desc: 'SomaFM · électro chill', url: 'https://somafm.com/groovesalad/' },
   { id: 'deepspaceone', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Deep Space One ↗', desc: 'SomaFM · ambient', url: 'https://somafm.com/deepspaceone/' },
   { id: 'fluid', kind: 'link', group: 'SomaFM (ouvre un onglet)', name: 'Fluid ↗', desc: 'SomaFM · hip-hop instrumental', url: 'https://somafm.com/fluid/' },
@@ -93,7 +102,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 5,
+  version: 6,
 
   // Temps
   focusMin: 25,
@@ -224,7 +233,8 @@ export const DEFAULTS = {
   customLinks: [], // une ligne par lien : « Nom | https://… »
   // Musiques décochées dans Paramètres : absentes du menu du lecteur.
   // Les radios laut.fm passent de la publicité : décochées au départ.
-  hiddenStations: ['lautlofi', 'lautminimal', 'lautambient'],
+  // Bollywood : publicité probable, à essayer en les cochant.
+  hiddenStations: ['lautlofi', 'lautminimal', 'lautambient', 'bwmirchi', 'bw2010'],
 
   // Affichage
   timeFormat: 'mmss', // 'mmss' | 'min'
