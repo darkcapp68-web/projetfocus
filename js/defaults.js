@@ -105,6 +105,8 @@ export const DEFAULTS = {
   autoChain: true,
   autoChainDelay: 5, // secondes entre la fin de la pause et la reprise du focus
   endDings: 3, // nombre de « ding » à la fin de la pause
+  countdownBreak: true, // dings de plus en plus rapprochés dans les 10 dernières secondes de la pause
+  countdownFocus: false, // … et du focus
 
   // Couleurs
   dayGradient: true,

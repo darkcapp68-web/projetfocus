@@ -1124,7 +1124,24 @@ window.addEventListener('pagehide', saveEverything);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveEverything(); });
 setInterval(saveAudio, 5000); // la position dans le morceau, au cas où la page serait tuée
 
+// Compte à rebours sonore : un ding toutes les 2 s à partir de 10 s, puis chaque seconde.
+const COUNTDOWN_AT = [10, 8, 6, 5, 4, 3, 2, 1];
+let lastCountdown = null;
+
+function countdownTick() {
+  const on = (T.phase === 'break' && !T.breakEnded && S.countdownBreak) ||
+    (T.phase === 'focus' && T.pausedRemaining == null && S.countdownFocus);
+  if (!on) { lastCountdown = null; return; }
+  const left = Math.ceil(remaining());
+  if (left === lastCountdown || !COUNTDOWN_AT.includes(left)) return;
+  // On ne rattrape pas un ding manqué (onglet endormi) : seulement si on est pile dans la seconde.
+  if (remaining() < left - 0.6) return;
+  lastCountdown = left;
+  audio.countdownDing(S.chimeVol / 100, (10 - left) / 9);
+}
+
 function tick() {
+  countdownTick();
   if (T.phase === 'focus' && T.pausedRemaining == null && remaining() <= 0) startBreak(true);
   else if (T.phase === 'break' && !T.breakEnded && remaining() <= 0) breakTimeUp();
   else if (T.phase === 'break' && T.resumeAt && Date.now() >= T.resumeAt) resumeFromBreak();

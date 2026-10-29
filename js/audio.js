@@ -595,6 +595,27 @@ export class AudioEngine {
     for (let k = 0; k < Math.max(1, times); k++) this._ding(ctx, type, volume, ctx.currentTime + 0.05 + k * gap);
   }
 
+  // Petit « ding » court du compte à rebours ; `urgency` (0 à 1) le fait monter un peu.
+  countdownDing(volume = 0.6, urgency = 0) {
+    if (volume <= 0) return;
+    const ctx = this.ensure();
+    if (!ctx) return;
+    const t0 = ctx.currentTime + 0.02;
+    const f = 1175 * (1 + 0.12 * urgency);
+    for (const [mult, lv, dur] of [[1, 0.22, 0.5], [2.76, 0.05, 0.2]]) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f * mult;
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(lv * volume, t0 + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g).connect(ctx.destination);
+      o.start(t0);
+      o.stop(t0 + dur + 0.05);
+    }
+  }
+
   _ding(ctx, type, volume, t0) {
     const out = ctx.createGain();
     out.gain.value = volume * 0.5;
