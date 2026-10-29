@@ -136,10 +136,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 
 ## 8. Hors ligne et publication
 
-- Service worker `sw.js` : site en cache (« cache d'abord, mise à jour en arrière-plan »),
-  musique en cache séparé (`projetfocus-music-v1`), lecture par morceaux (Range) depuis le
-  cache. Après une modification, recharger deux fois pour voir la nouvelle version ;
-  augmenter `CACHE` dans `sw.js` quand la liste des fichiers change.
+- Service worker `sw.js` : site en « réseau d'abord, cache en secours » (cache si le réseau
+  ne répond pas en 3 s ou hors ligne) : **un seul F5 suffit** pour voir une nouvelle version.
+  Musique en cache séparé (`projetfocus-music-v1`, « cache d'abord »), lecture par morceaux
+  (Range) depuis le cache. Augmenter `CACHE` dans `sw.js` quand la liste des fichiers change.
 - Rien n'est publié. Publication sur GitHub Pages **uniquement avec l'accord explicite** de
   l'utilisateur (dépôt public : CAHIER_DES_CHARGES.md, REGLES.md, CHANTIER.md seront
   visibles).
@@ -152,8 +152,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Commits locaux, messages en français ; ne jamais pousser sans accord.
 - Tester dans le navigateur intégré **sur `http://127.0.0.1:8417`** (mémoire séparée) pour
   ne pas perturber la session de l'utilisateur sur `localhost:8417`. Ne jamais recharger son
-  onglet en pleine utilisation. Avant un test : désinscrire le service worker et vider le
-  cache (sauf la musique), sinon l'ancienne version est servie. Serveur :
+  onglet en pleine utilisation. Le navigateur intégré refuse tout service worker (« unknown
+  error » à l'inscription) : tester `sw.js` à part, sous Node avec un faux cache. Serveur :
   `.claude/launch.json` (`python -m http.server 8417`).
 - Les tests qui écrivent dans localStorage doivent le vider à la fin (attention : l'appli
   réenregistre ses réglages à `pagehide` et `visibilitychange`).

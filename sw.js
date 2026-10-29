@@ -1,8 +1,9 @@
 // Service worker : l'appli marche hors ligne une fois ouverte une première fois.
-// Stratégie « cache d'abord, mise à jour en arrière-plan » : les nouvelles versions
-// publiées sur GitHub Pages arrivent au chargement suivant.
+// Stratégie « réseau d'abord, cache en secours » : une nouvelle version publiée sur
+// GitHub Pages arrive dès le chargement suivant (l'ancienne stratégie « cache d'abord »
+// en demandait deux, d'où des écrans qui ne reflétaient pas les derniers changements).
 
-const CACHE = 'projetfocus-v4';
+const CACHE = 'projetfocus-v5';
 const ASSETS = [
   './',
   'index.html',
@@ -81,13 +82,18 @@ self.addEventListener('fetch', (e) => {
     }));
     return;
   }
+  // Le site : réseau d'abord (un seul F5 suffit pour voir une nouvelle version),
+  // le cache si le réseau ne répond pas en 3 s ou si l'on est hors ligne.
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
       const cached = await cache.match(req, { ignoreSearch: true });
-      const network = fetch(req)
-        .then((res) => { if (res.ok) cache.put(req, res.clone()); return res; })
-        .catch(() => cached || (req.mode === 'navigate' ? cache.match('index.html') : Response.error()));
-      return cached || network;
+      const network = fetch(req, { cache: 'no-cache' })
+        .then((res) => { if (res.ok) cache.put(req, res.clone()); return res; });
+      const fallback = () => cached || (req.mode === 'navigate' ? cache.match('index.html') : Response.error());
+      if (!cached) return network.catch(fallback);
+      const late = new Promise((ok) => setTimeout(() => ok(cached), 3000));
+      e.waitUntil(network.catch(() => {}));
+      return Promise.race([network.catch(fallback), late]);
     }),
   );
 });
