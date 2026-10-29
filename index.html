@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>projetfocus</title>
+  <meta name="description" content="Minuteur de focus et de pause, avec musique et coach, qui suit l'heure de la journée.">
+  <meta name="theme-color" content="#1c1a4d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="projetfocus">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="ui phase-idle">
+  <div id="pulse" aria-hidden="true"></div>
+
+  <header id="topbar">
+    <div id="quick" class="ctl">
+      <button type="button" data-preset="25/5">25/5</button>
+      <button type="button" data-preset="50/10">50/10</button>
+      <span class="cycles">
+        <button type="button" id="cyc-minus" class="round" aria-label="Un cycle de moins">−</button>
+        <span id="cyc-val">4 cycles</span>
+        <button type="button" id="cyc-plus" class="round" aria-label="Un cycle de plus">+</button>
+      </span>
+    </div>
+    <button type="button" id="btn-settings" class="ctl link">Paramètres</button>
+  </header>
+
+  <main id="stage">
+    <div id="dial-wrap">
+      <svg id="dial" viewBox="0 0 300 300" role="slider" tabindex="0" aria-label="Durée en minutes"
+           aria-valuemin="1" aria-valuemax="60" aria-valuenow="25">
+        <circle class="track" cx="150" cy="150" r="128"/>
+        <g id="ticks"></g>
+        <circle id="arc" cx="150" cy="150" r="128" transform="rotate(-90 150 150)"/>
+        <circle id="knob" cx="150" cy="22" r="5"/>
+      </svg>
+      <div id="center">
+        <div id="time">25:00</div>
+        <div id="sub">focus</div>
+      </div>
+    </div>
+
+    <div id="setup" class="ctl">
+      <button type="button" id="edit-focus" class="seg on">focus <b id="v-focus">25</b> min</button>
+      <button type="button" id="edit-break" class="seg">pause <b id="v-break">5</b> min</button>
+    </div>
+
+    <p id="message" aria-live="polite"></p>
+
+    <div id="break-actions">
+      <button type="button" id="btn-hold"><span class="fill"></span><span class="lbl">maintenir pour reprendre</span></button>
+      <button type="button" id="btn-done" class="primary">Fait, je reprends</button>
+    </div>
+
+    <div id="actions" class="ctl">
+      <button type="button" id="btn-start" class="primary">Démarrer</button>
+      <button type="button" id="btn-skip">Passer à la pause</button>
+      <button type="button" id="btn-stop">Arrêter</button>
+    </div>
+
+    <ul id="coach-list" class="ctl" aria-label="Autres idées pour la pause"></ul>
+  </main>
+
+  <footer>
+    <div id="player" class="ctl">
+      <div class="group">
+        <button type="button" id="btn-music" class="round" aria-label="Lancer la radio">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
+        </button>
+        <select id="sel-station" aria-label="Radio"></select>
+        <input type="range" id="vol-music" min="0" max="100" aria-label="Volume de la musique">
+      </div>
+      <div class="group">
+        <select id="sel-noise" aria-label="Bruit de fond"></select>
+        <input type="range" id="vol-noise" min="0" max="100" aria-label="Volume du bruit de fond">
+      </div>
+      <div id="now-playing" aria-live="polite"></div>
+    </div>
+    <div id="info"></div>
+  </footer>
+
+  <aside id="settings" aria-label="Paramètres" inert>
+    <div class="sheet-head">
+      <h1>Paramètres</h1>
+      <button type="button" id="btn-close" class="link">Fermer</button>
+    </div>
+
+    <section>
+      <h2>Temps</h2>
+      <label>Focus (minutes)<input type="number" min="1" max="60" data-k="focusMin"></label>
+      <label>Pause (minutes)<input type="number" min="1" max="60" data-k="breakMin"></label>
+      <label>Nombre de cycles <small>0 = sans fin</small><input type="number" min="0" max="20" data-k="cycles"></label>
+      <label>Pause longue<input type="checkbox" data-k="longBreakOn"></label>
+      <label>… après combien de cycles<input type="number" min="1" max="12" data-k="longBreakEvery"></label>
+      <label>… durée (minutes)<input type="number" min="1" max="60" data-k="longBreakMin"></label>
+      <label>Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
+    </section>
+
+    <section>
+      <h2>Couleurs</h2>
+      <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
+      <div id="day-colors"></div>
+      <label>Couleur fixe (si le dégradé est coupé)<input type="color" data-k="fixedColor"></label>
+      <label>Couleur de la pause<input type="color" data-k="breakColor"></label>
+      <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
+      <label>Couleur du texte<input type="color" data-k="textColor"></label>
+    </section>
+
+    <section>
+      <h2>Pause</h2>
+      <label>Pulsation<input type="checkbox" data-k="pulseOn"></label>
+      <label>Une respiration toutes les (secondes)<span class="rng"><input type="range" min="1" max="8" step="0.5" data-k="pulseSeconds"><output></output></span></label>
+      <label>Intensité (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
+      <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
+      <label>Maintenir pour reprendre (secondes)<input type="number" min="1" max="10" data-k="holdSeconds"></label>
+      <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
+    </section>
+
+    <section>
+      <h2>Coach</h2>
+      <label>Pendant la pause<select data-k="coachMode"><option value="one">Une action à la fois</option><option value="none">Aucune action</option></select></label>
+      <label class="block">Actions <small>une par ligne : ajoute, modifie ou supprime</small><textarea data-k="coachActions" data-list rows="8"></textarea></label>
+    </section>
+
+    <section>
+      <h2>Messages pendant le focus</h2>
+      <label>Afficher un message<input type="checkbox" data-k="messagesOn"></label>
+      <label>Changer de message toutes les (minutes)<input type="number" min="1" max="60" data-k="messageEveryMin"></label>
+      <label>« Tard » à partir de (heure)<input type="number" min="0" max="23" data-k="lateHour"></label>
+      <div id="msg-cats"></div>
+      <div id="msg-pools"></div>
+    </section>
+
+    <section>
+      <h2>Son</h2>
+      <label>Signal de changement de phase<span class="pair"><select data-k="chime" id="sel-chime"></select><button type="button" id="btn-test-chime" class="link">Écouter</button></span></label>
+      <label>Volume du signal (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="chimeVol"><output></output></span></label>
+      <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
+      <label>Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
+      <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
+      <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>
+      <label>Radio par défaut<select data-k="defaultRadio" id="sel-default-radio"></select></label>
+      <label>Bruit de fond par défaut<select data-k="defaultNoise" id="sel-default-noise"></select></label>
+      <label>Lancer le son en démarrant le focus<input type="checkbox" data-k="autoStartAudio"></label>
+      <label class="block">Mes liens <small>une ligne par lien : Nom | https://… (flux audio direct, ou page YouTube / playlist ouverte dans un onglet)</small><textarea data-k="customLinks" data-list rows="4" placeholder="Ma radio | https://exemple.com/flux.mp3"></textarea></label>
+    </section>
+
+    <section>
+      <h2>Affichage</h2>
+      <label>Format du temps<select data-k="timeFormat"><option value="mmss">mm:ss</option><option value="min">minutes seules</option></select></label>
+      <label>Info discrète en bas (moment, phase, cycle)<input type="checkbox" data-k="showInfo"></label>
+      <label>Les contrôles s'effacent après (secondes)<input type="number" min="2" max="60" data-k="controlsDelay"></label>
+      <label>Garder l'écran allumé pendant une série<input type="checkbox" data-k="keepAwake"></label>
+    </section>
+
+    <section>
+      <h2>Sauvegarde</h2>
+      <div class="buttons">
+        <button type="button" id="btn-export">Exporter (JSON)</button>
+        <button type="button" id="btn-import">Importer</button>
+        <input type="file" id="file-import" accept="application/json,.json" hidden>
+        <button type="button" id="btn-reset">Revenir aux valeurs par défaut</button>
+      </div>
+      <p id="save-note" class="note" aria-live="polite">Tout est enregistré sur cet appareil.</p>
+    </section>
+  </aside>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
