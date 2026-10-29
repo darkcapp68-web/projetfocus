@@ -438,9 +438,12 @@ export class AudioEngine {
   /* ---------- Pause : fondu vers la musique douce, puis retour ---------- */
   // mode 'calme' : musique douce ; 'silence' : on coupe ; 'same' : même musique, plus bas.
   enterBreak(mode, level) {
-    if (mode === 'same' || !this.musicOn) { this.setMusicLevel(level); return; }
-    this.held = true;
-    this.setMusicLevel(0, 2500, () => { if (this.held) this.music.pause(); });
+    if (mode === 'same') { this.setMusicLevel(level); return; }
+    if (this.musicOn) {
+      this.held = true;
+      this.setMusicLevel(0, 2500, () => { if (this.held) this.music.pause(); });
+    }
+    // La musique douce joue même si rien ne jouait avant la pause.
     if (mode === 'calme') this._startLift(level);
   }
 

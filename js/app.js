@@ -412,6 +412,7 @@ function applyAudioLevels(fadeMs = 1500) {
   if (brk && S.duckNoise) noise *= S.musicVolWork > 0 ? Math.min(1, S.musicVolBreak / S.musicVolWork) : 0;
   audio.setNoiseLevel(noise);
   volMusic.value = brk ? S.musicVolBreak : S.musicVolWork;
+  $('#vol-break').value = S.musicVolBreak;
   volNoise.value = S.noiseVol;
 }
 
@@ -479,11 +480,9 @@ function resumeSavedAudio(e) {
   audioTouched = true;
   if (e?.target?.closest?.('#player')) return; // le lecteur s'en occupe lui-même
   audio.ensure();
-  if (savedAudio.playing && selStation.value !== 'none') {
-    playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
-    // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
-    if (onBreak()) audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
-  }
+  if (savedAudio.playing && selStation.value !== 'none') playSelectedStation({ file: savedAudio.track, time: savedAudio.time });
+  // Page rouverte en pause : on repasse tout de suite sur la musique de pause.
+  if (onBreak()) audio.enterBreak(S.breakMusic, S.musicVolBreak / 100);
   if (selNoise.value !== 'none') { applyAudioLevels(0); audio.setNoise(selNoise.value); }
 }
 
@@ -506,6 +505,15 @@ selNoise.addEventListener('change', () => {
   applyAudioLevels(0);
   audio.setNoise(selNoise.value);
   saveAudio();
+});
+
+// Curseur de l'écran de pause : règle le volume de la musique de pause.
+$('#vol-break').addEventListener('input', (e) => {
+  audioTouched = true;
+  audio.ensure();
+  S.musicVolBreak = Number(e.target.value);
+  applyAudioLevels(0);
+  saveSettings(); syncForm();
 });
 
 volMusic.addEventListener('input', () => {
