@@ -32,7 +32,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   affichée en bas, un toucher arrête).
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
-  l'arc se vide dans le sens des aiguilles d'une montre. Sous le cadran : bascule
+  l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
+  « Standard » (par défaut), « Niveau liquide » (pas d'arc : le cadran se vide comme un verre,
+  plein à 60 min, liquide clair qui ondule) ou « Orbites » (arc fin, deux orbites où tournent
+  lentement de petites lunes). Choisis parmi une maquette de 10 pistes. Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
 - **Téléphone à la verticale** : tout remonte sous la barre du haut (« Paramètres »), le

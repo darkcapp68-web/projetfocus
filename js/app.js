@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 18h00';
+const APP_VERSION = '29/10/2026 · 18h30';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -187,7 +187,7 @@ const remaining = () => {
    Cadran
    ========================================================= */
 
-const dial = $('#dial'), arc = $('#arc'), knob = $('#knob');
+const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), liquidLevel = $('#liquid-level');
 const R = 128, CIRC = 2 * Math.PI * R;
 
 (function buildTicks() {
@@ -224,6 +224,8 @@ function drawDial(sec) {
   knob.setAttribute('cx', 150 + R * Math.sin(a));
   knob.setAttribute('cy', 150 - R * Math.cos(a));
   knob.style.opacity = min <= 0 ? 0 : 1;
+  // Niveau liquide : plein à 60 min, vide à 0 (le cercle va de y = 25 à y = 275).
+  if (liquidLevel) liquidLevel.style.transform = `translateY(${275 - (min / 60) * 250}px)`;
 }
 
 let dragging = false, dragPrev = 0;
@@ -1262,6 +1264,7 @@ function applySettings() {
   const st = document.documentElement.style;
   st.setProperty('--fg', S.textColor);
   st.setProperty('--dial', S.dialColor);
+  for (const s of ['standard', 'liquide', 'orbites']) body.classList.toggle('dial-' + s, S.dialStyle === s);
   if (breathOn) breathStop(); // nouveau rythme : render() la relance
   applyAudioLevels(300);
   if (T.phase === 'break') { renderCoach(); showCoach(); }

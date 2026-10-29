@@ -151,6 +151,7 @@ export const DEFAULTS = {
   breakColorRandom: true,
   breakColor: '#b3261e', // utilisée si la couleur au hasard est coupée
   dialColor: '#ffffff',
+  dialStyle: 'standard', // standard, liquide (le cadran se vide comme un verre) ou orbites
   textColor: '#ffffff',
 
   // Pause

@@ -115,6 +115,28 @@ body.phase-idle.adjusting #dial { cursor: grabbing; }
 #knob { fill: var(--dial); transition: opacity 0.4s; }
 body.adjusting #arc, body.adjusting #knob { transition: none; }
 
+/* Styles du cadran (Paramètres → Couleurs) */
+#liquid, #orbits { display: none; }
+body.dial-liquide #liquid, body.dial-orbites #orbits { display: inline; }
+body.dial-liquide #arc, body.dial-liquide #knob { display: none; }
+body.dial-liquide #dial .track { fill: rgba(0, 0, 0, 0.1); stroke-width: 2; }
+#liquid path { fill: var(--dial); }
+#liquid .w1 { opacity: 0.24; }
+#liquid .w2 { opacity: 0.14; }
+#liquid-level { transition: transform 1.2s ease; }
+body.adjusting #liquid-level { transition: none; }
+#liquid .wave { animation: dial-wave 6s ease-in-out infinite alternate; }
+@keyframes dial-wave { to { transform: translateX(-140px); } }
+body.dial-orbites #dial .track { fill: transparent; stroke-width: 1; stroke: rgba(255, 255, 255, 0.14); }
+body.dial-orbites #arc { stroke-width: 2.5; }
+body.dial-orbites #knob { r: 4px; }
+#orbits .orbit { fill: none; stroke: var(--dial); stroke-width: 1; opacity: 0.12; }
+#orbits .moon circle { fill: var(--dial); }
+#orbits .moon { transform-origin: 150px 150px; }
+#orbits .m1 { animation: dial-spin 20s linear infinite; }
+#orbits .m2 { opacity: 0.7; animation: dial-spin 90s linear infinite reverse; }
+@keyframes dial-spin { to { transform: rotate(360deg); } }
+
 /* Graduations : seulement pendant le réglage */
 #ticks { opacity: 0; transition: opacity 0.5s ease; }
 #ticks line { stroke: rgba(255, 255, 255, 0.35); stroke-width: 1; }
@@ -370,6 +392,7 @@ body.no-info #info { visibility: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html, body, .ctl, #message, #settings { transition-duration: 0.01s; }
+  #liquid .wave, #orbits .moon { animation: none; }
 }
 
 /* ---------- Musiques du menu (Paramètres) ---------- */
