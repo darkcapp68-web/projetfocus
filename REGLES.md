@@ -176,6 +176,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Commits en français. **Pousser sur GitHub après chaque modification** (accord durable de
   l'utilisateur, 29/10/2026, pour ce projet : il teste sur PC et téléphone). Exception : tout
   ce qui touche aux secrets ou au dépôt `darkcapp68-web.github.io` se demande avant.
+  Après l'envoi, ne pas attendre la mise en ligne (environ 1 min) pour répondre : la vérifier
+  en arrière-plan et ne prévenir l'utilisateur qu'en cas d'échec.
 - Tester dans le navigateur intégré **sur `http://127.0.0.1:8417`** (mémoire séparée) pour
   ne pas perturber la session de l'utilisateur sur `localhost:8417`. Ne jamais recharger son
   onglet en pleine utilisation. Le navigateur intégré refuse tout service worker (« unknown
