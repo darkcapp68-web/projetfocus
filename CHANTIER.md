@@ -66,9 +66,8 @@ par Google Drive.
 
 - **Paramètres allégés** (30/10) : 6 sections au lieu de 8 (Couleurs + Affichage →
   Apparence, Volumes et sons + Musiques → Musiques et sons), 30 réglages visibles au lieu
-  de 65, le reste dans « Réglages avancés », réglages sans objet masqués. Rien supprimé.
-  À voir avec l'utilisateur : en retirer certains pour de bon (ID client Google, durée du
-  maintien, délai des contrôles…) ?
+  de 65, le reste dans « Réglages avancés », réglages sans objet masqués. Rien supprimé,
+  et on garde ainsi (décision de l'utilisateur, 30/10 : pas de retrait définitif).
 
 ## Idées en réserve
 
