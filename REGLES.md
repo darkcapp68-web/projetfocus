@@ -78,7 +78,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   Pendant le focus, le cadran s'efface : seul un **petit temps** discret reste, au-dessus du
   message de soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, le
   tracé **s'efface** (fondu 3 s) ; au focus suivant, un **nouveau tracé tiré au hasard**. Au
-  repos, le cadran normal.
+  repos, le cadran normal. **Vitesse** (réglage, visible en mode Brisure) : « Normale » (au
+  bout des branches à la fin du focus), « **Lente** » (la moitié, par défaut) ou « Très lente »
+  (30 %) ; demande de l'utilisateur, 30/10 : ralentir la progression.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
@@ -255,6 +257,16 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   l'utilisateur. Vérifier les licences de toute musique embarquée (CC0 / CC BY, noté dans
   `CREDITS.md`) et la présence de publicité avant d'ajouter une radio (tester le flux avec
   un en-tête `Referer` d'un autre site).
+- Le navigateur intégré, quand son volet est en arrière-plan, fige les animations, les
+  transitions et le dessin : mesurer ce qui est commandé (styles posés, pixels allumés après
+  une capture d'écran qui force l'affichage) plutôt que de se fier à l'image. Tests longs :
+  avancer l'horloge de la page (`Date.now = () => vrai + décalage`). Pour vider les réglages
+  de test : `Storage.prototype.setItem = () => {}` puis `localStorage.clear()` puis recharger
+  (l'appli réenregistre ses réglages en quittant la page).
+- Mise à jour et service worker : le navigateur intégré refuse les service workers ; les
+  tester dans un Chrome sans fenêtre (`--headless=new --remote-debugging-port`, profil
+  temporaire) avec un petit serveur qui imite GitHub Pages (`Cache-Control: max-age=600`,
+  ETag). Arrêter Chrome et le serveur à la fin.
 - Contrôle de syntaxe sans build :
   `node -e "new Function(require('fs').readFileSync('js/app.js','utf8').replace(/^import .*$/mg,''))"`.
 

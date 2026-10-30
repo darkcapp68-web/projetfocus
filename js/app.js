@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h25';
+const APP_VERSION = '30/10/2026 · 17h38';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -473,7 +473,9 @@ function crackFrame(now) {
   if (now - crack.last < 100) return; // ça pousse lentement : 10 images par seconde suffisent
   crack.last = now;
   if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio) crackBuild();
-  crackDraw(T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0);
+  // Vitesse (réglage) : « lente », le tracé n'a parcouru que la moitié de ses branches à la fin.
+  const speed = Number(S.crackSpeed) || 1;
+  crackDraw(T.total ? clamp(1 - remaining() / T.total, 0, 1) * speed : 0);
 }
 
 function crackStart() {

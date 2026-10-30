@@ -1,4 +1,4 @@
-# projetfocus — point de chantier (29/10/2026)
+# projetfocus — point de chantier (30/10/2026)
 
 Toutes les règles de fonctionnement et les décisions sont dans **REGLES.md** (à lire en
 premier pour reprendre le travail).
@@ -10,12 +10,14 @@ premier pour reprendre le travail).
   temps au centre, contrôles qui apparaissent au toucher. Démo « journée en accéléré ».
 - Focus / pause / cycles / pause longue, préréglages 25/5 et 50/10.
 - 4 styles de cadran (Apparence) : Normal (fondu lent), Rêveur (engrenages, atome, vague),
-  Rythme (réagit à la musique), Brisure (30/10 : un éclair ou une fissure se ramifie et pousse en continu depuis le centre, rebondit sur les bords ; version 1 retenue
-  et remplit l'écran pendant le focus, s'efface en pause ; à juger par l'utilisateur).
+  Rythme (réagit à la musique), Brisure (30/10 : un éclair ou une fissure se ramifie et
+  pousse en continu depuis le centre, rebondit sur les bords, vitesse réglable, s'efface en
+  pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
-  reprise automatique du focus après 5 s.
+  reprise automatique du focus après 5 s. Le mot « inspire » grandit pendant l'inspiration
+  et rétrécit à l'expiration (30/10).
 - Messages bienveillants (40), coach, notifications, plein écran (désactivé par défaut).
 - Son : lecteur avec menu groupé, playlists CC0 embarquées (lofi, ambient) gardées hors
   ligne, radios testées (Technolovers Minimal, France Musique Opéra / Classique Plus /
@@ -25,7 +27,13 @@ premier pour reprendre le travail).
 - Arrêter coupe tout ; Démarrer relance tout ; recharger la page repart de zéro.
 - Paramètres en 6 sections repliables, l'essentiel visible et le reste dans « Réglages
   avancés », export / import JSON.
-- Synchronisation Google Drive des paramètres (codée et testée avec un faux Google).
+- Sauvegarde Google Drive des paramètres, à la main (« Sauvegarder » / « Reprendre »).
+- Avis de mise à jour (30/10) : point bleu sur « Paramètres » quand une version plus récente
+  est en ligne ; « Mettre à jour l'appli » retélécharge chaque fichier (le bouton d'avant
+  17h09 reprenait parfois l'ancien `app.js`, reproduit et corrigé).
+- Téléphone (30/10) : la page ne déborde plus et ne glisse plus à gauche à l'ouverture des
+  Paramètres ; tous les contrôles s'effacent ensemble (« Paramètres » et boutons de pause
+  compris) ; menus du lecteur en dragée pleine.
 
 **En service** : sur le PC et sur le téléphone (installé depuis Chrome), réglages partagés
 par Google Drive.
@@ -48,8 +56,10 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
    la synchronisation automatique a été abandonnée (conflits PC / téléphone). À essayer :
    sauvegarder depuis le PC, reprendre sur le téléphone.
 3. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
-   - couleurs de la respiration, maintenant affichées telles quelles (bleu ciel / doré /
-     noir) : à garder ? la retenue après l'expiration (carrée) repasse au doré : gênant ?
+   - **couleurs de la cohérence cardiaque : à revoir** (30/10, l'utilisateur les trouve à
+     retravailler ; aujourd'hui bleu ciel à l'inspiration, noir à l'expiration) : lui demander
+     ce qui ne va pas avant de changer quoi que ce soit ;
+   - mot qui grandit à l'inspiration, Brisure (fluidité, vitesse) : à juger sur le téléphone ;
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
    - radios classiques : lesquelles garder ;

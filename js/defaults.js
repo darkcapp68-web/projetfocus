@@ -154,6 +154,7 @@ export const DEFAULTS = {
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
   dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause), rythme ou brisure (fissure qui se ramifie)
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
+  crackSpeed: '0.5', // mode brisure : part des branches parcourue à la fin du focus (1, 0.5, 0.3)
   crackLook: 'eclair', // mode brisure : 'eclair' (néon, frappe rapide, flash) ou 'fissure'
   slowGlow: true, // mode normal : le cadran s'efface presque puis revient, lentement, pendant le focus
   textColor: '#ffffff',
