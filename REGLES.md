@@ -143,7 +143,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Lecteur** en bas, **gros pour le doigt et la souris** (boutons 46 px, menus et curseurs
   d'au moins 44 px de haut ; partout, chaque curseur de volume sous son
   bouton et son menu) : bouton ▶ / ❚❚, menu de musiques groupé, volume ; bruit de fond avec
-  le **même bouton ▶ / ❚❚** (coupe sans perdre le choix), menu et volume.
+  le **même bouton ▶ / ❚❚** (coupe sans perdre le choix), menu et volume. Les menus du
+  lecteur sont des **dragées pleines** (capsule au fond translucide, flèche dessinée ; 30/10,
+  demande de l'utilisateur), sombres sur une teinte claire.
 - **Choisir une musique dans le menu la lance tout de suite.**
 - **Musiques** (ids dans `js/defaults.js`) :
   - Playlists embarquées CC0 (HoliznaCC0) : « Playlist lofi » (9), « Playlist ambient

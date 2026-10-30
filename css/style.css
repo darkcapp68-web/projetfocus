@@ -317,6 +317,23 @@ footer {
    (un retour à la ligne « flex » ne se faisait pas quand le menu était court). */
 #player .group { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 4px 10px; width: 300px; }
 #player select { max-width: 14em; }
+/* Menus du lecteur en « dragée » pleine : capsule au fond translucide, flèche dessinée. */
+#player select {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5em 2.4em 0.5em 1.1em;
+  max-width: 17em;
+  background: rgba(255, 255, 255, 0.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 1em center / 0.75em;
+  transition: background-color 0.3s;
+  text-overflow: ellipsis;
+}
+#player select:hover { background-color: rgba(255, 255, 255, 0.22); }
+body.ink-dark #player select {
+  background-color: rgba(0, 0, 0, 0.12);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
 #player input[type="range"] { grid-column: 1 / -1; justify-self: center; width: 124px; }
 @media (max-width: 680px) {
   /* Le lecteur prend toute la largeur : menu étiré, curseur sur toute la ligne. */
