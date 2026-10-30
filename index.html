@@ -141,111 +141,108 @@
       <label>Pause (minutes)<input type="number" min="1" max="60" data-k="breakMin"></label>
       <label>Nombre de cycles <small>0 = sans fin</small><input type="number" min="0" max="20" data-k="cycles"></label>
       <label>Pause longue<input type="checkbox" data-k="longBreakOn"></label>
-      <label>… après combien de cycles<input type="number" min="1" max="12" data-k="longBreakEvery"></label>
-      <label>… durée (minutes)<input type="number" min="1" max="60" data-k="longBreakMin"></label>
+      <label data-if="longBreakOn">… après combien de cycles<input type="number" min="1" max="12" data-k="longBreakEvery"></label>
+      <label data-if="longBreakOn">… durée (minutes)<input type="number" min="1" max="60" data-k="longBreakMin"></label>
       <label>Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
-      <label>… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>
-      <label>« Ding » à la fin de la pause<input type="number" min="1" max="5" data-k="endDings"></label>
-      <label>Compte à rebours sonore, 10 dernières secondes de la pause<input type="checkbox" data-k="countdownBreak"></label>
-      <label>… et du focus<input type="checkbox" data-k="countdownFocus"></label>
-      <label>Son du compte à rebours<select data-k="countdownSound"><option value="tictac">Tic-tac</option><option value="ding">Ding</option></select></label>
-    </details>
-
-    <details class="sec">
-      <summary>Pause <small>respiration, plein écran, coach</small></summary>
-      <label>Respiration guidée (l'écran respire)<input type="checkbox" data-k="pulseOn"></label>
-      <label>Rythme<select data-k="breathPattern" id="sel-breath"></select></label>
-      <label>Afficher « inspire / expire »<input type="checkbox" data-k="breathLabels"></label>
-      <label>Une couleur par étape<input type="checkbox" data-k="breathColors"></label>
-      <label>… couleur de l'inspiration<input type="color" data-k="breathInspireColor"></label>
-      <label>… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
-      <label>… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
-      <label>Simple pulsation : une respiration toutes les (s)<span class="rng"><input type="range" min="1" max="12" step="0.5" data-k="pulseSeconds"><output></output></span></label>
-      <label>Assombrissement sans couleurs (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
-      <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
-      <label>Maintenir pour reprendre (secondes)<input type="number" min="1" max="10" data-k="holdSeconds"></label>
-      <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
-      <label>Coach<select data-k="coachMode"><option value="one">Une action à la fois</option><option value="none">Aucune action</option></select></label>
+      <label data-if="autoChain">… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>
       <details class="more">
-        <summary>Modifier les actions du coach</summary>
-        <label class="block"><small>une par ligne : ajoute, modifie ou supprime</small><textarea data-k="coachActions" data-list rows="8"></textarea></label>
+        <summary>Réglages avancés <small>dings, compte à rebours</small></summary>
+        <label>« Ding » à la fin de la pause<input type="number" min="1" max="5" data-k="endDings"></label>
+        <label>Compte à rebours sonore, 10 dernières secondes de la pause<input type="checkbox" data-k="countdownBreak"></label>
+        <label>… et du focus<input type="checkbox" data-k="countdownFocus"></label>
+        <label data-if="countdownBreak|countdownFocus">Son du compte à rebours<select data-k="countdownSound"><option value="tictac">Tic-tac</option><option value="ding">Ding</option></select></label>
       </details>
     </details>
 
     <details class="sec">
-      <summary>Volumes et sons <small>musique, pause, bruit de fond, signal</small></summary>
-      <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
-      <label>Musique de la pause<select data-k="breakMusic" id="sel-pause-default"></select></label>
-      <label>Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
-      <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
-      <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>
-      <label>Reprise d'une radio après une pause<select data-k="radioResume"><option value="direct">en direct</option><option value="continuer">là où elle s'était arrêtée</option></select></label>
-      <label>Signal de changement de phase<span class="pair"><select data-k="chime" id="sel-chime"></select><button type="button" id="btn-test-chime" class="link">Écouter</button></span></label>
-      <label>Volume du signal (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="chimeVol"><output></output></span></label>
+      <summary>Pause <small>respiration, coach</small></summary>
+      <label>Respiration guidée (l'écran respire)<input type="checkbox" data-k="pulseOn"></label>
+      <label data-if="pulseOn">Rythme<select data-k="breathPattern" id="sel-breath"></select></label>
+      <label data-if="pulseOn breathPattern=simple">Une respiration toutes les (s)<span class="rng"><input type="range" min="1" max="12" step="0.5" data-k="pulseSeconds"><output></output></span></label>
+      <label data-if="pulseOn">Une couleur par étape<input type="checkbox" data-k="breathColors"></label>
+      <label data-if="pulseOn breathColors">… couleur de l'inspiration<input type="color" data-k="breathInspireColor"></label>
+      <label data-if="pulseOn breathColors">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
+      <label data-if="pulseOn breathColors">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
+      <label>Coach<select data-k="coachMode"><option value="one">Une action à la fois</option><option value="none">Aucune action</option></select></label>
+      <details class="more">
+        <summary>Réglages avancés <small>consignes, plein écran, notification, coach</small></summary>
+        <label data-if="pulseOn breathPattern!=simple">Afficher « inspire / expire »<input type="checkbox" data-k="breathLabels"></label>
+        <label data-if="pulseOn !breathColors">Assombrissement sans couleurs (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
+        <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
+        <label>Maintenir pour reprendre (secondes)<input type="number" min="1" max="10" data-k="holdSeconds"></label>
+        <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
+        <label class="block" data-if="coachMode=one">Actions du coach <small>une par ligne : ajoute, modifie ou supprime</small><textarea data-k="coachActions" data-list rows="8"></textarea></label>
+      </details>
     </details>
 
     <details class="sec">
-      <summary>Musiques <small>par défaut, menu, hors ligne, mes liens</small></summary>
+      <summary>Musiques et sons <small>volumes, pause, menu, hors ligne</small></summary>
       <label>Musique par défaut<select data-k="defaultRadio" id="sel-default-radio"></select></label>
+      <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
+      <label>Musique de la pause<select data-k="breakMusic" id="sel-pause-default"></select></label>
+      <label data-if="breakMusic!=silence">Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
       <label>Bruit de fond par défaut<select data-k="defaultNoise" id="sel-default-noise"></select></label>
-      <label>Lancer le son en démarrant le focus<input type="checkbox" data-k="autoStartAudio"></label>
+      <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
       <details class="more">
         <summary>Musiques du menu <small>décoche ce qui ne te plaît pas</small></summary>
         <div id="station-picks"></div>
       </details>
       <details class="more">
-        <summary>Bibliothèque hors ligne <small>télécharger ou retirer une playlist</small></summary>
+        <summary>Réglages avancés <small>démarrage, reprise, signal, hors ligne, mes liens</small></summary>
+        <label>Lancer le son en démarrant le focus<input type="checkbox" data-k="autoStartAudio"></label>
+        <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>
+        <label>Reprise d'une radio après une pause<select data-k="radioResume"><option value="direct">en direct</option><option value="continuer">là où elle s'était arrêtée</option></select></label>
+        <label>Signal de changement de phase<span class="pair"><select data-k="chime" id="sel-chime"></select><button type="button" id="btn-test-chime" class="link">Écouter</button></span></label>
+        <label data-if="chime!=none">Volume du signal (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="chimeVol"><output></output></span></label>
+        <p class="pick-group">Bibliothèque hors ligne</p>
         <p class="note">Les morceaux écoutés restent sur l'appareil. Télécharge une playlist entière pour l'avoir sans Internet, ou retire-la pour libérer de la place.</p>
         <div id="library"></div>
-      </details>
-      <details class="more">
-        <summary>Mes liens</summary>
-        <label class="block"><small>une ligne par lien : Nom | https://… (flux audio direct, ou page YouTube / playlist ouverte dans un onglet)</small><textarea data-k="customLinks" data-list rows="4" placeholder="Ma radio | https://exemple.com/flux.mp3"></textarea></label>
+        <label class="block">Mes liens <small>une ligne par lien : Nom | https://… (flux audio direct, ou page YouTube / playlist ouverte dans un onglet)</small><textarea data-k="customLinks" data-list rows="4" placeholder="Ma radio | https://exemple.com/flux.mp3"></textarea></label>
       </details>
     </details>
 
     <details class="sec">
       <summary>Messages <small>pendant le focus</small></summary>
       <label>Afficher un message<input type="checkbox" data-k="messagesOn"></label>
-      <label>Changer de message toutes les (minutes)<input type="number" min="1" max="60" data-k="messageEveryMin"></label>
-      <label>« Tard » à partir de (heure)<input type="number" min="0" max="23" data-k="lateHour"></label>
-      <div id="msg-cats"></div>
-      <details class="more">
-        <summary>Modifier les messages</summary>
-        <div id="msg-pools"></div>
-      </details>
+      <div data-if="messagesOn">
+        <label>Changer de message toutes les (minutes)<input type="number" min="1" max="60" data-k="messageEveryMin"></label>
+        <details class="more">
+          <summary>Réglages avancés <small>catégories, « tard », textes</small></summary>
+          <label>« Tard » à partir de (heure)<input type="number" min="0" max="23" data-k="lateHour"></label>
+          <div id="msg-cats"></div>
+          <div id="msg-pools"></div>
+        </details>
+      </div>
     </details>
 
     <details class="sec">
-      <summary>Couleurs <small>journée, pause, cadran</small></summary>
-      <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
-      <div class="buttons"><button type="button" id="btn-day-demo">Voir la journée en accéléré (30 s)</button></div>
-      <label>Couleur fixe (si le dégradé est coupé)<input type="color" data-k="fixedColor"></label>
-      <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
-      <label>Couleur de la pause (si pas au hasard)<input type="color" data-k="breakColor"></label>
+      <summary>Apparence <small>cadran, couleurs, écran</small></summary>
       <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option></select></label>
-      <label>Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
-      <label>Fondu lent du cadran pendant le focus (mode Normal)<input type="checkbox" data-k="slowGlow"></label>
-      <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
-      <label>Couleur du texte<input type="color" data-k="textColor"></label>
+      <label data-if="dialStyle=rythme">Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
+      <label data-if="dialStyle=standard">Fondu lent du cadran pendant le focus<input type="checkbox" data-k="slowGlow"></label>
+      <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
+      <div class="buttons" data-if="dayGradient"><button type="button" id="btn-day-demo">Voir la journée en accéléré (30 s)</button></div>
+      <label data-if="!dayGradient">Couleur fixe<input type="color" data-k="fixedColor"></label>
+      <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
+      <label data-if="!breakColorRandom">Couleur de la pause<input type="color" data-k="breakColor"></label>
       <details class="more">
-        <summary>Couleurs et heures de la journée</summary>
-        <div id="day-colors"></div>
+        <summary>Réglages avancés <small>couleurs, format, contrôles, écran</small></summary>
+        <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
+        <label>Couleur du texte<input type="color" data-k="textColor"></label>
+        <label>Format du temps<select data-k="timeFormat"><option value="mmss">mm:ss</option><option value="min">minutes seules</option></select></label>
+        <label>Info discrète en bas (moment, phase, cycle)<input type="checkbox" data-k="showInfo"></label>
+        <label>Les contrôles s'effacent après (secondes)<input type="number" min="2" max="60" data-k="controlsDelay"></label>
+        <label>Garder l'écran allumé pendant une série<input type="checkbox" data-k="keepAwake"></label>
+        <div data-if="dayGradient">
+          <p class="pick-group">Couleurs et heures de la journée</p>
+          <div id="day-colors"></div>
+        </div>
       </details>
-    </details>
-
-    <details class="sec">
-      <summary>Affichage <small>format du temps, contrôles, écran</small></summary>
-      <label>Format du temps<select data-k="timeFormat"><option value="mmss">mm:ss</option><option value="min">minutes seules</option></select></label>
-      <label>Info discrète en bas (moment, phase, cycle)<input type="checkbox" data-k="showInfo"></label>
-      <label>Les contrôles s'effacent après (secondes)<input type="number" min="2" max="60" data-k="controlsDelay"></label>
-      <label>Garder l'écran allumé pendant une série<input type="checkbox" data-k="keepAwake"></label>
     </details>
 
     <details class="sec">
       <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
       <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus-parametres.json ») ; « Reprendre » les ramène sur un autre appareil.</p>
-      <label class="block">ID client Google <small>à créer une fois : voir le README, « Synchroniser avec Google Drive »</small><input type="text" data-k="syncClientId" placeholder="123456-abc.apps.googleusercontent.com" spellcheck="false" autocomplete="off"></label>
       <div class="buttons">
         <button type="button" id="btn-sync-save">Sauvegarder mes paramètres</button>
         <button type="button" id="btn-sync-load">Reprendre mes paramètres</button>
@@ -253,12 +250,16 @@
         <button type="button" id="btn-sync-out" class="link" hidden>Se déconnecter de Google</button>
       </div>
       <p id="sync-status" class="note" aria-live="polite"></p>
-      <div class="buttons">
-        <button type="button" id="btn-export">Exporter (JSON)</button>
-        <button type="button" id="btn-import">Importer</button>
-        <input type="file" id="file-import" accept="application/json,.json" hidden>
-        <button type="button" id="btn-reset">Revenir aux valeurs par défaut</button>
-      </div>
+      <details class="more">
+        <summary>Réglages avancés <small>fichier, valeurs par défaut, ID Google</small></summary>
+        <div class="buttons">
+          <button type="button" id="btn-export">Exporter (JSON)</button>
+          <button type="button" id="btn-import">Importer</button>
+          <input type="file" id="file-import" accept="application/json,.json" hidden>
+          <button type="button" id="btn-reset">Revenir aux valeurs par défaut</button>
+        </div>
+        <label class="block">ID client Google <small>déjà réglé ; à changer seulement pour un autre projet Google (voir le README)</small><input type="text" data-k="syncClientId" placeholder="123456-abc.apps.googleusercontent.com" spellcheck="false" autocomplete="off"></label>
+      </details>
       <p id="save-note" class="note" aria-live="polite">Tout est enregistré sur cet appareil.</p>
     </details>
 

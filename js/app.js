@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h21';
+const APP_VERSION = '30/10/2026 · 16h25';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1405,6 +1405,20 @@ function syncForm() {
     const out = el.parentElement.querySelector('output');
     if (out) out.textContent = el.value;
   }
+  showRelevant();
+}
+
+// Un réglage n'apparaît que s'il sert : data-if="pulseOn breathColors" (et), « a|b » (ou),
+// « !clé », « clé=valeur », « clé!=valeur ».
+function showRelevant() {
+  const test = (t) => {
+    if (t.includes('|')) return t.split('|').some(test);
+    if (t.startsWith('!')) return !getPath(t.slice(1));
+    const m = t.match(/^(.+?)(!?=)(.*)$/);
+    if (!m) return !!getPath(t);
+    return (String(getPath(m[1])) === m[3]) === (m[2] === '=');
+  };
+  for (const el of $$('[data-if]', sheet)) el.hidden = !el.dataset.if.split(' ').every(test);
 }
 
 function readInput(el) {
@@ -1431,6 +1445,7 @@ function onField(el, committed) {
   if (out) out.textContent = el.value;
   if (committed && el.type === 'number') el.value = v;
   saveSettings();
+  showRelevant();
   if (el.dataset.k === 'customLinks') fillStationSelects();
   if (el.dataset.k === 'notifyOn' && v) askNotifyPermission();
   if (el.dataset.k === 'breakMusic' && onBreak()) pauseAudio();

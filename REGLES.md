@@ -28,11 +28,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   À l'heure d'un moment, sa couleur est pure ; entre deux, la couleur **glisse en continu,
   minute par minute** (courbe douce, mélange OKLab). Le nom affiché est celui du moment le
   plus proche. Réglable : couleurs, heures, noms, ou couleur fixe.
-- **Démo** : Paramètres → Couleurs → « Voir la journée en accéléré » (24 h en 30 s, heure
+- **Démo** : Paramètres → Apparence → « Voir la journée en accéléré » (24 h en 30 s, heure
   affichée en bas, un toucher arrête).
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
-  l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Couleurs) :
+  l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Apparence) :
   « **Normal** » (par défaut, l'arc et les chiffres ; pendant le focus, **fondu lent** : le
   cadran s'efface presque (12 %) puis revient, 16 s aller-retour, et redevient entièrement
   visible dès que les contrôles s'affichent ; réglable) ou « **Rêveur** » : le cadran est posé
@@ -51,7 +51,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   « **Rythme** » : le cadran normal, mais le cercle **réagit à la musique** qui joue :
   il bat sur les temps forts (léger grossissement et lueur), le **BPM** s'affiche sous le
   temps (« focus · 124 BPM », estimé en ~10 s, fiable sur l'électro, absent sur le classique
-  sans battement), et une forme au choix (Paramètres → Couleurs → Forme du mode Rythme) :
+  sans battement), et une forme au choix (Paramètres → Apparence → Forme du mode Rythme) :
   barres, onde, **goutte** (par défaut), sonar ou étincelles, toutes en **néon** (cœur clair
   et halo, magenta → violet → bleu → cyan : selon la fréquence pour les barres, autour du
   cercle pour l'onde et la goutte, avec l'âge pour le sonar, au hasard pour les étincelles).
@@ -128,7 +128,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Musiques** (ids dans `js/defaults.js`) :
   - Playlists embarquées CC0 (HoliznaCC0) : « Playlist lofi » (9), « Playlist ambient
     électro » (7). Jouées au hasard, gardées sur l'appareil à l'écoute ; Paramètres →
-    Musiques → Bibliothèque hors ligne pour télécharger / retirer une playlist entière.
+    Musiques et sons → Réglages avancés → Bibliothèque hors ligne pour télécharger / retirer une playlist entière.
   - Radios testées (lisibles depuis un autre site) : chill (I♥Chillhop, Chillsynth, Radio
     Paradise Mellow, laut.fm lofi), électro (Technolovers Minimal / Deep House, FIP Electro,
     Intergalactic FM, NTS 1 et 2, Ambient Sleeping Pill, laut.fm minimal / ambient),
@@ -137,7 +137,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   - SomaFM (Groove Salad, Deep Space One, Fluid) : refuse la lecture depuis un autre site →
     s'ouvre dans un onglet (marqué ↗).
   - Noms : « Playlist … » pour l'embarqué, « Radio … » pour les radios (pas d'ambiguïté).
-  - **Cases à cocher par musique** (Paramètres → Musiques → Musiques du menu) : seules les
+  - **Cases à cocher par musique** (Paramètres → Musiques et sons → Musiques du menu) : seules les
     cochées apparaissent dans le lecteur. **Actuellement cochées : Technolovers Minimal
     (musique par défaut) et les 5 radios classiques.**
   - « Mes liens » : flux audio directs ajoutés par l'utilisateur (YouTube / Spotify →
@@ -150,7 +150,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - La musique du focus est **notée au début de la pause** et **reprend après** : la playlist
   au même morceau et à la seconde près, une radio en direct. Toute radio reprise après plus de 5 s de pause
   (notification Android, écran verrouillé, pause) est **rechargée en direct** par défaut ;
-  réglage « Reprise d'une radio après une pause » (Volumes et sons) : « là où elle s'était
+  réglage « Reprise d'une radio après une pause » (Musiques et sons, avancés) : « là où elle s'était
   arrêtée » pour finir un morceau (classique…), dans la limite de ce que le navigateur garde.
 - **Bruits de fond générés** (Web Audio, aucun fichier) : pluie, orage lointain (grondements
   à des moments imprévisibles), vent par rafales, neige feutrée, café. Pas de bruit blanc /
@@ -160,11 +160,16 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 
 ## 7. Paramètres et sauvegarde
 
-- Bouton « Paramètres » discret, visible avec les contrôles. Panneau en **8 sections
+- Bouton « Paramètres » discret, visible avec les contrôles. Panneau en **6 sections
   repliables**, une seule ouverte à la fois (sa ligne est surlignée en bleu clair, ses réglages
-  décalés à droite avec un trait bleu) : Temps, Pause, Volumes et sons, Musiques,
-  Messages, Couleurs, Affichage, Sauvegarde. Les longues listes sont repliées dans leur
-  section.
+  décalés à droite avec un trait bleu) : Temps, Pause, Musiques et sons, Messages,
+  Apparence, Sauvegarde. **Allégé le 30/10** (demande de l'utilisateur : trop de réglages) :
+  chaque section ne montre que l'essentiel (30 réglages visibles au lieu de 65), le reste est
+  replié dans « **Réglages avancés** » ; et **un réglage n'apparaît que s'il sert**
+  (attribut `data-if` dans `index.html`, lu par `showRelevant()` : « Forme » seulement en
+  mode Rythme, « Fondu lent » seulement en Normal, couleurs de respiration seulement avec
+  « une couleur par étape », couleur fixe seulement sans dégradé…). Aucun réglage n'a été
+  supprimé.
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà

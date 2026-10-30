@@ -20,7 +20,8 @@ premier pour reprendre le travail).
   pause au choix (musique douce générée par défaut), bruits générés (pluie, orage, vent,
   neige, café) avec bouton lecture / pause.
 - Arrêter coupe tout ; Démarrer relance tout ; recharger la page repart de zéro.
-- Paramètres en 8 sections repliables, export / import JSON.
+- Paramètres en 6 sections repliables, l'essentiel visible et le reste dans « Réglages
+  avancés », export / import JSON.
 - Synchronisation Google Drive des paramètres (codée et testée avec un faux Google).
 
 **En service** : sur le PC et sur le téléphone (installé depuis Chrome), réglages partagés
@@ -63,19 +64,11 @@ par Google Drive.
 
 ## À faire
 
-- **Alléger les Paramètres** (demande de l'utilisateur, 29/10) : pratique au début, mais il y
-  en a trop. État au 29/10 : 65 réglages et boutons répartis en 8 sections (Temps 12,
-  Pause 14, Couleurs 10, Volumes et sons 9, Sauvegarde 9, Musiques 4, Affichage 4,
-  Messages 3), sans compter les listes de radios et de messages. Pistes, à décider avec lui :
-  - ne laisser visibles qu'une dizaine de réglages essentiels, le reste replié dans
-    « Réglages avancés » ;
-  - n'afficher un réglage que s'il sert : « Forme du mode Rythme » seulement en mode Rythme,
-    « Fondu lent » seulement en mode Normal, couleurs de respiration seulement si « une
-    couleur par étape » est cochée ;
-  - retirer ceux qu'on ne change jamais en gardant une bonne valeur par défaut (ID client
-    Google, intensité sans couleurs, simple pulsation, durée du maintien, délai des
-    contrôles…) ;
-  - regrouper : Couleurs et Affichage en une section « Apparence ».
+- **Paramètres allégés** (30/10) : 6 sections au lieu de 8 (Couleurs + Affichage →
+  Apparence, Volumes et sons + Musiques → Musiques et sons), 30 réglages visibles au lieu
+  de 65, le reste dans « Réglages avancés », réglages sans objet masqués. Rien supprimé.
+  À voir avec l'utilisateur : en retirer certains pour de bon (ID client Google, durée du
+  maintien, délai des contrôles…) ?
 
 ## Idées en réserve
 

@@ -45,11 +45,11 @@ aucun son. Tes réglages sont relus (durées, couleurs, volumes, musique et brui
 l'appli retient ta musique d'une phase à l'autre : la playlist reprend au même morceau après
 chaque pause. Choisir une musique dans le menu la lance tout de suite.
 
-Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent). Les réglages sont rangés en 8 sections repliables (Temps, Pause, Volumes et sons, Musiques, Messages, Couleurs, Affichage, Sauvegarde) : une seule s'ouvre à la fois.
-Dans Paramètres → Musiques → « Musiques du menu », décoche les radios et playlists qui ne te
+Tout se règle dans **Paramètres** (en haut à droite, visible quand les contrôles apparaissent). Les réglages sont rangés en 6 sections repliables (Temps, Pause, Musiques et sons, Messages, Apparence, Sauvegarde) : une seule s'ouvre à la fois. Chacune montre l'essentiel ; le reste est replié dans « Réglages avancés », et un réglage n'apparaît que s'il sert.
+Dans Paramètres → Musiques et sons → « Musiques du menu », décoche les radios et playlists qui ne te
 plaisent pas : elles disparaissent du lecteur (tu peux les recocher quand tu veux).
-Les réglages restent sur l'appareil. Pour avoir les mêmes ailleurs : Paramètres → Exporter,
-puis Importer sur l'autre appareil.
+Les réglages restent sur l'appareil. Pour avoir les mêmes ailleurs : Paramètres → Sauvegarde
+(Google Drive, ou Exporter / Importer dans « Réglages avancés »).
 
 Raccourcis clavier : `Espace` démarre ou met en pause le focus, les flèches règlent le cadran
 quand il a le focus, `Échap` ferme les Paramètres.
@@ -69,7 +69,7 @@ Il faut seulement Python (déjà installé chez toi).
 2. Ouvre http://localhost:8417 dans Chrome ou Edge.
 3. Vérifie, dans l'ordre :
    - Le fond a une couleur qui correspond au moment de la journée (le nom est écrit en bas).
-     Paramètres → Couleurs → « Voir la journée en accéléré » fait défiler les 24 h en 30 s.
+     Paramètres → Apparence → « Voir la journée en accéléré » fait défiler les 24 h en 30 s.
    - Tourne le cadran : les graduations apparaissent, le temps change minute par minute.
    - Règle un focus de **1 minute** et une pause de **1 minute**, puis Démarrer.
    - Après 1 minute : petit son, fond coloré qui respire, une action du coach, et si une
@@ -133,7 +133,7 @@ Une fois publiée, ouvre `https://darkcapp68-web.github.io/projetfocus/` puis :
   → *Installer*.
 - **iPhone ou iPad (Safari)** : bouton Partager → *Sur l'écran d'accueil*.
 
-Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique embarquée, voir Paramètres → Musiques → Bibliothèque hors ligne).
+Ouvre l'appli une fois avec Internet : ensuite elle marche **hors ligne** (sauf les radios ; pour la musique embarquée, voir Paramètres → Musiques et sons → Réglages avancés → Bibliothèque hors ligne).
 
 Au premier démarrage d'un focus, le navigateur demande l'autorisation d'afficher des
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
@@ -218,13 +218,13 @@ Une série en cours survit à un rechargement de la page.
   À la place, l'appli lit **I♥Chillhop**, **Lofi (laut.fm)**, **Nightride Chillsynth** et
   **Radio Paradise Mellow**. Ce sont des radios externes : elles peuvent changer d'adresse,
   et I♥Chillhop peut glisser un jingle. **laut.fm passe de la publicité** : ses trois radios
-  (lofi, minimal, ambient) sont décochées au départ ; Paramètres → Musiques → Musiques du menu
+  (lofi, minimal, ambient) sont décochées au départ ; Paramètres → Musiques et sons → Musiques du menu
   permet de les réactiver.
 - **Bibliothèque embarquée** : deux playlists de HoliznaCC0, dans le domaine public (licence
   vérifiée sur chaque page : voir [CREDITS.md](CREDITS.md)) : « Playlist lofi » (9 morceaux, 56 Mo,
   la musique par défaut) et « Playlist ambient électro » (7 morceaux, 51 Mo), en ordre aléatoire.
   Ce sont les MP3 d'origine (320 kbit/s), donc lourds : l'appli ne les télécharge pas d'office.
-  Chaque morceau écouté reste sur l'appareil ; Paramètres → Musiques → Bibliothèque hors ligne permet de
+  Chaque morceau écouté reste sur l'appareil ; Paramètres → Musiques et sons → Réglages avancés → Bibliothèque hors ligne permet de
   télécharger ou de retirer une playlist entière.
 - **Style « Work with Paul »** (techno, house, ambient, sans paroles) : trois radios de ce
   style sont ajoutées, testées depuis un autre site : Minimal (laut.fm), Ambient Sleeping
@@ -234,14 +234,14 @@ Une série en cours survit à un rechargement de la page.
   décochées au départ car probablement avec pub. Côté classique, cinq radios publiques sans pub :
   France Musique Opéra, Classique Plus, Baroque et Easy Classique (Radio France), et Radio Swiss
   Classic. Pour l'instant, seules Technolovers Minimal et ces radios classiques sont cochées ; les
-  autres se recochent dans Paramètres → Musiques → Musiques du menu.
+  autres se recochent dans Paramètres → Musiques et sons → Musiques du menu.
   La house et la techno vraiment libres de droits sont rares :
   il n'y en a pas d'embarquées pour l'instant.
 - **Live lofi YouTube** : pas intégré. Un lien YouTube ajouté dans « Mes liens » s'ouvre dans
   un onglet.
 - **Cadran** : le style minimal (arc blanc fin) remplace le secteur violet / rouge du premier
   jet. La pause prend une couleur au hasard parmi dix (à ta demande, à la place du rouge
-  fixe ; réglable dans Paramètres → Couleurs). Les couleurs du cadran et du texte
+  fixe ; réglable dans Paramètres → Apparence). Les couleurs du cadran et du texte
   sont réglables.
 - **Coach** : une action affichée à la fois (décision de style) ; deux autres idées sont
   proposées au toucher, et on peut les choisir à la place.
