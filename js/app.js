@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h38';
+const APP_VERSION = '30/10/2026 · 17h43';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -327,7 +327,7 @@ function drawSolar() {
 // branches, qui se ramifient au hasard en chemin et poussent en continu, à vitesse constante
 // (version 1, la plus fluide : les essais « 2 traits qui se divisent à chaque minute » étaient
 // saccadés). Un trait qui touche le bord de l'écran rebondit (angle réfléchi). Aspect
-// « éclair » (zigzag, néon bleu-violet, cœur blanc) ou « fissure » (courbe douce, couleur du
+// « éclair » (zigzag) ou « fissure » (courbe douce) ; teinte noire par défaut, ou claire (néon, couleur du
 // cadran). En pause, le tracé s'efface (fondu CSS). La graine permet de redessiner le même
 // après un changement de taille.
 const crackCanvas = $('#crack-fx');
@@ -416,7 +416,15 @@ function crackBuild() {
 // épaisses et lumineuses, les suivantes de plus en plus fines. Éclair : néon, halo bleu-violet et cœur blanc.
 function crackStroke(ctx, path, lv) {
   let passes;
-  if (crack.zap) {
+  // Teinte « sombre » (par défaut) : trait noir, qui tranche sur le temps et le message en blanc ;
+  // l'éclair garde un mince halo bleuté pour rester visible sur un fond de nuit.
+  if (S.crackShade !== 'clair') {
+    const w = crack.zap ? Math.max(0.6, 2.2 - lv * 0.25) : Math.max(0.7, 2.6 - lv * 0.3);
+    const al = Math.max(0.45, 0.9 - lv * 0.06);
+    passes = crack.zap
+      ? [[w * 4, 0.12, '#8fb8ff'], [w * 1.2, al, '#000']]
+      : lv < 2 ? [[w * 3, 0.12, '#000'], [w, al, '#000']] : [[w, al, '#000']];
+  } else if (crack.zap) {
     const w = Math.max(0.6, 2.2 - lv * 0.25);
     passes = [[w * 6, 0.07, '#7f6bff'], [w * 2.4, 0.22, '#8fb8ff'], [w * 0.9, Math.max(0.5, 0.95 - lv * 0.04), '#fff']];
     ctx.globalCompositeOperation = 'lighter';

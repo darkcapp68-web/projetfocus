@@ -12,7 +12,8 @@ premier pour reprendre le travail).
 - 4 styles de cadran (Apparence) : Normal (fondu lent), Rêveur (engrenages, atome, vague),
   Rythme (réagit à la musique), Brisure (30/10 : un éclair ou une fissure se ramifie et
   pousse en continu depuis le centre, rebondit sur les bords, vitesse réglable, s'efface en
-  pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer).
+  pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer ;
+  tracé noir par défaut pour trancher sur le texte blanc, « Claire » en réglage).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
@@ -59,7 +60,7 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
    - **couleurs de la cohérence cardiaque : à revoir** (30/10, l'utilisateur les trouve à
      retravailler ; aujourd'hui bleu ciel à l'inspiration, noir à l'expiration) : lui demander
      ce qui ne va pas avant de changer quoi que ce soit ;
-   - mot qui grandit à l'inspiration, Brisure (fluidité, vitesse) : à juger sur le téléphone ;
+   - mot qui grandit à l'inspiration, Brisure (fluidité, vitesse, tracé noir) : à juger sur le téléphone ;
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
    - radios classiques : lesquelles garder ;

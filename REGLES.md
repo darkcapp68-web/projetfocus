@@ -80,7 +80,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   tracé **s'efface** (fondu 3 s) ; au focus suivant, un **nouveau tracé tiré au hasard**. Au
   repos, le cadran normal. **Vitesse** (réglage, visible en mode Brisure) : « Normale » (au
   bout des branches à la fin du focus), « **Lente** » (la moitié, par défaut) ou « Très lente »
-  (30 %) ; demande de l'utilisateur, 30/10 : ralentir la progression.
+  (30 %) ; demande de l'utilisateur, 30/10 : ralentir la progression. **Teinte du tracé**
+  (réglage) : « **Noire** » par défaut (30/10, demande de l'utilisateur : le tracé blanc se
+  confondait avec le temps et le message en blanc ; l'éclair garde un mince halo bleuté) ou
+  « Claire » (le néon blanc et la fissure couleur du cadran d'avant).
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
