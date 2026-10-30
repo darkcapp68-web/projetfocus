@@ -226,8 +226,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   une heure inventée. Bouton « Mettre à jour l'appli » à côté : vide le cache du
   site (pas la musique) et recharge, pour un appareil resté sur une ancienne version.
   **Avis de mise à jour** (30/10) : l'appli relit `APP_VERSION` dans le `js/app.js` publié
-  (`?verif-version`, sans cache) à l'ouverture, au retour au premier plan (au plus une fois
-  par minute) et toutes les 30 min ; si elle diffère, un **point bleu** s'allume sur
+  (`?verif-version`, revalidé auprès du site) à l'ouverture, au retour au premier plan, quand
+  la fenêtre reprend la main (PC), à l'ouverture des Paramètres (au plus une fois par minute)
+  et toutes les 10 min ; si elle diffère, un **point bleu** s'allume sur
   « Paramètres », la ligne de version annonce la nouvelle et « Mettre à jour l'appli » est
   mis en avant. **Jamais de rechargement tout seul** (ne pas couper un focus). Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
   CHANTIER.md visibles) : jamais de secret dedans (ni code secret Google, ni clé APK).

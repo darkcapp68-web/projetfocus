@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h02';
+const APP_VERSION = '30/10/2026 · 17h08';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1492,6 +1492,7 @@ let settingsOpen = false;
 
 function openSettings() {
   settingsOpen = true;
+  checkUpdate(); // c'est là qu'on regarde la version
   syncForm();
   libraryStatus();
   sheet.inert = false;
@@ -1751,7 +1752,9 @@ $('#btn-update')?.addEventListener('click', async () => {
 });
 
 // Une version plus récente est-elle en ligne ? On relit `APP_VERSION` dans le js/app.js
-// publié (sans cache) : à l'ouverture, au retour au premier plan, puis toutes les 30 min.
+// publié (revalidé auprès du site : le fichier n'est renvoyé que s'il a changé) : à
+// l'ouverture, au retour au premier plan, quand la fenêtre reprend la main, à l'ouverture
+// des Paramètres (au plus une fois par minute), et toutes les 10 min.
 // Jamais de rechargement tout seul : un point sur « Paramètres », et le bouton
 // « Mettre à jour l'appli » mis en avant.
 let lastCheck = 0;
@@ -1759,7 +1762,7 @@ async function checkUpdate() {
   if (!navigator.onLine || Date.now() - lastCheck < 60000) return;
   lastCheck = Date.now();
   try {
-    const res = await fetch('js/app.js?verif-version', { cache: 'no-store' });
+    const res = await fetch('js/app.js?verif-version', { cache: 'no-cache' });
     const online = res.ok && /APP_VERSION = '([^']+)'/.exec(await res.text())?.[1];
     if (!online || online === APP_VERSION) return;
     $('#btn-settings').classList.add('has-update');
@@ -1768,7 +1771,8 @@ async function checkUpdate() {
   } catch { /* hors ligne ou site injoignable : on réessaiera */ }
 }
 setTimeout(checkUpdate, 5000);
-setInterval(checkUpdate, 30 * 60000);
+setInterval(checkUpdate, 10 * 60000);
+window.addEventListener('focus', checkUpdate); // PC : une fenêtre restée affichée ne change pas de visibilité
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
 
 $('#btn-day-demo').addEventListener('click', startDayDemo);
