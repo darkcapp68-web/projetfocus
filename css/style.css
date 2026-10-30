@@ -239,6 +239,9 @@ body.phase-break #actions { display: none; }
 #break-actions { display: none; }
 body.phase-break #break-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 #btn-stop-break { font-size: 12px; padding: 0.5em 1.2em; }
+/* Les boutons de la pause s'effacent avec les autres contrôles ; « maintenir » reste
+   saisissable effacé : appuyer à sa place réaffiche les contrôles et lance le maintien. */
+#btn-hold { pointer-events: auto; }
 #btn-done { display: none; }
 body.break-ended #btn-done { display: inline-block; }
 body.break-ended #btn-hold { display: none; }

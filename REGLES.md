@@ -100,7 +100,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   La respiration s'arrête quand la pause est finie.
 - **Une action du coach** à la fois (liste modifiable), deux autres proposées au toucher.
 - **Maintenir 3 s** pour reprendre avant la fin (geste volontaire). Bouton **Arrêter** au
-  toucher.
+  toucher. Ces boutons (et « Fait, je reprends ») s'effacent avec les autres contrôles ;
+  appuyer à la place de « maintenir », même effacé, le réaffiche et lance le maintien.
 - **Compte à rebours sonore** dans les 10 dernières secondes de la pause : à 10, 8, 6 s puis
   chaque seconde de 5 à 1, en **tic-tac** (par défaut) ou en ding. Option pour le focus aussi
   (décochée).
