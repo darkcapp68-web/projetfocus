@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h27';
+const APP_VERSION = '30/10/2026 · 16h38';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -321,6 +321,138 @@ function drawSolar() {
   requestAnimationFrame(drawSolar);
 }
 
+/* ---------- Mode « Brisure » : une fissure se ramifie depuis le centre ---------- */
+
+// À chaque focus, une nouvelle fissure tirée au hasard (graine) part du centre du cadran :
+// d'abord 2 traits, puis **chaque minute** chaque bout se divise en 2 (une génération par
+// minute du focus). Une branche s'arrête quand elle rejoint une autre fissure (comme une
+// fêlure de verre) ou sort de l'écran ; les générations raccourcissent, les dernières
+// comblent les vides. En pause, elle s'efface (fondu CSS). La graine permet de redessiner
+// la même après un changement de taille de la fenêtre.
+const crackCanvas = $('#crack-fx');
+const crackFx = crackCanvas?.getContext('2d');
+const crack = { on: false, seed: 0, levels: 1, segs: [], done: 0, last: 0, w: 0, h: 0 };
+// Les segments finis sont dessinés une seule fois ici ; seuls ceux qui poussent sont redessinés.
+const crackDone = document.createElement('canvas');
+
+function prng(seed) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Segments [x0, y0, x1, y1, t0, t1, génération] ; t = moment du focus (0 → 1) où le
+// segment pousse. Toutes les branches d'une génération poussent ensemble, pas à pas.
+function crackBuild() {
+  const W = innerWidth, H = innerHeight, rnd = prng(crack.seed), L = crack.levels;
+  const r = dial.getBoundingClientRect();
+  const cx = r.width ? r.left + r.width / 2 : W / 2, cy = r.width ? r.top + r.height / 2 : H / 2;
+  const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+  // Longueur de chaque génération : décroissante, la somme dépasse un peu la distance au coin.
+  const q = L > 8 ? 0.9 : 0.93;
+  const len0 = (R * 1.35 * (1 - q)) / (1 - q ** L);
+  const CELL = 5, cols = Math.ceil(W / CELL) + 2, grid = new Int32Array(cols * (Math.ceil(H / CELL) + 2));
+  const cell = (x, y) => {
+    const i = Math.floor(x / CELL) + 1, j = Math.floor(y / CELL) + 1;
+    return i < 0 || j < 0 || i >= cols || j * cols >= grid.length ? -1 : j * cols + i;
+  };
+  const segs = [];
+  const a0 = rnd() * 2 * Math.PI;
+  let tips = [{ x: cx, y: cy, a: a0 }, { x: cx, y: cy, a: a0 + Math.PI + (rnd() - 0.5) * 0.8 }];
+  let id = 1;
+  for (let lv = 0; lv < L && tips.length; lv++) {
+    const len = Math.max(7, len0 * q ** lv), SUB = 6;
+    // Génération 0 : les 2 traits du départ ; ensuite chaque bout se divise en 2.
+    let br = lv === 0 ? tips.map((t) => ({ ...t, id: id++ }))
+      : tips.flatMap((t) => [-1, 1].map((side) => ({ x: t.x, y: t.y, a: t.a + side * (0.22 + rnd() * 0.5), id: id++ })));
+    if (br.length > 3000) br = br.sort(() => rnd() - 0.5).slice(0, 3000);
+    for (let s = 0; s < SUB; s++) {
+      const t0 = (lv + s / SUB) / L, t1 = (lv + (s + 1) / SUB) / L;
+      for (const b of br) {
+        if (b.dead) continue;
+        b.a += (rnd() - 0.5) * 0.35;
+        const step = (len / SUB) * (0.7 + rnd() * 0.6);
+        let nx = b.x + Math.cos(b.a) * step, ny = b.y + Math.sin(b.a) * step;
+        // Rencontre avec une autre fissure : la branche s'y raccorde et s'arrête.
+        if (s > 0 || lv === 0) {
+          const n = Math.max(1, Math.ceil(step / (CELL / 2)));
+          for (let k = 1; k <= n; k++) {
+            const px = b.x + (nx - b.x) * (k / n), py = b.y + (ny - b.y) * (k / n), c = cell(px, py);
+            if (c >= 0 && grid[c] && grid[c] !== b.id && Math.hypot(px - cx, py - cy) > CELL * 2) { nx = px; ny = py; b.dead = true; break; }
+          }
+        }
+        segs.push([b.x, b.y, nx, ny, t0, t1, lv]);
+        const n = Math.max(1, Math.ceil(step / (CELL / 2)));
+        for (let k = 0; k <= n; k++) {
+          const c = cell(b.x + (nx - b.x) * (k / n), b.y + (ny - b.y) * (k / n));
+          if (c >= 0 && !grid[c]) grid[c] = b.id;
+        }
+        b.x = nx; b.y = ny;
+        if (nx < -10 || ny < -10 || nx > W + 10 || ny > H + 10) b.dead = true;
+      }
+    }
+    tips = br.filter((b) => !b.dead);
+  }
+  segs.sort((p, q2) => p[5] - q2[5]); // par moment où le segment a fini de pousser
+  crack.segs = segs;
+  crack.w = W; crack.h = H; crack.dpr = devicePixelRatio;
+  crackCanvas.width = crackDone.width = Math.round(W * devicePixelRatio);
+  crackCanvas.height = crackDone.height = Math.round(H * devicePixelRatio);
+  crackDone.getContext('2d').clearRect(0, 0, crackDone.width, crackDone.height);
+  crack.done = 0;
+}
+
+// Un segment, en entier ou jusqu'à la fraction f : les premiers traits épais et lumineux,
+// les suivants de plus en plus fins.
+function crackSeg(ctx, [x0, y0, x1, y1, , , lv], f) {
+  const w = Math.max(0.7, 2.6 - lv * 0.3), al = Math.max(0.4, 0.95 - lv * 0.06);
+  const bx = x0 + (x1 - x0) * f, by = y0 + (y1 - y0) * f;
+  for (const [lw, alpha] of lv < 2 ? [[w * 3, 0.1], [w, al]] : [[w, al]]) {
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke();
+  }
+}
+
+function crackDraw(p) {
+  const k = crackCanvas.width / crack.w, segs = crack.segs;
+  const done = crackDone.getContext('2d'), ctx = crackFx;
+  for (const c of [done, ctx]) { c.setTransform(k, 0, 0, k, 0, 0); c.lineCap = 'round'; c.strokeStyle = S.dialColor; }
+  while (crack.done < segs.length && segs[crack.done][5] <= p) crackSeg(done, segs[crack.done++], 1);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
+  ctx.drawImage(crackDone, 0, 0);
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  // Ceux qui poussent : tous de la même génération et de la même étape (même t0, t1).
+  for (let i = crack.done; i < segs.length && segs[i][4] < p; i++) {
+    const [, , , , t0, t1] = segs[i];
+    crackSeg(ctx, segs[i], (p - t0) / (t1 - t0));
+  }
+}
+
+function crackFrame(now) {
+  if (!crack.on) return;
+  requestAnimationFrame(crackFrame);
+  if (now - crack.last < 100) return; // la fissure pousse lentement : 10 images par seconde suffisent
+  crack.last = now;
+  if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio) crackBuild();
+  crackDraw(T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0);
+}
+
+function crackStart() {
+  crack.seed = (Math.random() * 2 ** 31) | 0;
+  crack.levels = Math.max(1, Math.round(T.total / 60)); // une génération par minute
+  crackBuild();
+  crackFx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
+  crack.on = true;
+  crack.last = 0;
+  requestAnimationFrame(crackFrame);
+}
+
 // Scène du cadran selon le mode et la phase. Au repos, le cadran normal (arc, point,
 // graduations) pour bien voir ce qu'on règle ; la scène et son cadre arrivent au démarrage.
 function setScene() {
@@ -332,6 +464,11 @@ function setScene() {
   body.classList.toggle('scene-liquid', liquid);
   if (solar && !solarOn) { solarOn = true; requestAnimationFrame(drawSolar); }
   else if (!solar) solarOn = false;
+  // Brisure : une nouvelle fissure à chaque focus ; elle s'efface en pause (fondu CSS).
+  const cracking = S.dialStyle === 'brisure' && !demo && p === 'focus' && !!crackFx;
+  if (cracking && !crack.on) crackStart();
+  else if (!cracking) crack.on = false;
+  body.classList.toggle('scene-crack', cracking);
 }
 
 /* ---------- Mode « Rythme » : le cercle réagit à la musique ---------- */

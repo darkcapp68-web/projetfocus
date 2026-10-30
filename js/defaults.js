@@ -152,7 +152,7 @@ export const DEFAULTS = {
   breakColor: '#b3261e', // utilisée si la couleur au hasard est coupée
   dialColor: '#ffffff',
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
-  dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause) ou rythme
+  dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause), rythme ou brisure (fissure qui se ramifie)
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
   slowGlow: true, // mode normal : le cadran s'efface presque puis revient, lentement, pendant le focus
   textColor: '#ffffff',

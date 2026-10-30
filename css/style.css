@@ -164,6 +164,12 @@ body.dial-rythme #sub { text-shadow: 0 0 6px hsl(300 100% 65% / 0.7), 0 0 12px h
 #dial { transition: transform 0.08s ease-out; }
 body.scene-solar #dial .track, body.scene-liquid #dial .track { fill: url(#orb-veil); stroke: none; }
 #comet-head { fill: #fff; }
+/* Mode brisure : la fissure sur tout l'écran, derrière le cadran ; pendant le focus, seuls le
+   temps et la phase restent (détachés de la fissure par une ombre de la couleur du fond). */
+#crack-fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 3s ease; }
+body.scene-crack #crack-fx { opacity: 1; transition-duration: 0.3s; }
+body.scene-crack #dial .track, body.scene-crack #arc, body.scene-crack #knob { visibility: hidden; }
+body.scene-crack #time, body.scene-crack #sub { text-shadow: 0 0 10px var(--bg), 0 0 22px var(--bg), 0 0 36px var(--bg); }
 
 /* Graduations : seulement pendant le réglage */
 #ticks { opacity: 0; transition: opacity 0.5s ease; }

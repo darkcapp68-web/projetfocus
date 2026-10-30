@@ -17,6 +17,7 @@
 </head>
 <body class="ui phase-idle">
   <div id="pulse" aria-hidden="true"></div>
+  <canvas id="crack-fx" aria-hidden="true"></canvas>
 
   <header id="topbar">
     <div id="quick" class="ctl">
@@ -217,7 +218,7 @@
 
     <details class="sec">
       <summary>Apparence <small>cadran, couleurs, écran</small></summary>
-      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option></select></label>
+      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option><option value="brisure">Brisure (une fissure se ramifie et remplit l'écran pendant le focus)</option></select></label>
       <label data-if="dialStyle=rythme">Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
       <label data-if="dialStyle=standard">Fondu lent du cadran pendant le focus<input type="checkbox" data-k="slowGlow"></label>
       <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
