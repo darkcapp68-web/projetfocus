@@ -215,7 +215,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Version** affichée en bas des Paramètres (`APP_VERSION` dans `js/app.js`) : la changer
   à chaque envoi avec la **vraie** date et heure du PC (`date "+%d/%m/%Y · %Hh%M"`), jamais
   une heure inventée. Bouton « Mettre à jour l'appli » à côté : vide le cache du
-  site (pas la musique) et recharge, pour un appareil resté sur une ancienne version. Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
+  site (pas la musique) et recharge, pour un appareil resté sur une ancienne version.
+  **Avis de mise à jour** (30/10) : l'appli relit `APP_VERSION` dans le `js/app.js` publié
+  (`?verif-version`, sans cache) à l'ouverture, au retour au premier plan (au plus une fois
+  par minute) et toutes les 30 min ; si elle diffère, un **point bleu** s'allume sur
+  « Paramètres », la ligne de version annonce la nouvelle et « Mettre à jour l'appli » est
+  mis en avant. **Jamais de rechargement tout seul** (ne pas couper un focus). Le dépôt est public (CAHIER_DES_CHARGES.md, REGLES.md,
   CHANTIER.md visibles) : jamais de secret dedans (ni code secret Google, ni clé APK).
 
 ## 9. Conventions de travail (pour Claude)

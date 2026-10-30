@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h46';
+const APP_VERSION = '30/10/2026 · 16h51';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1716,6 +1716,27 @@ $('#btn-update')?.addEventListener('click', async () => {
   saveEverything();
   location.reload();
 });
+
+// Une version plus récente est-elle en ligne ? On relit `APP_VERSION` dans le js/app.js
+// publié (sans cache) : à l'ouverture, au retour au premier plan, puis toutes les 30 min.
+// Jamais de rechargement tout seul : un point sur « Paramètres », et le bouton
+// « Mettre à jour l'appli » mis en avant.
+let lastCheck = 0;
+async function checkUpdate() {
+  if (!navigator.onLine || Date.now() - lastCheck < 60000) return;
+  lastCheck = Date.now();
+  try {
+    const res = await fetch('js/app.js?verif-version', { cache: 'no-store' });
+    const online = res.ok && /APP_VERSION = '([^']+)'/.exec(await res.text())?.[1];
+    if (!online || online === APP_VERSION) return;
+    $('#btn-settings').classList.add('has-update');
+    $('#btn-update').classList.add('primary');
+    if (versionEl) versionEl.textContent = `Version du ${APP_VERSION} · nouvelle version en ligne : ${online}`;
+  } catch { /* hors ligne ou site injoignable : on réessaiera */ }
+}
+setTimeout(checkUpdate, 5000);
+setInterval(checkUpdate, 30 * 60000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
 
 $('#btn-day-demo').addEventListener('click', startDayDemo);
 // Un toucher pendant la démo l'arrête (sauf dans la première demi-seconde).
