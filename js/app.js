@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '29/10/2026 · 20h02';
+const APP_VERSION = '30/10/2026 · 16h16';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1306,14 +1306,14 @@ function openSettings() {
   sheet.inert = false;
   sheet.classList.add('open');
   body.classList.add('ui');
-  $('#btn-close').focus();
+  $('#btn-close').focus({ preventScroll: true });
 }
 
 function closeSettings() {
   settingsOpen = false;
   sheet.classList.remove('open');
   sheet.inert = true;
-  $('#btn-settings').focus();
+  $('#btn-settings').focus({ preventScroll: true });
   poke();
 }
 

@@ -358,13 +358,16 @@ body.no-info #info { visibility: hidden; }
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   padding: 0 20px max(28px, env(safe-area-inset-bottom));
-  transform: translateX(100%);
-  transition: transform 0.35s ease;
+  /* Fermé, le panneau reste à sa place mais masqué (et non poussé hors de l'écran) : sur
+     Android, un panneau posé à droite de l'écran élargissait la page et la décalait. */
+  clip-path: inset(0 0 0 100%);
+  visibility: hidden;
+  transition: clip-path 0.35s ease, visibility 0s 0.35s;
   user-select: text;
   -webkit-user-select: text;
   font-size: 14px;
 }
-#settings.open { transform: none; }
+#settings.open { clip-path: inset(0); visibility: visible; transition: clip-path 0.35s ease; }
 .sheet-head {
   position: sticky;
   top: 0;
