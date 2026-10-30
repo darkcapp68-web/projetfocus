@@ -27,9 +27,11 @@ premier pour reprendre le travail).
 **En service** : sur le PC et sur le téléphone (installé depuis Chrome), réglages partagés
 par Google Drive.
 
-**Appli Android** : **APK abandonné** (décision de l'utilisateur, 30/10). Chrome a installé
+**Appli Android** : **APK mis de côté** (décision de l'utilisateur, 30/10), à reprendre peut-être plus tard. Chrome a installé
 le site sur le téléphone comme une appli (icône sur l'écran d'accueil), ce qui suffit. Le
-projet Android Studio `android/` reste dans le dépôt, sans suite.
+projet Android Studio `android/` reste dans le dépôt pour plus tard (il resterait : clé de
+signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json`, voir
+`android/README.md`).
 
 ## En cours
 

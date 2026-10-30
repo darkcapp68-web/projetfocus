@@ -141,7 +141,7 @@ Au premier démarrage d'un focus, le navigateur demande l'autorisation d'affiche
 
 **Sur Android** : ouvre le site dans Chrome et accepte « Installer l'appli » (ou menu ⋮ →
 Ajouter à l'écran d'accueil) : l'appli a son icône et s'ouvre en plein écran. Le dossier
-[android/](android/README.md) (projet d'APK) n'est plus utilisé.
+[android/](android/README.md) (projet d'APK) est mis de côté pour plus tard.
 ---
 
 ## Sauvegarder ses paramètres sur Google Drive (mêmes réglages partout)
