@@ -77,11 +77,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   le cadran s'efface : seul un **petit temps** discret reste, au-dessus du message de
   soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, la fissure **s'efface** (fondu 3 s) ;
   au focus suivant, une **nouvelle fissure tirée au hasard**. Au repos, le cadran normal.
-  **Éclair** : dents de scie autour de la direction de chaque branche, néon (halo bleu-violet,
-  cœur blanc), il **pousse en continu** comme la fissure (une frappe d'un coup par génération
-  a été essayée puis retirée le 30/10 : moins plaisant), avec un **flash** discret du canevas
-  à chaque nouvelle génération (luminosité qui retombe en 1,4 s). **Fissure** : trait de la
-  couleur du cadran, qui se courbe doucement.
+  **Traits droits** (30/10, pour la fluidité sur téléphone) : un segment par branche et par
+  génération, coupé et réfléchi à chaque bord ; dessin groupé (un tracé par génération),
+  canevas plafonné à 2 pixels par point, pas de filtre. Il **pousse en continu** (une frappe
+  d'un coup par génération et un flash ont été essayés puis retirés le 30/10). **Éclair** :
+  néon, halo bleu-violet et cœur blanc. **Fissure** : trait de la couleur du cadran.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
@@ -224,7 +224,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Version** affichée en bas des Paramètres (`APP_VERSION` dans `js/app.js`) : la changer
   à chaque envoi avec la **vraie** date et heure du PC (`date "+%d/%m/%Y · %Hh%M"`), jamais
   une heure inventée. Bouton « Mettre à jour l'appli » à côté : vide le cache du
-  site (pas la musique) et recharge, pour un appareil resté sur une ancienne version.
+  site (pas la musique), **retélécharge chaque fichier du site** (`cache: 'reload'` : GitHub
+  Pages laisse le navigateur garder un fichier 10 min, un simple rechargement reprenait
+  l'ancien `app.js`) et recharge, pour un appareil resté sur une ancienne version.
   **Avis de mise à jour** (30/10) : l'appli relit `APP_VERSION` dans le `js/app.js` publié
   (`?verif-version`, revalidé auprès du site) à l'ouverture, au retour au premier plan, quand
   la fenêtre reprend la main (PC), à l'ouverture des Paramètres (au plus une fois par minute)
