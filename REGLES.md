@@ -63,18 +63,24 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à
   l'échelle des dernières secondes : une musique calme ou jouée bas bouge autant qu'une
   forte.
-  « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, une **fissure** part du
+  « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, un **éclair** ou une
+  **fissure** (réglage « Aspect », éclair par défaut) part du
   centre du cadran sur tout l'écran (canevas `#crack-fx`) : **2 traits** au début, puis
   **chaque bout se divise en 2** toutes les 15, 30, 45 s ou **minute** (réglage « Nouvelle
   ramification toutes les », visible en mode Brisure ; une minute par défaut). Chaque nouvelle
   branche part dans une **direction tirée au hasard sur 360°** (demande de l'utilisateur),
   parmi celles qui mènent à un espace libre (8 essais, sinon pas de branche). Une
-  branche s'arrête quand elle rejoint une autre fissure (fêlure de verre) ou sort de l'écran ;
+  branche s'arrête quand elle rejoint une autre fissure (fêlure de verre) ; un trait qui touche
+  le **bord de l'écran rebondit** (angle réfléchi) et continue de se ramifier ;
   les générations raccourcissent et les dernières comblent les vides. Remplir l'écran n'est
   pas un but (avis de l'utilisateur) : la fissure peut s'arrêter avant les bords. Traits épais et lumineux au début, de plus en plus fins. Pendant le focus,
   le cadran s'efface : seul un **petit temps** discret reste, au-dessus du message de
   soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, la fissure **s'efface** (fondu 3 s) ;
   au focus suivant, une **nouvelle fissure tirée au hasard**. Au repos, le cadran normal.
+  **Éclair** : dents de scie autour de la direction de chaque branche, néon (halo bleu-violet,
+  cœur blanc), chaque génération **jaillit en 0,6 s** au lieu de pousser pendant toute sa
+  période, avec un **flash** du canevas (luminosité qui retombe en 1,4 s). **Fissure** :
+  trait de la couleur du cadran, qui pousse lentement et se courbe doucement.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).

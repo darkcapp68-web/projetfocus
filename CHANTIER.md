@@ -10,7 +10,7 @@ premier pour reprendre le travail).
   temps au centre, contrôles qui apparaissent au toucher. Démo « journée en accéléré ».
 - Focus / pause / cycles / pause longue, préréglages 25/5 et 50/10.
 - 4 styles de cadran (Apparence) : Normal (fondu lent), Rêveur (engrenages, atome, vague),
-  Rythme (réagit à la musique), Brisure (30/10 : une fissure se divise en 2 toutes les 15 à 60 s
+  Rythme (réagit à la musique), Brisure (30/10 : un éclair ou une fissure se divise en 2 toutes les 15 à 60 s, rebondit sur les bords
   et remplit l'écran pendant le focus, s'efface en pause ; à juger par l'utilisateur).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,

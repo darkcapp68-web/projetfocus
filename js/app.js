@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h51';
+const APP_VERSION = '30/10/2026 · 16h56';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -323,6 +323,8 @@ function drawSolar() {
 
 /* ---------- Mode « Brisure » : une fissure se ramifie depuis le centre ---------- */
 
+// Aspect « éclair » (par défaut) ou « fissure ». Un trait qui touche le bord de l'écran
+// rebondit et continue.
 // À chaque focus, une nouvelle fissure tirée au hasard (graine) part du centre du cadran :
 // d'abord 2 traits, puis **chaque minute** chaque bout se divise en 2 (une génération par
 // minute du focus). Une branche s'arrête quand elle rejoint une autre fissure (comme une
@@ -331,7 +333,7 @@ function drawSolar() {
 // la même après un changement de taille de la fenêtre.
 const crackCanvas = $('#crack-fx');
 const crackFx = crackCanvas?.getContext('2d');
-const crack = { on: false, seed: 0, levels: 1, segs: [], done: 0, last: 0, w: 0, h: 0 };
+const crack = { on: false, seed: 0, levels: 1, segs: [], done: 0, last: 0, lv: -1, zap: false, w: 0, h: 0 };
 // Les segments finis sont dessinés une seule fois ici ; seuls ceux qui poussent sont redessinés.
 const crackDone = document.createElement('canvas');
 
@@ -348,6 +350,10 @@ function prng(seed) {
 // segment pousse. Toutes les branches d'une génération poussent ensemble, pas à pas.
 function crackBuild() {
   const W = innerWidth, H = innerHeight, rnd = prng(crack.seed), L = crack.levels;
+  // Éclair : zigzag autour d'une direction, et chaque génération jaillit en 0,6 s au lieu
+  // de pousser pendant toute sa période.
+  const zap = crack.zap = S.crackLook !== 'fissure';
+  const strike = zap ? Math.min(1, 0.6 / Math.max(1, T.total / L)) : 1;
   const r = dial.getBoundingClientRect();
   const cx = r.width ? r.left + r.width / 2 : W / 2, cy = r.width ? r.top + r.height / 2 : H / 2;
   const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
@@ -364,7 +370,8 @@ function crackBuild() {
   };
   const segs = [];
   const a0 = rnd() * 2 * Math.PI;
-  let tips = [{ x: cx, y: cy, a: a0 }, { x: cx, y: cy, a: a0 + Math.PI + (rnd() - 0.5) * 0.8 }];
+  const a1 = a0 + Math.PI + (rnd() - 0.5) * 0.8;
+  let tips = [{ x: cx, y: cy, a: a0, h: a0 }, { x: cx, y: cy, a: a1, h: a1 }];
   let id = 1;
   for (let lv = 0; lv < L && tips.length && segs.length < 80000; lv++) {
     const len = Math.max(7, len0 * q ** lv), SUB = 6;
@@ -384,18 +391,29 @@ function crackBuild() {
       : tips.flatMap((t) => [0, 1].map(() => {
         for (let k = 0; k < 8; k++) {
           const a = rnd() * 2 * Math.PI;
-          if (free(t.x, t.y, a)) return { x: t.x, y: t.y, a, id: id++ };
+          if (free(t.x, t.y, a)) return { x: t.x, y: t.y, a, h: a, id: id++ };
         }
         return null;
       }).filter(Boolean));
     if (br.length > 3000) br = br.sort(() => rnd() - 0.5).slice(0, 3000);
     for (let s = 0; s < SUB; s++) {
-      const t0 = (lv + s / SUB) / L, t1 = (lv + (s + 1) / SUB) / L;
+      const t0 = (lv + strike * s / SUB) / L, t1 = (lv + strike * (s + 1) / SUB) / L;
       for (const b of br) {
         if (b.dead) continue;
-        b.a += (rnd() - 0.5) * 0.35;
+        if (zap) b.a = b.h + (rnd() - 0.5) * 1.3; // dents de scie autour de la direction
+        else b.a += (rnd() - 0.5) * 0.35;
         const step = (len / SUB) * (0.7 + rnd() * 0.6);
         let nx = b.x + Math.cos(b.a) * step, ny = b.y + Math.sin(b.a) * step;
+        // Bord de l'écran : le trait s'arrête au bord et rebondit (angle réfléchi), puis
+        // continue et se ramifie comme les autres.
+        if (nx < 1 || nx > W - 1) {
+          const bx = nx < 1 ? 1 : W - 1, f = (bx - b.x) / (nx - b.x || 1);
+          nx = bx; ny = b.y + (ny - b.y) * f; b.a = Math.PI - b.a; b.h = Math.PI - b.h;
+        }
+        if (ny < 1 || ny > H - 1) {
+          const by = ny < 1 ? 1 : H - 1, f = (by - b.y) / (ny - b.y || 1);
+          ny = by; nx = b.x + (nx - b.x) * f; b.a = -b.a; b.h = -b.h;
+        }
         // Rencontre avec une autre fissure : la branche s'y raccorde et s'arrête.
         if (s > 0 || lv === 0) {
           const n = Math.max(1, Math.ceil(step / (CELL / 2)));
@@ -411,7 +429,6 @@ function crackBuild() {
           if (c >= 0 && !grid[c]) grid[c] = b.id;
         }
         b.x = nx; b.y = ny;
-        if (nx < -10 || ny < -10 || nx > W + 10 || ny > H + 10) b.dead = true;
       }
     }
     tips = br.filter((b) => !b.dead);
@@ -426,21 +443,31 @@ function crackBuild() {
 }
 
 // Un segment, en entier ou jusqu'à la fraction f : les premiers traits épais et lumineux,
-// les suivants de plus en plus fins.
+// les suivants de plus en plus fins. Éclair : néon, halo bleu-violet et cœur blanc.
 function crackSeg(ctx, [x0, y0, x1, y1, , , lv], f) {
-  const w = Math.max(0.7, 2.6 - lv * 0.3), al = Math.max(0.4, 0.95 - lv * 0.06);
   const bx = x0 + (x1 - x0) * f, by = y0 + (y1 - y0) * f;
-  for (const [lw, alpha] of lv < 2 ? [[w * 3, 0.1], [w, al]] : [[w, al]]) {
+  let passes;
+  if (crack.zap) {
+    const w = Math.max(0.6, 2.2 - lv * 0.25);
+    passes = [[w * 6, 0.07, '#7f6bff'], [w * 2.4, 0.22, '#8fb8ff'], [w * 0.9, Math.max(0.5, 0.95 - lv * 0.04), '#fff']];
+    ctx.globalCompositeOperation = 'lighter';
+  } else {
+    const w = Math.max(0.7, 2.6 - lv * 0.3), al = Math.max(0.4, 0.95 - lv * 0.06);
+    passes = lv < 2 ? [[w * 3, 0.1, S.dialColor], [w, al, S.dialColor]] : [[w, al, S.dialColor]];
+  }
+  for (const [lw, alpha, color] of passes) {
     ctx.globalAlpha = alpha;
     ctx.lineWidth = lw;
+    ctx.strokeStyle = color;
     ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke();
   }
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 function crackDraw(p) {
   const k = crackCanvas.width / crack.w, segs = crack.segs;
   const done = crackDone.getContext('2d'), ctx = crackFx;
-  for (const c of [done, ctx]) { c.setTransform(k, 0, 0, k, 0, 0); c.lineCap = 'round'; c.strokeStyle = S.dialColor; }
+  for (const c of [done, ctx]) { c.setTransform(k, 0, 0, k, 0, 0); c.lineCap = 'round'; c.lineJoin = 'round'; }
   while (crack.done < segs.length && segs[crack.done][5] <= p) crackSeg(done, segs[crack.done++], 1);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
@@ -457,10 +484,18 @@ function crackDraw(p) {
 function crackFrame(now) {
   if (!crack.on) return;
   requestAnimationFrame(crackFrame);
-  if (now - crack.last < 100) return; // la fissure pousse lentement : 10 images par seconde suffisent
+  // La fissure pousse lentement : 10 images par seconde suffisent ; l'éclair, plus vif.
+  if (now - crack.last < (crack.zap ? 40 : 100)) return;
   crack.last = now;
   if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio) crackBuild();
-  crackDraw(T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0);
+  const p = T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0;
+  // Éclair : un flash à chaque nouvelle génération, qui s'éteint doucement.
+  const lv = Math.min(crack.levels - 1, Math.floor(p * crack.levels));
+  if (lv !== crack.lv) {
+    if (crack.zap) crackCanvas.animate?.([{ filter: 'brightness(2.6)' }, { filter: 'brightness(1)' }], { duration: 1400, easing: 'ease-out' });
+    crack.lv = lv;
+  }
+  crackDraw(p);
 }
 
 function crackStart() {
@@ -470,6 +505,7 @@ function crackStart() {
   crackFx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
   crack.on = true;
   crack.last = 0;
+  crack.lv = -1;
   requestAnimationFrame(crackFrame);
 }
 
