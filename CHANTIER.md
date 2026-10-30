@@ -78,6 +78,10 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
 
 ## Idées en réserve
 
+- **Brisure : grosseur des points / du trait** (30/10, idée de l'utilisateur) : le tracé noir
+  donne un aspect d'« envahissement spatial » agréable ; ajouter un réglage de grosseur pour
+  l'accentuer. À préciser avec lui : épaisseur des traits, ou points ronds aux embranchements.
+
 - **Cadres du mode Rêveur** : le cadre en engrenages est intégré (29/10). D'autres images
   de cadre (méditation, anneau) ont été essayées dans `perso/cadres.html` (dossier `perso/`
   exclu de GitHub) ; celle « méditation » montre un personnage protégé (Shaka, Saint Seiya)
