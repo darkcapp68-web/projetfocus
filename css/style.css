@@ -54,6 +54,9 @@ button.round { width: 2.2em; height: 2.2em; padding: 0; display: inline-grid; pl
 /* ---------- Contrôles qui apparaissent au toucher ---------- */
 .ctl { opacity: 0; pointer-events: none; transition: opacity 0.6s ease; }
 body.ui .ctl { opacity: 1; pointer-events: auto; }
+/* Effacé, un contrôle le reste même si son propre style lui donne une opacité (« Paramètres »
+   est un lien à 0.8, et 1 au survol, qui reste collé après un toucher sur Android). */
+html body:not(.ui) .ctl { opacity: 0; }
 
 /* ---------- Pulsation de la pause ---------- */
 #pulse { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; }
