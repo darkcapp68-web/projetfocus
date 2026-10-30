@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h59';
+const APP_VERSION = '30/10/2026 · 17h02';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -350,10 +350,8 @@ function prng(seed) {
 // segment pousse. Toutes les branches d'une génération poussent ensemble, pas à pas.
 function crackBuild() {
   const W = innerWidth, H = innerHeight, rnd = prng(crack.seed), L = crack.levels;
-  // Éclair : zigzag autour d'une direction, et chaque génération jaillit en 0,6 s au lieu
-  // de pousser pendant toute sa période.
+  // Éclair : zigzag autour d'une direction ; il pousse en continu comme la fissure.
   const zap = crack.zap = S.crackLook !== 'fissure';
-  const strike = zap ? Math.min(1, 0.6 / Math.max(1, T.total / L)) : 1;
   const r = dial.getBoundingClientRect();
   const cx = r.width ? r.left + r.width / 2 : W / 2, cy = r.width ? r.top + r.height / 2 : H / 2;
   const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
@@ -397,7 +395,7 @@ function crackBuild() {
       }).filter(Boolean));
     if (br.length > 3000) br = br.sort(() => rnd() - 0.5).slice(0, 3000);
     for (let s = 0; s < SUB; s++) {
-      const t0 = (lv + strike * s / SUB) / L, t1 = (lv + strike * (s + 1) / SUB) / L;
+      const t0 = (lv + s / SUB) / L, t1 = (lv + (s + 1) / SUB) / L;
       for (const b of br) {
         if (b.dead) continue;
         if (zap) b.a = b.h + (rnd() - 0.5) * 1.3; // dents de scie autour de la direction
@@ -484,15 +482,14 @@ function crackDraw(p) {
 function crackFrame(now) {
   if (!crack.on) return;
   requestAnimationFrame(crackFrame);
-  // La fissure pousse lentement : 10 images par seconde suffisent ; l'éclair, plus vif.
-  if (now - crack.last < (crack.zap ? 40 : 100)) return;
+  if (now - crack.last < 100) return; // ça pousse lentement : 10 images par seconde suffisent
   crack.last = now;
   if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio) crackBuild();
   const p = T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0;
-  // Éclair : un flash à chaque nouvelle génération, qui s'éteint doucement.
+  // Éclair : un flash discret à chaque nouvelle génération, qui s'éteint doucement.
   const lv = Math.min(crack.levels - 1, Math.floor(p * crack.levels));
   if (lv !== crack.lv) {
-    if (crack.zap) crackCanvas.animate?.([{ filter: 'brightness(2.6)' }, { filter: 'brightness(1)' }], { duration: 1400, easing: 'ease-out' });
+    if (crack.zap) crackCanvas.animate?.([{ filter: 'brightness(1.8)' }, { filter: 'brightness(1)' }], { duration: 1400, easing: 'ease-out' });
     crack.lv = lv;
   }
   crackDraw(p);

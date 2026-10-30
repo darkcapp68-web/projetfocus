@@ -78,9 +78,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, la fissure **s'efface** (fondu 3 s) ;
   au focus suivant, une **nouvelle fissure tirée au hasard**. Au repos, le cadran normal.
   **Éclair** : dents de scie autour de la direction de chaque branche, néon (halo bleu-violet,
-  cœur blanc), chaque génération **jaillit en 0,6 s** au lieu de pousser pendant toute sa
-  période, avec un **flash** du canevas (luminosité qui retombe en 1,4 s). **Fissure** :
-  trait de la couleur du cadran, qui pousse lentement et se courbe doucement.
+  cœur blanc), il **pousse en continu** comme la fissure (une frappe d'un coup par génération
+  a été essayée puis retirée le 30/10 : moins plaisant), avec un **flash** discret du canevas
+  à chaque nouvelle génération (luminosité qui retombe en 1,4 s). **Fissure** : trait de la
+  couleur du cadran, qui se courbe doucement.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).
