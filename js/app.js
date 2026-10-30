@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h44';
+const APP_VERSION = '30/10/2026 · 16h46';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -354,7 +354,9 @@ function crackBuild() {
   // Longueur de chaque génération : décroissante (la dernière fait ~7 % de la première, quel
   // que soit le nombre de générations), la somme dépasse un peu la distance au coin.
   const q = L > 8 ? 0.072 ** (1 / L) : 0.93;
-  const len0 = (R * 1.35 * (1 - q)) / (1 - q ** L);
+  // Les branches partant en tous sens, la fissure avance moins vite qu'en ligne droite :
+  // les longueurs cumulées valent environ 2 fois la distance au coin.
+  const len0 = (R * 2 * (1 - q)) / (1 - q ** L);
   const CELL = 5, cols = Math.ceil(W / CELL) + 2, grid = new Int32Array(cols * (Math.ceil(H / CELL) + 2));
   const cell = (x, y) => {
     const i = Math.floor(x / CELL) + 1, j = Math.floor(y / CELL) + 1;
@@ -366,9 +368,26 @@ function crackBuild() {
   let id = 1;
   for (let lv = 0; lv < L && tips.length && segs.length < 80000; lv++) {
     const len = Math.max(7, len0 * q ** lv), SUB = 6;
-    // Génération 0 : les 2 traits du départ ; ensuite chaque bout se divise en 2.
+    // Génération 0 : les 2 traits du départ ; ensuite chaque bout se divise en 2, chaque
+    // nouvelle branche partant dans une direction tirée au hasard (360°).
+    // Jusqu'à 8 tirages pour trouver une direction qui part vers un espace libre ; sinon,
+    // pas de branche (elle aurait aussitôt percuté une fissure).
+    const free = (x, y, a) => {
+      for (let d = CELL * 2; d <= len; d += CELL / 2) {
+        const c = cell(x + Math.cos(a) * d, y + Math.sin(a) * d);
+        if (c < 0) return true;
+        if (grid[c]) return false;
+      }
+      return true;
+    };
     let br = lv === 0 ? tips.map((t) => ({ ...t, id: id++ }))
-      : tips.flatMap((t) => [-1, 1].map((side) => ({ x: t.x, y: t.y, a: t.a + side * (0.22 + rnd() * 0.5), id: id++ })));
+      : tips.flatMap((t) => [0, 1].map(() => {
+        for (let k = 0; k < 8; k++) {
+          const a = rnd() * 2 * Math.PI;
+          if (free(t.x, t.y, a)) return { x: t.x, y: t.y, a, id: id++ };
+        }
+        return null;
+      }).filter(Boolean));
     if (br.length > 3000) br = br.sort(() => rnd() - 0.5).slice(0, 3000);
     for (let s = 0; s < SUB; s++) {
       const t0 = (lv + s / SUB) / L, t1 = (lv + (s + 1) / SUB) / L;

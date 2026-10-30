@@ -66,7 +66,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, une **fissure** part du
   centre du cadran sur tout l'écran (canevas `#crack-fx`) : **2 traits** au début, puis
   **chaque bout se divise en 2** toutes les 15, 30, 45 s ou **minute** (réglage « Nouvelle
-  ramification toutes les », visible en mode Brisure ; une minute par défaut). Une
+  ramification toutes les », visible en mode Brisure ; une minute par défaut). Chaque nouvelle
+  branche part dans une **direction tirée au hasard sur 360°** (demande de l'utilisateur),
+  parmi celles qui mènent à un espace libre (8 essais, sinon pas de branche). Une
   branche s'arrête quand elle rejoint une autre fissure (fêlure de verre) ou sort de l'écran ;
   les générations raccourcissent et les dernières comblent les vides : l'écran est rempli à
   la fin du focus. Traits épais et lumineux au début, de plus en plus fins. Pendant le focus,
