@@ -155,7 +155,6 @@ export const DEFAULTS = {
   dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause), rythme ou brisure (fissure qui se ramifie)
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
   crackLook: 'eclair', // mode brisure : 'eclair' (néon, frappe rapide, flash) ou 'fissure'
-  crackEvery: '60', // mode brisure : chaque bout se divise en 2 toutes les N secondes (15, 30, 45 ou 60)
   slowGlow: true, // mode normal : le cadran s'efface presque puis revient, lentement, pendant le focus
   textColor: '#ffffff',
 

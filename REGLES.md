@@ -64,24 +64,21 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   l'échelle des dernières secondes : une musique calme ou jouée bas bouge autant qu'une
   forte.
   « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, un **éclair** ou une
-  **fissure** (réglage « Aspect », éclair par défaut) part du
-  centre du cadran sur tout l'écran (canevas `#crack-fx`) : **2 traits** au début, puis
-  **chaque bout se divise en 2** toutes les 15, 30, 45 s ou **minute** (réglage « Nouvelle
-  ramification toutes les », visible en mode Brisure ; une minute par défaut). Chaque nouvelle
-  branche part dans une **direction tirée au hasard sur 360°** (demande de l'utilisateur),
-  parmi celles qui mènent à un espace libre (8 essais, sinon pas de branche). Une
-  branche s'arrête quand elle rejoint une autre fissure (fêlure de verre) ; un trait qui touche
-  le **bord de l'écran rebondit** (angle réfléchi) et continue de se ramifier ;
-  les générations raccourcissent et les dernières comblent les vides. Remplir l'écran n'est
-  pas un but (avis de l'utilisateur) : la fissure peut s'arrêter avant les bords. Traits épais et lumineux au début, de plus en plus fins. Pendant le focus,
-  le cadran s'efface : seul un **petit temps** discret reste, au-dessus du message de
-  soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, la fissure **s'efface** (fondu 3 s) ;
-  au focus suivant, une **nouvelle fissure tirée au hasard**. Au repos, le cadran normal.
-  **Traits droits** (30/10, pour la fluidité sur téléphone) : un segment par branche et par
-  génération, coupé et réfléchi à chaque bord ; dessin groupé (un tracé par génération),
-  canevas plafonné à 2 pixels par point, pas de filtre. Il **pousse en continu** (une frappe
-  d'un coup par génération et un flash ont été essayés puis retirés le 30/10). **Éclair** :
-  néon, halo bleu-violet et cœur blanc. **Fissure** : trait de la couleur du cadran.
+  **fissure** (réglage « Aspect », éclair par défaut) part du centre du cadran sur tout l'écran
+  (canevas `#crack-fx`) en 6 à 9 branches qui se **ramifient au hasard en chemin** et
+  **poussent en continu**, à vitesse constante le long des branches ; les derniers bouts
+  arrivent à la fin du focus. C'est la **version 1**, retenue par l'utilisateur (30/10) pour
+  sa fluidité, après des essais « 2 traits qui se divisent en 2 toutes les N secondes, directions
+  sur 360°, traits droits » jugés saccadés. Un trait qui touche le **bord de l'écran rebondit**
+  (angle réfléchi). **Éclair** : dents de scie autour de la direction de chaque branche, néon
+  (halo bleu-violet, cœur blanc). **Fissure** : courbe douce, couleur du cadran. Branches
+  principales épaisses et lumineuses, les suivantes de plus en plus fines. Remplir l'écran
+  n'est pas un but. Allégé pour le téléphone : segments finis dessinés une fois, un tracé par
+  profondeur, canevas plafonné à 2 pixels par point, 10 images par seconde, ni filtre ni flash.
+  Pendant le focus, le cadran s'efface : seul un **petit temps** discret reste, au-dessus du
+  message de soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, le
+  tracé **s'efface** (fondu 3 s) ; au focus suivant, un **nouveau tracé tiré au hasard**. Au
+  repos, le cadran normal.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de
   cycles (0 = sans fin).

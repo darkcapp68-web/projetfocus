@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h17';
+const APP_VERSION = '30/10/2026 · 17h25';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -323,17 +323,16 @@ function drawSolar() {
 
 /* ---------- Mode « Brisure » : un éclair ou une fissure se ramifie depuis le centre ---------- */
 
-// À chaque focus, un nouveau tracé tiré au hasard (graine) part du centre du cadran :
-// d'abord 2 traits, puis toutes les N secondes (réglage, une minute par défaut) chaque bout
-// se divise en 2, chaque nouvelle branche partant dans une direction au hasard (360°) vers
-// un espace libre. Traits droits : un segment par branche et par génération (léger à
-// calculer et à dessiner sur un téléphone). Un trait qui touche le bord de l'écran rebondit
-// (angle réfléchi) ; une branche s'arrête quand elle rejoint un autre trait. Aspect « éclair »
-// (néon bleu-violet, cœur blanc) ou « fissure » (couleur du cadran). En pause, le tracé
-// s'efface (fondu CSS). La graine permet de redessiner le même après un changement de taille.
+// À chaque focus, un nouveau tracé tiré au hasard (graine) part du centre du cadran en 6 à 9
+// branches, qui se ramifient au hasard en chemin et poussent en continu, à vitesse constante
+// (version 1, la plus fluide : les essais « 2 traits qui se divisent à chaque minute » étaient
+// saccadés). Un trait qui touche le bord de l'écran rebondit (angle réfléchi). Aspect
+// « éclair » (zigzag, néon bleu-violet, cœur blanc) ou « fissure » (courbe douce, couleur du
+// cadran). En pause, le tracé s'efface (fondu CSS). La graine permet de redessiner le même
+// après un changement de taille.
 const crackCanvas = $('#crack-fx');
 const crackFx = crackCanvas?.getContext('2d');
-const crack = { on: false, seed: 0, levels: 1, segs: [], done: 0, last: 0, zap: false, w: 0, h: 0 };
+const crack = { on: false, seed: 0, segs: [], maxDur: 0, done: 0, last: 0, zap: false, w: 0, h: 0 };
 // Les segments finis sont dessinés une seule fois ici ; seuls ceux qui poussent sont redessinés.
 const crackDone = document.createElement('canvas');
 // Au-delà de 2 pixels par point, la différence ne se voit pas et le dessin coûte bien plus cher.
@@ -348,86 +347,64 @@ function prng(seed) {
   };
 }
 
-// Segments [x0, y0, x1, y1, t0, t1, génération] ; t = moment du focus (0 → 1) où le
-// segment pousse. Toutes les branches d'une génération poussent ensemble.
+// Segments [x0, y0, x1, y1, t0, t1, profondeur] ; t = moment du focus (0 → 1) où le
+// segment pousse : le tracé avance à vitesse constante le long de ses branches, et ses
+// derniers bouts arrivent à la fin du focus.
 function crackBuild() {
-  const W = innerWidth, H = innerHeight, rnd = prng(crack.seed), L = crack.levels;
-  crack.zap = S.crackLook !== 'fissure';
+  const W = innerWidth, H = innerHeight, rnd = prng(crack.seed);
+  const zap = crack.zap = S.crackLook !== 'fissure';
   const r = dial.getBoundingClientRect();
   const cx = r.width ? r.left + r.width / 2 : W / 2, cy = r.width ? r.top + r.height / 2 : H / 2;
   const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
-  // Longueur de chaque génération : décroissante (la dernière fait ~7 % de la première, quel
-  // que soit le nombre de générations). Les branches partant en tous sens, le tracé avance
-  // moins vite qu'en ligne droite : les longueurs cumulées valent 2 fois la distance au coin.
-  const q = L > 8 ? 0.072 ** (1 / L) : 0.93;
-  const len0 = (R * 2 * (1 - q)) / (1 - q ** L);
-  const CELL = 5, cols = Math.ceil(W / CELL) + 2, grid = new Int32Array(cols * (Math.ceil(H / CELL) + 2));
-  const cell = (x, y) => {
-    const i = Math.floor(x / CELL) + 1, j = Math.floor(y / CELL) + 1;
-    return i < 0 || j < 0 || i >= cols || j * cols >= grid.length ? -1 : j * cols + i;
-  };
-  const segs = [];
-  const a0 = rnd() * 2 * Math.PI;
-  let tips = [{ x: cx, y: cy, a: a0 }, { x: cx, y: cy, a: a0 + Math.PI + (rnd() - 0.5) * 0.8 }];
-  let id = 1;
-  for (let lv = 0; lv < L && tips.length && segs.length < 40000; lv++) {
-    const len = Math.max(7, len0 * q ** lv);
-    // Jusqu'à 8 tirages pour trouver une direction qui part vers un espace libre ; sinon,
-    // pas de branche (elle aurait aussitôt percuté un trait).
-    const free = (x, y, a) => {
-      for (let d = CELL * 2; d <= len; d += CELL / 2) {
-        const c = cell(x + Math.cos(a) * d, y + Math.sin(a) * d);
-        if (c < 0) return true;
-        if (grid[c]) return false;
+  const step = Math.max(6, R / 60);
+  const segs = [], todo = [];
+  const n = 6 + Math.floor(rnd() * 4);
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * 2 * Math.PI + (rnd() - 0.5) * 0.9;
+    todo.push({ x: cx, y: cy, a, h: a, d: 0, depth: 0, life: Math.ceil((R / step) * 2) });
+  }
+  // Les branches dans l'ordre de leur naissance : si la limite est atteinte, seules des
+  // brindilles manquent.
+  while (todo.length && segs.length < 10000) {
+    const b = todo.shift();
+    let { x, y, a, h, d } = b, bounced = false;
+    for (let k = 0; k < b.life; k++) {
+      // Fissure : courbe douce ; éclair : dents de scie autour de sa direction. Une légère
+      // attirance vers l'extérieur fait rayonner le tracé (jusqu'au premier rebond).
+      if (zap) a = h + (rnd() - 0.5) * 1.1;
+      else a += (rnd() - 0.5) * 0.55;
+      if (d > 0 && !bounced) {
+        const out = Math.atan2(y - cy, x - cx);
+        const pull = Math.atan2(Math.sin(out - (zap ? h : a)), Math.cos(out - (zap ? h : a))) * (b.depth ? 0.02 : 0.1);
+        if (zap) h += pull; else a += pull;
       }
-      return true;
-    };
-    let br = lv === 0 ? tips.map((t) => ({ ...t, id: id++ }))
-      : tips.flatMap((t) => [0, 1].map(() => {
-        for (let k = 0; k < 8; k++) {
-          const a = rnd() * 2 * Math.PI;
-          if (free(t.x, t.y, a)) return { x: t.x, y: t.y, a, id: id++ };
-        }
-        return null;
-      }).filter(Boolean));
-    if (br.length > 2000) br = br.sort(() => rnd() - 0.5).slice(0, 2000);
-    const T0 = lv / L, span = 1 / L;
-    for (const b of br) {
-      // Un trait droit de longueur `len`, coupé à chaque rebond sur un bord.
-      let rest = len * (0.8 + rnd() * 0.4), done = 0;
-      const total = rest;
-      for (let bounce = 0; rest > 0.5 && bounce < 4 && !b.dead; bounce++) {
-        const dx = Math.cos(b.a), dy = Math.sin(b.a);
-        const tx = dx > 0 ? (W - 1 - b.x) / dx : dx < 0 ? (1 - b.x) / dx : Infinity;
-        const ty = dy > 0 ? (H - 1 - b.y) / dy : dy < 0 ? (1 - b.y) / dy : Infinity;
-        let d = Math.max(0, Math.min(rest, tx, ty));
-        // Rencontre avec un autre trait : la branche s'y raccorde et s'arrête (sans compter le
-        // tout début, qui touche forcément sa branche mère).
-        const n = Math.max(1, Math.ceil(d / (CELL / 2)));
-        for (let k = 1; k <= n; k++) {
-          const s = d * (k / n), c = cell(b.x + dx * s, b.y + dy * s);
-          if (c >= 0 && grid[c] && grid[c] !== b.id && done + s > CELL * 2 && Math.hypot(b.x + dx * s - cx, b.y + dy * s - cy) > CELL * 2) {
-            d = s; b.dead = true; break;
-          }
-        }
-        const nx = b.x + dx * d, ny = b.y + dy * d;
-        segs.push([b.x, b.y, nx, ny, T0 + span * (done / total), T0 + span * ((done + d) / total), lv]);
-        for (let k = 0; k <= n; k++) {
-          const c = cell(b.x + (nx - b.x) * (k / n), b.y + (ny - b.y) * (k / n));
-          if (c >= 0 && !grid[c]) grid[c] = b.id;
-        }
-        b.x = nx; b.y = ny; done += d; rest -= d;
-        // Bord touché : angle réfléchi, et le trait continue.
-        if (rest > 0.5 && !b.dead) {
-          if (d === tx) b.a = Math.PI - b.a;
-          else b.a = -b.a;
-        }
+      const L = step * (0.6 + rnd() * 0.8);
+      let nx = x + Math.cos(a) * L, ny = y + Math.sin(a) * L;
+      // Bord de l'écran : le trait s'arrête au bord et rebondit (angle réfléchi).
+      if (nx < 1 || nx > W - 1) {
+        const bx = nx < 1 ? 1 : W - 1, f = (bx - x) / (nx - x || 1);
+        nx = bx; ny = y + (ny - y) * f; a = Math.PI - a; h = Math.PI - h; bounced = true;
+      }
+      if (ny < 1 || ny > H - 1) {
+        const by = ny < 1 ? 1 : H - 1, f = (by - y) / (ny - y || 1);
+        ny = by; nx = x + (nx - x) * f; a = -a; h = -h; bounced = true;
+      }
+      const len = Math.hypot(nx - x, ny - y);
+      segs.push([x, y, nx, ny, d, d + len, b.depth]);
+      x = nx; y = ny; d += len;
+      if (b.depth < 6 && rnd() < 0.12 - b.depth * 0.015) {
+        const ca = a + (rnd() < 0.5 ? -1 : 1) * (0.45 + rnd() * 0.9);
+        todo.push({ x, y, a: ca, h: ca, d, depth: b.depth + 1, life: Math.ceil((b.life - k) * (0.35 + rnd() * 0.5)) });
       }
     }
-    tips = br.filter((b) => !b.dead);
   }
-  segs.sort((p, q2) => p[5] - q2[5]); // par moment où le segment a fini de pousser
+  // Distances → moments du focus.
+  const maxD = segs.reduce((m, s) => Math.max(m, s[5]), 1);
+  let maxDur = 0;
+  for (const s of segs) { s[4] /= maxD; s[5] /= maxD; maxDur = Math.max(maxDur, s[5] - s[4]); }
+  segs.sort((p, q) => p[5] - q[5]); // par moment où le segment a fini de pousser
   crack.segs = segs;
+  crack.maxDur = maxDur;
   crack.w = W; crack.h = H; crack.dpr = devicePixelRatio;
   crackCanvas.width = crackDone.width = Math.round(W * crackScale());
   crackCanvas.height = crackDone.height = Math.round(H * crackScale());
@@ -435,8 +412,8 @@ function crackBuild() {
   crack.done = 0;
 }
 
-// Trace d'un coup un ensemble de segments de la même génération : les premiers épais et
-// lumineux, les suivants de plus en plus fins. Éclair : néon, halo bleu-violet et cœur blanc.
+// Trace d'un coup un ensemble de segments de la même profondeur : les branches principales
+// épaisses et lumineuses, les suivantes de plus en plus fines. Éclair : néon, halo bleu-violet et cœur blanc.
 function crackStroke(ctx, path, lv) {
   let passes;
   if (crack.zap) {
@@ -456,20 +433,19 @@ function crackStroke(ctx, path, lv) {
   ctx.globalCompositeOperation = 'source-over';
 }
 
-// Ajoute les segments [from, to) au dessin, groupés par génération ; `frac(seg)` donne la
+// Ajoute les segments [from, to) au dessin, un tracé par profondeur ; `frac(seg)` donne la
 // part déjà poussée (1 = entier).
 function crackBatch(ctx, from, to, frac) {
-  const segs = crack.segs;
-  let path = null, plv = -1;
+  const segs = crack.segs, paths = [];
   for (let i = from; i < to; i++) {
     const [x0, y0, x1, y1, , , lv] = segs[i];
     const f = frac(segs[i]);
     if (f <= 0) continue; // pas encore commencé (sinon un point rond s'afficherait)
-    if (lv !== plv) { if (path) crackStroke(ctx, path, plv); path = new Path2D(); plv = lv; }
+    const path = paths[lv] ||= new Path2D();
     path.moveTo(x0, y0);
     path.lineTo(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f);
   }
-  if (path) crackStroke(ctx, path, plv);
+  paths.forEach((path, lv) => path && crackStroke(ctx, path, lv));
 }
 
 function crackDraw(p) {
@@ -484,12 +460,10 @@ function crackDraw(p) {
   ctx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
   ctx.drawImage(crackDone, 0, 0);
   ctx.setTransform(k, 0, 0, k, 0, 0);
-  // Ceux qui poussent encore : tous ceux de la génération en cours (rangés par fin de
-  // pousse, un morceau après rebond peut passer avant un trait déjà commencé : on les
-  // parcourt donc tous jusqu'à la fin de la génération).
-  const genEnd = (Math.floor(p * crack.levels) + 1) / crack.levels + 1e-9;
+  // Ceux qui poussent encore (rangés par fin de pousse : tous ceux qui ont commencé finissent
+  // avant p + la durée du plus long segment).
   let end = crack.done;
-  while (end < segs.length && segs[end][5] <= genEnd) end++;
+  while (end < segs.length && segs[end][5] <= p + crack.maxDur) end++;
   crackBatch(ctx, crack.done, end, ([, , , , t0, t1]) => clamp((p - t0) / (t1 - t0), 0, 1));
 }
 
@@ -504,7 +478,6 @@ function crackFrame(now) {
 
 function crackStart() {
   crack.seed = (Math.random() * 2 ** 31) | 0;
-  crack.levels = Math.max(1, Math.round(T.total / (Number(S.crackEvery) || 60))); // une génération toutes les N secondes
   crackBuild();
   crackFx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
   crack.on = true;
