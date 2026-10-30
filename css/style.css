@@ -170,6 +170,14 @@ body.scene-solar #dial .track, body.scene-liquid #dial .track { fill: url(#orb-v
 body.scene-crack #crack-fx { opacity: 1; transition-duration: 0.3s; }
 body.scene-crack #dial .track, body.scene-crack #arc, body.scene-crack #knob { visibility: hidden; }
 body.scene-crack #time, body.scene-crack #sub { text-shadow: 0 0 10px var(--bg), 0 0 22px var(--bg), 0 0 36px var(--bg); }
+/* Brisure : le grand temps laisse le centre à la fissure ; un petit temps discret au-dessus
+   du message de soutien. Un toucher (contrôles affichés) ramène le grand temps. */
+#center { transition: opacity 0.6s ease; }
+body.scene-crack:not(.ui) #center { opacity: 0; }
+#mini-time { display: none; margin: 0 0 -6px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 0.6s ease; text-shadow: 0 0 8px var(--bg), 0 0 16px var(--bg); }
+body.scene-crack #mini-time { display: block; }
+body.scene-crack:not(.ui) #mini-time { opacity: 0.6; }
+body.scene-crack #message { text-shadow: 0 0 8px var(--bg), 0 0 16px var(--bg); }
 
 /* Graduations : seulement pendant le réglage */
 #ticks { opacity: 0; transition: opacity 0.5s ease; }

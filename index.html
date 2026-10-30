@@ -91,6 +91,7 @@
       <button type="button" id="edit-break" class="seg">pause <b id="v-break">5</b> min</button>
     </div>
 
+    <p id="mini-time" aria-hidden="true"></p>
     <p id="message" aria-live="polite"></p>
 
     <div id="break-actions" class="ctl">
@@ -220,6 +221,7 @@
       <summary>Apparence <small>cadran, couleurs, écran</small></summary>
       <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option><option value="brisure">Brisure (une fissure se ramifie et remplit l'écran pendant le focus)</option></select></label>
       <label data-if="dialStyle=rythme">Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
+      <label data-if="dialStyle=brisure">Nouvelle ramification toutes les<select data-k="crackEvery"><option value="15">15 secondes</option><option value="30">30 secondes</option><option value="45">45 secondes</option><option value="60">minute</option></select></label>
       <label data-if="dialStyle=standard">Fondu lent du cadran pendant le focus<input type="checkbox" data-k="slowGlow"></label>
       <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
       <div class="buttons" data-if="dayGradient"><button type="button" id="btn-day-demo">Voir la journée en accéléré (30 s)</button></div>

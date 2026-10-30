@@ -65,11 +65,13 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   forte.
   « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, une **fissure** part du
   centre du cadran sur tout l'écran (canevas `#crack-fx`) : **2 traits** au début, puis
-  **chaque minute chaque bout se divise en 2** (une génération par minute du focus). Une
+  **chaque bout se divise en 2** toutes les 15, 30, 45 s ou **minute** (réglage « Nouvelle
+  ramification toutes les », visible en mode Brisure ; une minute par défaut). Une
   branche s'arrête quand elle rejoint une autre fissure (fêlure de verre) ou sort de l'écran ;
   les générations raccourcissent et les dernières comblent les vides : l'écran est rempli à
   la fin du focus. Traits épais et lumineux au début, de plus en plus fins. Pendant le focus,
-  seuls le temps et la phase restent du cadran. En pause, la fissure **s'efface** (fondu 3 s) ;
+  le cadran s'efface : seul un **petit temps** discret reste, au-dessus du message de
+  soutien ; un toucher (contrôles affichés) ramène le grand temps. En pause, la fissure **s'efface** (fondu 3 s) ;
   au focus suivant, une **nouvelle fissure tirée au hasard**. Au repos, le cadran normal.
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule
   « focus / pause » pour choisir ce que l'on règle. Préréglages 25/5 et 50/10, nombre de

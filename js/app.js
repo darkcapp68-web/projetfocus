@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 16h38';
+const APP_VERSION = '30/10/2026 · 16h44';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -351,8 +351,9 @@ function crackBuild() {
   const r = dial.getBoundingClientRect();
   const cx = r.width ? r.left + r.width / 2 : W / 2, cy = r.width ? r.top + r.height / 2 : H / 2;
   const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
-  // Longueur de chaque génération : décroissante, la somme dépasse un peu la distance au coin.
-  const q = L > 8 ? 0.9 : 0.93;
+  // Longueur de chaque génération : décroissante (la dernière fait ~7 % de la première, quel
+  // que soit le nombre de générations), la somme dépasse un peu la distance au coin.
+  const q = L > 8 ? 0.072 ** (1 / L) : 0.93;
   const len0 = (R * 1.35 * (1 - q)) / (1 - q ** L);
   const CELL = 5, cols = Math.ceil(W / CELL) + 2, grid = new Int32Array(cols * (Math.ceil(H / CELL) + 2));
   const cell = (x, y) => {
@@ -363,7 +364,7 @@ function crackBuild() {
   const a0 = rnd() * 2 * Math.PI;
   let tips = [{ x: cx, y: cy, a: a0 }, { x: cx, y: cy, a: a0 + Math.PI + (rnd() - 0.5) * 0.8 }];
   let id = 1;
-  for (let lv = 0; lv < L && tips.length; lv++) {
+  for (let lv = 0; lv < L && tips.length && segs.length < 80000; lv++) {
     const len = Math.max(7, len0 * q ** lv), SUB = 6;
     // Génération 0 : les 2 traits du départ ; ensuite chaque bout se divise en 2.
     let br = lv === 0 ? tips.map((t) => ({ ...t, id: id++ }))
@@ -445,7 +446,7 @@ function crackFrame(now) {
 
 function crackStart() {
   crack.seed = (Math.random() * 2 ** 31) | 0;
-  crack.levels = Math.max(1, Math.round(T.total / 60)); // une génération par minute
+  crack.levels = Math.max(1, Math.round(T.total / (Number(S.crackEvery) || 60))); // une génération toutes les N secondes
   crackBuild();
   crackFx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
   crack.on = true;
@@ -738,6 +739,7 @@ dial.addEventListener('wheel', (e) => {
    ========================================================= */
 
 const msgEl = $('#message');
+const miniTime = $('#mini-time');
 const M = { text: '', changedAt: 0, finShown: false, timer: null };
 
 const isLate = () => { const h = new Date().getHours(); return h >= S.lateHour || h < 5; };
@@ -1764,6 +1766,7 @@ function render(force) {
 
   drawDial(p === 'idle' ? rem : p === 'done' ? 0 : rem);
   setText(els.time, p === 'done' ? 'terminé' : fmt(rem));
+  if (p === 'focus') setText(miniTime, fmt(rem)); // petit temps du mode Brisure
 
   let sub = '';
   if (p === 'idle') sub = T.editing === 'focus' ? 'focus' : 'pause';
