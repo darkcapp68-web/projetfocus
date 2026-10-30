@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h09';
+const APP_VERSION = '30/10/2026 · 17h14';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -463,8 +463,9 @@ function crackBatch(ctx, from, to, frac) {
   let path = null, plv = -1;
   for (let i = from; i < to; i++) {
     const [x0, y0, x1, y1, , , lv] = segs[i];
-    if (lv !== plv) { if (path) crackStroke(ctx, path, plv); path = new Path2D(); plv = lv; }
     const f = frac(segs[i]);
+    if (f <= 0) continue; // pas encore commencé (sinon un point rond s'afficherait)
+    if (lv !== plv) { if (path) crackStroke(ctx, path, plv); path = new Path2D(); plv = lv; }
     path.moveTo(x0, y0);
     path.lineTo(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f);
   }
@@ -483,9 +484,12 @@ function crackDraw(p) {
   ctx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
   ctx.drawImage(crackDone, 0, 0);
   ctx.setTransform(k, 0, 0, k, 0, 0);
-  // Ceux qui poussent encore.
+  // Ceux qui poussent encore : tous ceux de la génération en cours (rangés par fin de
+  // pousse, un morceau après rebond peut passer avant un trait déjà commencé : on les
+  // parcourt donc tous jusqu'à la fin de la génération).
+  const genEnd = (Math.floor(p * crack.levels) + 1) / crack.levels + 1e-9;
   let end = crack.done;
-  while (end < segs.length && segs[end][4] < p) end++;
+  while (end < segs.length && segs[end][5] <= genEnd) end++;
   crackBatch(ctx, crack.done, end, ([, , , , t0, t1]) => clamp((p - t0) / (t1 - t0), 0, 1));
 }
 
