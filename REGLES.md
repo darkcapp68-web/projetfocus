@@ -13,8 +13,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   (GitHub Pages, dépôt public `darkcapp68-web/projetfocus`, branche `main` / racine).
   Site : https://darkcapp68-web.github.io/projetfocus/
 - **Un seul site à maintenir.** PC : appli installée depuis Chrome / Edge (fenêtre à part).
-  Téléphone et tablette (tout Android, pas d'Apple) : APK « coquille » (projet Android Studio
-  `android/`, Trusted Web Activity) qui ouvre le site publié. L'APK n'a pas de maintenance.
+  Téléphone et tablette (tout Android, pas d'Apple) : site **installé par Chrome** (icône sur
+  l'écran d'accueil). **Pas d'APK** (abandonné le 30/10, décision de l'utilisateur : l'appli
+  installée par Chrome suffit) ; le projet `android/` reste dans le dépôt, sans suite.
 - Style moderne et minimal : au repos, seulement le fond, le cadran, le temps (et le message
   ou l'action du coach). Contrôles visibles au toucher / mouvement de souris, puis effacés.
 - Ton bienveillant, en français, pensé pour un développeur (Progress / ABL).
@@ -240,7 +241,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `js/defaults.js` | valeurs par défaut, radios, playlists, respirations, messages |
 | `sw.js` | hors ligne |
 | `music/` | 16 MP3 CC0 (voir `CREDITS.md`) |
-| `android/` | projet Android Studio de l'APK (voir `android/README.md`) |
+| `android/` | projet Android Studio d'un APK abandonné (30/10), gardé sans suite |
 | `tools/make-icons.mjs` | icônes du site et de l'APK |
 | `tools/qrcode.py` | QR code de n'importe quel texte ou adresse : `python tools/qrcode.py "texte" [fichier.png\|.svg]` (segno installé tout seul dans `tools/.pylib`, ignoré par git) |
 | `tools/detourer-damier.py` | retire le faux fond en damier qu'une IA dessine parfois à la place de la transparence : `python tools/detourer-damier.py image [sortie.webp]` (garde les lueurs en semi-transparence) |

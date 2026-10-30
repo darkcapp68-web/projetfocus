@@ -139,10 +139,9 @@ Au premier démarrage d'un focus, le navigateur demande l'autorisation d'affiche
 **notifications** : accepte-la si tu veux être prévenu quand la fenêtre est cachée.
 
 
-**Appli Android (APK)** : le dossier [android/](android/README.md) est un projet Android Studio
-(comme Frigo ou Bulles) qui fabrique un APK « coquille » ouvrant le site publié, en plein
-écran, avec son icône. Le site reste la seule chose à maintenir ; tout est expliqué dans
-[android/README.md](android/README.md).
+**Sur Android** : ouvre le site dans Chrome et accepte « Installer l'appli » (ou menu ⋮ →
+Ajouter à l'écran d'accueil) : l'appli a son icône et s'ouvre en plein écran. Le dossier
+[android/](android/README.md) (projet d'APK) n'est plus utilisé.
 ---
 
 ## Sauvegarder ses paramètres sur Google Drive (mêmes réglages partout)

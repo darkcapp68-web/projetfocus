@@ -27,17 +27,13 @@ premier pour reprendre le travail).
 **En service** : sur le PC et sur le téléphone (installé depuis Chrome), réglages partagés
 par Google Drive.
 
-**Appli Android**
-- Projet Android Studio `android/` (mêmes versions que Frigo) : APK « coquille » qui ouvre
-  le site publié. Guide : `android/README.md`.
-
-- APK de test construit avec Gradle (`android/app/build/outputs/apk/debug/app-debug.apk`,
-  4,9 Mo, paquet `fr.projetfocus.app`). Il pointe sur `darkcapp68-web.github.io/projetfocus/` : il
-  ne sert à rien avant la publication du site (à reconstruire, l'adresse a changé).
+**Appli Android** : **APK abandonné** (décision de l'utilisateur, 30/10). Chrome a installé
+le site sur le téléphone comme une appli (icône sur l'écran d'accueil), ce qui suffit. Le
+projet Android Studio `android/` reste dans le dépôt, sans suite.
 
 ## En cours
 
-- Rien. L'APK est remis à plus tard (décision de l'utilisateur, 29/10).
+- Rien.
 
 ## Ce dont j'ai besoin de toi
 
@@ -46,12 +42,7 @@ par Google Drive.
 2. **Sauvegarde Google Drive** : à la main (« Sauvegarder » / « Reprendre mes paramètres »),
    la synchronisation automatique a été abandonnée (conflits PC / téléphone). À essayer :
    sauvegarder depuis le PC, reprendre sur le téléphone.
-3. **APK** (après la publication) :
-   - fait : l'adresse du site est réglée sur `darkcapp68-web.github.io` ;
-   - créer la **clé de signature** dans Android Studio et la garder hors du dépôt ;
-   - pour enlever la barre d'adresse : créer le dépôt **`darkcapp68-web.github.io`** avec
-     `.well-known/assetlinks.json` (je prépare le fichier avec l'empreinte SHA-256).
-4. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
+3. **Tes retours d'écoute**, que je ne peux pas juger moi-même :
    - couleurs de la respiration, maintenant affichées telles quelles (bleu ciel / doré /
      noir) : à garder ? la retenue après l'expiration (carrée) repasse au doré : gênant ?
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
@@ -59,7 +50,7 @@ par Google Drive.
    - radios classiques : lesquelles garder ;
    - couleurs : ajouter un moment « Nuit profonde » indigo vers 2 h (sinon le fond tire sur
      le brun-rouge vers 3 h du matin) ?
-5. **Optionnel** : abonnement DI.FM Premium un jour → je peux ajouter la saisie de la clé
+4. **Optionnel** : abonnement DI.FM Premium un jour → je peux ajouter la saisie de la clé
    d'écoute pour avoir toutes leurs chaînes électro sans pub.
 
 ## À faire
