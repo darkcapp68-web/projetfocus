@@ -116,7 +116,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   **bleu ciel**, retiens → **doré** puis ne bouge plus, expire → **noir**. La première
   inspiration part de la couleur de pause. Sur une teinte claire, texte et cadran passent en
   sombre (à mi-chemin de l'étape). « inspire / retiens / expire » écrit sous le temps
-  (réglable). Sans couleurs : voile sombre dont l'intensité est réglable. Le rythme choisi
+  (réglable) ; **le mot grandit pendant l'inspiration** (jusqu'à 2,4 fois, sur toute la durée
+  de l'étape), **rétrécit pendant l'expiration** et garde sa taille quand on retient (30/10,
+  demande de l'utilisateur ; réglage « Le mot grandit… », coché par défaut). Sans couleurs : voile sombre dont l'intensité est réglable. Le rythme choisi
   s'affiche sous le temps (« pause · cohérence cardiaque »).
   La respiration s'arrête quand la pause est finie.
 - **Une action du coach** à la fois (liste modifiable), deux autres proposées au toucher.

@@ -70,7 +70,9 @@ html body:not(.ui) .ctl { opacity: 0; }
   letter-spacing: 0.3em;
   text-transform: uppercase;
   opacity: 0;
-  transition: opacity 0.8s ease;
+  /* La durée du grossissement (transform) est celle de l'étape, posée en JS. */
+  transition: opacity 0.8s ease, transform 1s ease-in-out;
+  transform-origin: 50% 0;
 }
 #breath.on { opacity: 0.75; }
 

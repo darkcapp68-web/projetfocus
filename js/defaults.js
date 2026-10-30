@@ -163,6 +163,7 @@ export const DEFAULTS = {
   pulseOn: true,
   breathPattern: 'coherence', // voir BREATHS
   breathLabels: true, // « inspire / retiens / expire » sous le temps
+  breathGrow: true, // le mot grandit à l'inspiration et rétrécit à l'expiration
   breathColors: true, // une teinte par étape (sauf simple pulsation)
   breathInspireColor: '#8fd3ff', // bleu ciel
   breathHoldColor: '#ffd36e', // doré

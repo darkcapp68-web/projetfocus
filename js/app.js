@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h14';
+const APP_VERSION = '30/10/2026 · 17h17';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -938,6 +938,12 @@ function breathStep(k) {
   else if (kind === 'expire' || !kind) setPulse(dark, sec);
   breathEl.textContent = kind;
   breathEl.classList.toggle('on', !!kind && S.breathLabels);
+  // Le mot grandit pendant toute l'inspiration, rétrécit pendant l'expiration, et garde sa
+  // taille quand on retient.
+  if (S.breathGrow && (kind === 'inspire' || kind === 'expire')) {
+    breathEl.style.transitionDuration = `0.8s, ${sec}s`;
+    breathEl.style.transform = kind === 'inspire' ? 'scale(2.4)' : 'scale(1)';
+  } else if (!S.breathGrow) breathEl.style.transform = '';
   breathTimer = setTimeout(() => breathStep(k + 1), sec * 1000);
 }
 
@@ -958,6 +964,8 @@ function breathStop() {
   clearTimeout(inkTimer);
   breathInk(null);
   breathEl.classList.remove('on');
+  breathEl.style.transitionDuration = '';
+  breathEl.style.transform = '';
 }
 
 /* =========================================================
