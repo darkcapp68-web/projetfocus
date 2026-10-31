@@ -14,7 +14,8 @@ premier pour reprendre le travail).
   pousse en continu depuis le centre, rebondit sur les bords, vitesse réglable, s'efface en
   pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer ;
   tracé noir par défaut pour trancher sur le texte blanc, « Claire » en réglage ; épaisseur
-  des traits réglable, de Fine à Très épaisse).
+  des traits réglable, de Fine à Très épaisse ; teinte « Faille » (31/10) : les traits
+  s'élargissent et s'ouvrent sur un ciel étoilé, à juger sur le téléphone).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,

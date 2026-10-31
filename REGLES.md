@@ -83,7 +83,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   (30 %) ; demande de l'utilisateur, 30/10 : ralentir la progression. **Teinte du tracé**
   (réglage) : « **Noire** » par défaut (30/10, demande de l'utilisateur : le tracé blanc se
   confondait avec le temps et le message en blanc ; l'éclair garde un mince halo bleuté) ou
-  « Claire » (le néon blanc et la fissure couleur du cadran d'avant). **Épaisseur des traits**
+  « Claire » (le néon blanc et la fissure couleur du cadran d'avant) ou « **Faille** » (31/10,
+  idée de l'utilisateur : « une ouverture sur une autre dimension ») : les traits
+  **s'élargissent** pendant tout le focus (jusqu'à 4 fois, surtout les grosses branches) et
+  laissent voir un **ciel étoilé** (nébuleuses violettes et bleues, deux couches d'étoiles
+  qui glissent lentement à des vitesses différentes), bordé de violet ; à la fin, l'autre
+  dimension couvre environ la moitié de l'écran. **Épaisseur des traits**
   (réglage, idée de l'utilisateur : aspect d'« envahissement spatial ») : Fine (× 0,6),
   Normale (par défaut), Épaisse (× 1,8), Très épaisse (× 3).
   Animations même si l'appareil demande de les réduire (souhait de l'utilisateur). Sous le cadran : bascule

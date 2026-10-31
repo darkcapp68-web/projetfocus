@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 18h38';
+const APP_VERSION = '31/10/2026 · 18h55';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -337,6 +337,11 @@ const crackFx = crackCanvas?.getContext('2d');
 const crack = { on: false, seed: 0, segs: [], maxDur: 0, done: 0, last: 0, zap: false, w: 0, h: 0 };
 // Les segments finis sont dessinés une seule fois ici ; seuls ceux qui poussent sont redessinés.
 const crackDone = document.createElement('canvas');
+// Teinte « Faille » : les traits s'élargissent pendant le focus et laissent voir un ciel étoilé
+// (deux couches qui glissent lentement, à des vitesses différentes) bordé de violet.
+// crackDone sert alors de masque, crackRim garde le bord, crackTmp compose le ciel dans le masque.
+const crackRim = document.createElement('canvas'), crackTmp = document.createElement('canvas');
+let crackSky = null;
 // Au-delà de 2 pixels par point, la différence ne se voit pas et le dessin coûte bien plus cher.
 const crackScale = () => Math.min(2, devicePixelRatio || 1);
 
@@ -408,19 +413,58 @@ function crackBuild() {
   crack.segs = segs;
   crack.maxDur = maxDur;
   crack.w = W; crack.h = H; crack.dpr = devicePixelRatio;
-  crackCanvas.width = crackDone.width = Math.round(W * crackScale());
-  crackCanvas.height = crackDone.height = Math.round(H * crackScale());
+  crackCanvas.width = crackDone.width = crackRim.width = crackTmp.width = Math.round(W * crackScale());
+  crackCanvas.height = crackDone.height = crackRim.height = crackTmp.height = Math.round(H * crackScale());
   crackDone.getContext('2d').clearRect(0, 0, crackDone.width, crackDone.height);
+  crackRim.getContext('2d').clearRect(0, 0, crackRim.width, crackRim.height);
   crack.done = 0;
+  crack.grow = 0;
+  crackSky = S.crackShade === 'faille' ? crackSkyBuild(cx, cy) : null;
+}
+
+// Ciel de la faille, en pixels du canevas, avec une marge pour glisser : un fond de nébuleuses
+// et de petites étoiles, et une couche de grosses étoiles qui glisse plus vite (profondeur).
+function crackSkyBuild(cx, cy) {
+  const k = crackScale(), rnd = prng(crack.seed ^ 0x5bd1e995);
+  const M = Math.round(60 * k), w = crackCanvas.width + 2 * M, h = crackCanvas.height + 2 * M;
+  const layer = () => Object.assign(document.createElement('canvas'), { width: w, height: h });
+  const back = layer(), front = layer();
+  const b = back.getContext('2d'), f = front.getContext('2d');
+  const R = Math.max(w, h);
+  let g = b.createRadialGradient(cx * k + M, cy * k + M, 0, cx * k + M, cy * k + M, R * 0.7);
+  g.addColorStop(0, '#2a0f4f'); g.addColorStop(1, '#07040f');
+  b.fillStyle = g; b.fillRect(0, 0, w, h);
+  const neb = ['#6a2fa0', '#1f3f9a', '#8a1f66', '#127080'];
+  for (let i = 0; i < 7; i++) {
+    const x = rnd() * w, y = rnd() * h, r = R * (0.15 + rnd() * 0.3);
+    g = b.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, neb[i % neb.length] + '66'); g.addColorStop(1, neb[i % neb.length] + '00');
+    b.fillStyle = g; b.fillRect(0, 0, w, h);
+  }
+  const star = (c, x, y, r, a, color) => { c.globalAlpha = a; c.fillStyle = color; c.beginPath(); c.arc(x, y, r, 0, 2 * Math.PI); c.fill(); };
+  for (let i = 0, n = (w * h) / (1600 * k * k); i < n; i++) {
+    star(b, rnd() * w, rnd() * h, (0.3 + rnd() * 0.8) * k, 0.35 + rnd() * 0.65, rnd() < 0.15 ? '#bcd0ff' : '#fff');
+  }
+  for (let i = 0, n = (w * h) / (14000 * k * k); i < n; i++) {
+    const x = rnd() * w, y = rnd() * h, r = (0.9 + rnd() * 1.3) * k;
+    star(f, x, y, r * 3.5, 0.12, '#cdb8ff'); // petit halo
+    star(f, x, y, r, 0.9, rnd() < 0.3 ? '#ffe9c4' : '#fff');
+  }
+  return { back, front, M };
 }
 
 // Trace d'un coup un ensemble de segments de la même profondeur : les branches principales
 // épaisses et lumineuses, les suivantes de plus en plus fines. Éclair : néon, halo bleu-violet et cœur blanc.
-function crackStroke(ctx, path, lv) {
+function crackStroke(ctx, path, lv, rim) {
   let passes;
-  // Teinte « sombre » (par défaut) : trait noir, qui tranche sur le temps et le message en blanc ;
-  // l'éclair garde un mince halo bleuté pour rester visible sur un fond de nuit.
-  if (S.crackShade !== 'clair') {
+  if (S.crackShade === 'faille') {
+    // Masque blanc (le ciel s'y dessinera) ou bord violet, plus large, dessous.
+    // Les grosses branches s'ouvrent le plus, les brindilles restent fines.
+    const w = Math.max(1.2, 3 - lv * 0.35) * (1 + (crack.grow - 1) * Math.max(0.2, 1 - lv * 0.15));
+    passes = rim ? [[w * 1.6 + 3, 0.35, '#a98bff'], [w * 1.15 + 1, 0.6, '#d9c8ff']] : [[w, 1, '#fff']];
+  } else if (S.crackShade !== 'clair') {
+    // Teinte « sombre » (par défaut) : trait noir, qui tranche sur le temps et le message en blanc ;
+    // l'éclair garde un mince halo bleuté pour rester visible sur un fond de nuit.
     const w = crack.zap ? Math.max(0.6, 2.2 - lv * 0.25) : Math.max(0.7, 2.6 - lv * 0.3);
     const al = Math.max(0.45, 0.9 - lv * 0.06);
     passes = crack.zap
@@ -446,7 +490,7 @@ function crackStroke(ctx, path, lv) {
 
 // Ajoute les segments [from, to) au dessin, un tracé par profondeur ; `frac(seg)` donne la
 // part déjà poussée (1 = entier).
-function crackBatch(ctx, from, to, frac) {
+function crackBatch(ctx, from, to, frac, rim) {
   const segs = crack.segs, paths = [];
   for (let i = from; i < to; i++) {
     const [x0, y0, x1, y1, , , lv] = segs[i];
@@ -456,26 +500,64 @@ function crackBatch(ctx, from, to, frac) {
     path.moveTo(x0, y0);
     path.lineTo(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f);
   }
-  paths.forEach((path, lv) => path && crackStroke(ctx, path, lv));
+  paths.forEach((path, lv) => path && crackStroke(ctx, path, lv, rim));
 }
 
-function crackDraw(p) {
+// p : part des branches parcourue ; q : part du focus écoulée (la faille s'élargit avec).
+function crackDraw(p, q, now) {
   const k = crackCanvas.width / crack.w, segs = crack.segs;
-  const done = crackDone.getContext('2d'), ctx = crackFx;
-  for (const c of [done, ctx]) { c.setTransform(k, 0, 0, k, 0, 0); c.lineCap = 'round'; c.lineJoin = 'round'; }
+  const done = crackDone.getContext('2d'), rim = crackRim.getContext('2d'), tmp = crackTmp.getContext('2d'), ctx = crackFx;
+  const faille = !!crackSky;
+  if (faille) {
+    // Les traits s'élargissent (jusqu'à 4 fois à la fin) : les segments finis sont redessinés
+    // à chaque palier de 4 %.
+    const g = 1 + 3 * q ** 1.3;
+    if (!crack.grow || g > crack.grow * 1.04) {
+      crack.grow = g;
+      for (const c of [done, rim]) { c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, crackDone.width, crackDone.height); }
+      crack.done = 0;
+    }
+  }
+  for (const c of [done, rim, tmp, ctx]) { c.setTransform(k, 0, 0, k, 0, 0); c.lineCap = 'round'; c.lineJoin = 'round'; }
   const from = crack.done;
   while (crack.done < segs.length && segs[crack.done][5] <= p) crack.done++;
   crackBatch(done, from, crack.done, () => 1);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.globalAlpha = 1;
-  ctx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
-  ctx.drawImage(crackDone, 0, 0);
-  ctx.setTransform(k, 0, 0, k, 0, 0);
+  if (faille) crackBatch(rim, from, crack.done, () => 1, true);
   // Ceux qui poussent encore (rangés par fin de pousse : tous ceux qui ont commencé finissent
   // avant p + la durée du plus long segment).
   let end = crack.done;
   while (end < segs.length && segs[end][5] <= p + crack.maxDur) end++;
-  crackBatch(ctx, crack.done, end, ([, , , , t0, t1]) => clamp((p - t0) / (t1 - t0), 0, 1));
+  const growing = ([, , , , t0, t1]) => clamp((p - t0) / (t1 - t0), 0, 1);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
+  if (!faille) {
+    ctx.drawImage(crackDone, 0, 0);
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    crackBatch(ctx, crack.done, end, growing);
+    return;
+  }
+  // Faille : le bord violet, puis le ciel découpé dans le masque des traits.
+  ctx.drawImage(crackRim, 0, 0);
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  crackBatch(ctx, crack.done, end, growing, true);
+  tmp.setTransform(1, 0, 0, 1, 0, 0);
+  tmp.globalAlpha = 1;
+  tmp.clearRect(0, 0, crackTmp.width, crackTmp.height);
+  tmp.drawImage(crackDone, 0, 0);
+  tmp.setTransform(k, 0, 0, k, 0, 0);
+  crackBatch(tmp, crack.done, end, growing);
+  tmp.setTransform(1, 0, 0, 1, 0, 0);
+  tmp.globalAlpha = 1;
+  tmp.globalCompositeOperation = 'source-in';
+  const { back, front, M } = crackSky, s = now / 1000;
+  tmp.drawImage(back, -M + Math.sin(s / 41) * M * 0.35, -M + Math.cos(s / 53) * M * 0.35);
+  tmp.globalCompositeOperation = 'source-atop';
+  tmp.drawImage(front, -M + Math.sin(s / 23) * M * 0.9, -M + Math.cos(s / 29) * M * 0.9);
+  tmp.globalCompositeOperation = 'source-over';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.drawImage(crackTmp, 0, 0);
 }
 
 function crackFrame(now) {
@@ -483,10 +565,12 @@ function crackFrame(now) {
   requestAnimationFrame(crackFrame);
   if (now - crack.last < 100) return; // ça pousse lentement : 10 images par seconde suffisent
   crack.last = now;
-  if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio) crackBuild();
+  if (crack.w !== innerWidth || crack.h !== innerHeight || crack.dpr !== devicePixelRatio
+    || (S.crackShade === 'faille') !== !!crackSky) crackBuild(); // taille ou teinte changée
   // Vitesse (réglage) : « lente », le tracé n'a parcouru que la moitié de ses branches à la fin.
   const speed = Number(S.crackSpeed) || 1;
-  crackDraw(T.total ? clamp(1 - remaining() / T.total, 0, 1) * speed : 0);
+  const q = T.total ? clamp(1 - remaining() / T.total, 0, 1) : 0;
+  crackDraw(q * speed, q, now);
 }
 
 function crackStart() {
