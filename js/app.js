@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '30/10/2026 · 17h43';
+const APP_VERSION = '31/10/2026 · 17h44';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -432,9 +432,10 @@ function crackStroke(ctx, path, lv) {
     const w = Math.max(0.7, 2.6 - lv * 0.3), al = Math.max(0.4, 0.95 - lv * 0.06);
     passes = lv < 2 ? [[w * 3, 0.1, S.dialColor], [w, al, S.dialColor]] : [[w, al, S.dialColor]];
   }
+  const thick = Number(S.crackWidth) || 1; // épaisseur des traits (réglage)
   for (const [lw, alpha, color] of passes) {
     ctx.globalAlpha = alpha;
-    ctx.lineWidth = lw;
+    ctx.lineWidth = lw * thick;
     ctx.strokeStyle = color;
     ctx.stroke(path);
   }

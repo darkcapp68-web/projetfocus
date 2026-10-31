@@ -156,6 +156,7 @@ export const DEFAULTS = {
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
   crackSpeed: '0.5', // mode brisure : part des branches parcourue à la fin du focus (1, 0.5, 0.3)
   crackLook: 'eclair', // mode brisure : 'eclair' (néon, frappe rapide, flash) ou 'fissure'
+  crackWidth: '1', // mode brisure : épaisseur des traits (0.6 fine, 1 normale, 1.8 épaisse, 3 très épaisse)
   crackShade: 'sombre', // mode brisure : 'sombre' (trait noir, tranche sur le texte blanc) ou 'clair' (néon blanc / couleur du cadran)
   slowGlow: true, // mode normal : le cadran s'efface presque puis revient, lentement, pendant le focus
   textColor: '#ffffff',

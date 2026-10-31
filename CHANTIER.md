@@ -13,7 +13,8 @@ premier pour reprendre le travail).
   Rythme (réagit à la musique), Brisure (30/10 : un éclair ou une fissure se ramifie et
   pousse en continu depuis le centre, rebondit sur les bords, vitesse réglable, s'efface en
   pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer ;
-  tracé noir par défaut pour trancher sur le texte blanc, « Claire » en réglage).
+  tracé noir par défaut pour trancher sur le texte blanc, « Claire » en réglage ; épaisseur
+  des traits réglable, de Fine à Très épaisse).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
@@ -78,9 +79,6 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
 
 ## Idées en réserve
 
-- **Brisure : grosseur des points / du trait** (30/10, idée de l'utilisateur) : le tracé noir
-  donne un aspect d'« envahissement spatial » agréable ; ajouter un réglage de grosseur pour
-  l'accentuer. À préciser avec lui : épaisseur des traits, ou points ronds aux embranchements.
 
 - **Cadres du mode Rêveur** : le cadre en engrenages est intégré (29/10). D'autres images
   de cadre (méditation, anneau) ont été essayées dans `perso/cadres.html` (dossier `perso/`
