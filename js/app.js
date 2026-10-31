@@ -1,3 +1,4 @@
+import { parseYouTube } from './youtube.js';
 import { DEFAULTS, STATIONS, SHOWN_STATIONS, PLAYLISTS, BREATHS, NOISES, CHIMES, MESSAGE_POOLS, BREAK_COLORS } from './defaults.js';
 import { AudioEngine } from './audio.js';
 import { createSync } from './sync.js';
@@ -10,7 +11,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 17h52';
+const APP_VERSION = '31/10/2026 · 18h24';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1027,8 +1028,9 @@ function allStations() {
   return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: PLAYLISTS[s.id].tracks } : s)), ...own];
 }
 
-const isStreamable = (url) => !/youtube\.com|youtu\.be|spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com|somafm\.com\/[a-z]/i.test(url);
-const kindOf = (st) => st.kind || (isStreamable(st.url) ? 'stream' : 'link');
+// Les liens YouTube jouent dans l'appli (lecteur intégré) ; Spotify, Deezer… s'ouvrent à côté.
+const isStreamable = (url) => !/spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com|somafm\.com\/[a-z]/i.test(url);
+const kindOf = (st) => st.kind || (parseYouTube(st.url) ? 'youtube' : isStreamable(st.url) ? 'stream' : 'link');
 
 function fillSelect(sel, items, value, none) {
   sel.innerHTML = '';
@@ -1106,7 +1108,11 @@ function renderPlayer() {
     np.textContent = mode === 'calme' ? 'Musique douce, générée par l’appli · ta musique reprend après la pause'
       : mode === 'silence' ? 'Silence · ta musique reprend après la pause'
         : 'Rien ne jouait pendant le focus';
-  } else if (audio.musicState === 'error') np.textContent = st?.kind === 'tracks' ? 'Morceaux indisponibles hors ligne.' : 'Radio injoignable (hors ligne ?)';
+  } else if (audio.musicState === 'error') {
+    np.textContent = st?.kind === 'tracks' ? 'Morceaux indisponibles hors ligne.'
+      : st?.kind === 'youtube' ? 'YouTube ne veut pas lire ce lien ici (privé, ou lecture hors YouTube interdite).'
+        : 'Radio injoignable (hors ligne ?)';
+  }
   else if (audio.musicState === 'loading') np.textContent = 'Connexion…';
   else if (on && audio.track) {
     np.append(`${audio.track.title} · HoliznaCC0 `);
@@ -1116,9 +1122,19 @@ function renderPlayer() {
     b.textContent = 'suivant';
     b.addEventListener('click', () => audio.nextTrack());
     np.appendChild(b);
+  } else if (on && st?.kind === 'youtube') {
+    np.append(`${audio.yt.title || st.name} · YouTube `);
+    if (audio.yt.isPlaylist) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'link';
+      b.textContent = 'suivant';
+      b.addEventListener('click', () => audio.nextTrack());
+      np.appendChild(b);
+    }
   } else if (on && st) np.textContent = st.desc;
   if (on && 'mediaSession' in navigator && window.MediaMetadata) {
-    const title = audio.track ? audio.track.title : st?.name || 'projetfocus';
+    const title = audio.track ? audio.track.title : (st?.kind === 'youtube' && audio.yt.title) || st?.name || 'projetfocus';
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist: audio.track ? 'HoliznaCC0' : st?.desc || '', album: 'projetfocus' });
   }
   renderNoiseSwitch();

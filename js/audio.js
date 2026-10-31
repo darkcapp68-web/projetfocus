@@ -1,5 +1,7 @@
-// Moteur audio : radio en ligne (élément <audio>), bruits de fond générés
-// en Web Audio (aucun fichier) et petits signaux de changement de phase.
+// Moteur audio : radio en ligne (élément <audio>) ou YouTube (lecteur intégré), bruits de
+// fond générés en Web Audio (aucun fichier) et petits signaux de changement de phase.
+
+import { YouTubePlayer } from './youtube.js';
 
 const LOOP_SECONDS = 12;
 const FADE_SECONDS = 0.6; // fondu entre la fin et le début de la boucle
@@ -326,16 +328,24 @@ export class AudioEngine {
     this.noiseId = 'none';
     this.noiseLevel = 0.3;
 
-    this.music = new Audio();
-    this.music.preload = 'none';
+    // `music` : le lecteur en service, l'élément <audio> (`el`) ou YouTube (`yt`), qui
+    // s'utilisent de la même façon.
+    this.el = new Audio();
+    this.el.preload = 'none';
+    this.yt = new YouTubePlayer();
+    this.music = this.el;
     this.station = null;
     this.musicLevel = 0.4;
     this.musicState = 'stopped'; // 'stopped' | 'loading' | 'playing' | 'error'
     this._fadeTimer = null;
     this.onchange = () => {};
 
-    this.music.addEventListener('playing', () => { this.skips = 0; this._setMusicState('playing'); });
-    this.music.addEventListener('ended', () => this.nextTrack());
+    for (const p of [this.el, this.yt]) {
+      p.addEventListener('playing', () => { if (p === this.music) { this.skips = 0; this._setMusicState('playing'); } });
+      p.addEventListener('waiting', () => { if (p === this.music) this._setMusicState('loading'); });
+    }
+    this.yt.addEventListener('error', () => { if (this.music === this.yt) this._setMusicState('error'); });
+    this.el.addEventListener('ended', () => this.nextTrack());
     // Une radio mise en pause (notification Android, entrée en pause…) reprend là où elle
     // s'était arrêtée, en retard sur le direct : après plus de 5 s, on la recharge en direct
     // (sauf réglage « là où elle s'était arrêtée »).
@@ -343,21 +353,20 @@ export class AudioEngine {
     this.resumeLive = true; // réglage « Reprise d'une radio après une pause »
     this.wantAnalysis = false; // mode « Rythme » : analyser la musique
     this.analyser = null;
-    this.music.addEventListener('pause', () => { this._pausedAt = Date.now(); });
-    this.music.addEventListener('play', () => {
+    this.el.addEventListener('pause', () => { this._pausedAt = Date.now(); });
+    this.el.addEventListener('play', () => {
       const late = this._pausedAt && Date.now() - this._pausedAt > 5000;
       this._pausedAt = 0;
-      if (late && this.resumeLive && this.station && this.station.kind !== 'tracks' && this.station.url) {
-        this.music.src = this.station.url;
-        this.music.play().catch(() => {});
+      if (late && this.resumeLive && this.station?.kind === 'stream' && this.station.url) {
+        this.el.src = this.station.url;
+        this.el.play().catch(() => {});
       }
     });
     if ('mediaSession' in navigator) {
       try { navigator.mediaSession.setActionHandler('nexttrack', () => this.nextTrack()); } catch { /* non géré */ }
     }
-    this.music.addEventListener('waiting', () => this._setMusicState('loading'));
-    this.music.addEventListener('error', () => {
-      if (!this.music.getAttribute('src')) return;
+    this.el.addEventListener('error', () => {
+      if (this.music !== this.el || !this.el.getAttribute('src')) return;
       // Morceau absent (hors ligne, pas encore en cache) : on essaie le suivant.
       if (this.queue && ++this.skips < this.queue.length) { this.nextTrack(); return; }
       // Serveur SomaFM suivant si celui-ci ne répond pas.
@@ -397,28 +406,37 @@ export class AudioEngine {
     if (this.analyser) return true;
     const ctx = this.ensure();
     if (!ctx) return false;
-    this.music.crossOrigin = 'anonymous';
-    const src = ctx.createMediaElementSource(this.music);
+    this.el.crossOrigin = 'anonymous';
+    const src = ctx.createMediaElementSource(this.el);
     this.analyser = ctx.createAnalyser();
     this.analyser.fftSize = 1024;
     this.analyser.smoothingTimeConstant = 0.6;
     src.connect(this.analyser);
     this.analyser.connect(ctx.destination);
     // Ce qui joue déjà a été chargé sans autorisation d'analyse : on le relance.
-    if (this.station && !this.music.paused) {
+    if (this.station && this.music === this.el && !this.el.paused) {
       this.playStation(this.station, this.track ? { file: this.track.file, time: this.music.currentTime } : null);
     }
     return true;
   }
 
   /* ---------- Radio et playlist embarquée ---------- */
-  // `resume` : { file, time } pour reprendre la playlist au morceau et à la seconde près.
+  // `resume` : { file, time } pour reprendre la playlist au morceau et à la seconde près
+  // ({ yt: { index, time } } pour YouTube).
   playStation(station, resume) {
     this._stopLift();
     if (this.wantAnalysis && !this.analyser) { this.enableAnalysis(); if (this.station === station && !this.music.paused) return; }
+    // On change de lecteur : l'autre se tait.
+    const player = station.kind === 'youtube' ? this.yt : this.el;
+    if (player !== this.music) { this.music.pause(); this.music.removeAttribute('src'); this.music.load(); this.music = player; }
     this.station = station;
     this.queue = null;
     this.track = null;
+    if (station.kind === 'youtube') {
+      this.yt.volume = this.musicLevel;
+      this._setMusicState('loading');
+      return this.yt.open(station.url, resume?.yt);
+    }
     if (station.kind === 'tracks') {
       this.queue = shuffled(station.tracks);
       const k = resume?.file ? this.queue.findIndex((t) => t.file === resume.file) : -1;
@@ -441,6 +459,7 @@ export class AudioEngine {
   }
 
   nextTrack() {
+    if (this.music === this.yt) { this.yt.next(); return; }
     if (!this.queue) return;
     this.qi++;
     if (this.qi >= this.queue.length) { this.queue = shuffled(this.queue); this.qi = 0; }
@@ -484,6 +503,7 @@ export class AudioEngine {
       this.memo = {
         station: this.station, on: this.musicOn,
         file: this.track?.file || null, time: this.track ? this.music.currentTime : 0,
+        yt: this.music === this.yt ? this.yt.where() : null,
       };
     }
     this.breakMode = mode;
@@ -528,7 +548,7 @@ export class AudioEngine {
       this.music.play().catch(() => {});
     } else {
       this.musicLevel = 0;
-      this.playStation(m.station, { file: m.file, time: m.time });
+      this.playStation(m.station, { file: m.file, time: m.time, yt: m.yt });
     }
     this.setMusicLevel(level, 2500);
   }

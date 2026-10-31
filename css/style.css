@@ -360,6 +360,22 @@ body.ink-dark #player select {
 button.play svg { width: 14px; height: 14px; fill: currentColor; }
 button.play .i-pause, button.play.playing .i-play { display: none; }
 button.play.playing .i-pause { display: inline; }
+/* Vidéo YouTube en cours (règle de YouTube : visible, au moins 200 × 200 px), dans un coin. */
+#yt-box {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  visibility: hidden;
+}
+#yt-box.on { visibility: visible; }
+#yt-box iframe { display: block; width: 100%; height: 100%; border: 0; }
 #now-playing { width: 100%; font-weight: 500; text-align: center; font-size: 11px; opacity: 0.55; min-height: 1.4em; }
 #now-playing button.link { font-size: inherit; padding: 0 0.3em; text-decoration: underline; text-underline-offset: 3px; }
 .lib-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }

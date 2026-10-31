@@ -3,7 +3,7 @@
 // GitHub Pages arrive dès le chargement suivant (l'ancienne stratégie « cache d'abord »
 // en demandait deux, d'où des écrans qui ne reflétaient pas les derniers changements).
 
-const CACHE = 'projetfocus-v6';
+const CACHE = 'projetfocus-v7';
 const ASSETS = [
   './',
   'index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   'js/audio.js',
   'js/defaults.js',
   'js/sync.js',
+  'js/youtube.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',

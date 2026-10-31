@@ -27,6 +27,9 @@ premier pour reprendre le travail).
   Baroque / Easy Classique, Radio Swiss Classic cochées ; les autres décochées), musique de
   pause au choix (musique douce générée par défaut), bruits générés (pluie, orage, vent,
   neige, café) avec bouton lecture / pause.
+- YouTube dans l'appli (31/10) : une vidéo ou playlist de « Mes liens » (Mix compris) joue
+  dans l'ordre et en boucle, pilotée comme une radio, vidéo visible dans un coin ; à juger
+  sur le PC et le téléphone (place de la vidéo, absence de pub avec Premium).
 - Arrêter coupe tout ; Démarrer relance tout ; recharger la page repart de zéro.
 - Paramètres en 6 sections repliables, l'essentiel visible et le reste dans « Réglages
   avancés », export / import JSON.
