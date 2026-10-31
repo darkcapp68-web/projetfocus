@@ -41,6 +41,9 @@ export class YouTubePlayer extends EventTarget {
     this._paused = true;
     this._volume = 0.4;
     this._fails = 0;
+    this._on = false; // « en lecture » annoncé au moteur audio
+    this._startAt = null;
+    this._watcher = 0;
   }
 
   _emit(type) { this.dispatchEvent(new Event(type)); }
@@ -82,7 +85,9 @@ export class YouTubePlayer extends EventTarget {
     this._src = url;
     this._paused = false;
     this._fails = 0;
+    this._on = false;
     this._box().classList.add('on');
+    this._watch();
     try { await loadApi(); } catch { this._emit('error'); return; }
     if (this._src !== url) return; // autre choix entre-temps
     const start = Math.floor(at?.time || 0);
@@ -118,16 +123,9 @@ export class YouTubePlayer extends EventTarget {
   _state(s) {
     const YTS = window.YT.PlayerState;
     if (s === YTS.PLAYING) {
-      this._fails = 0;
-      if (this.isPlaylist) { this.player.setLoop(true); this.player.setShuffle(false); }
-      if (this._startAt) {
-        const k = this.player.getPlaylist()?.indexOf(this._startAt) ?? -1;
-        this._startAt = null;
-        if (k > 0) { this.player.playVideoAt(k); return; }
-      }
+      if (this._goToStart()) return;
       if (this._paused) { this.player.pauseVideo(); return; } // mis en pause pendant le chargement
-      this._emit('play');
-      this._emit('playing');
+      this._playing();
     } else if (s === YTS.BUFFERING) this._emit('waiting');
     else if (s === YTS.PAUSED) {
       // Pause depuis la vidéo elle-même : elle compte comme une pause du lecteur.
@@ -136,6 +134,40 @@ export class YouTubePlayer extends EventTarget {
       // Une vidéo seule recommence ; une playlist en boucle repart d'elle-même.
       if (!this.isPlaylist) { this.player.seekTo(0, true); this.player.playVideo(); }
     }
+  }
+
+  // Une playlist ouverte depuis un de ses morceaux (Mix « RD… ») saute à ce morceau.
+  _goToStart() {
+    if (!this._startAt) return false;
+    const list = this.player.getPlaylist();
+    if (!list?.length) return false;
+    const k = list.indexOf(this._startAt);
+    this._startAt = null;
+    if (k <= 0) return false;
+    this.player.playVideoAt(k);
+    return true;
+  }
+
+  _playing() {
+    this._fails = 0;
+    this._on = true;
+    this._lastTitle = this.title;
+    if (this.isPlaylist) { this.player.setLoop(true); this.player.setShuffle(false); }
+    this._emit('play');
+    this._emit('playing');
+  }
+
+  // Avec un Mix, YouTube n'annonce pas toujours « en lecture » : on regarde chaque seconde si
+  // le temps avance (et si le morceau a changé, pour mettre son titre à jour).
+  _watch() {
+    if (this._watcher) return;
+    this._watcher = setInterval(() => {
+      if (!this.ready || !this._src || this._paused) { this._lastT = null; return; }
+      if (this._goToStart()) return;
+      const t = this.player.getCurrentTime() || 0;
+      if (this._lastT != null && t > this._lastT && (!this._on || this.title !== this._lastTitle)) this._playing();
+      this._lastT = t;
+    }, 1000);
   }
 
   play() {
@@ -148,6 +180,7 @@ export class YouTubePlayer extends EventTarget {
   pause() {
     if (this._paused) return;
     this._paused = true;
+    this._on = false;
     if (this.ready) this.player.pauseVideo();
     document.getElementById('yt-box')?.classList.remove('on'); // rien ne joue : la vidéo se range
     this._emit('pause');
@@ -158,6 +191,7 @@ export class YouTubePlayer extends EventTarget {
   // Arrêter : plus de son, la vidéo disparaît.
   stop() {
     this._paused = true;
+    this._on = false;
     this._src = '';
     if (this.ready) this.player.stopVideo();
     document.getElementById('yt-box')?.classList.remove('on');
