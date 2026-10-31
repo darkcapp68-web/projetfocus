@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 20h20';
+const APP_VERSION = '31/10/2026 · 20h36';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -703,7 +703,11 @@ function rhythmFrame(t) {
   if (rhythmCanvas.width !== w) { rhythmCanvas.width = w; rhythmCanvas.height = w; }
   const ctx = rhythmFx, C = w / 2, u = w / 420, R = 128 * u; // 1 unité du cadran = u px
   ctx.clearRect(0, 0, w, w);
-  if (!an || !audio.musicOn || document.hidden) { dial.style.transform = ''; return; }
+  if (!an || !audio.musicOn || document.hidden) {
+    dial.style.transform = '';
+    if (S.rhythmForm === 'horizon' && !document.hidden) drawHorizon(t, null, 0); // ligne calme et avancée du temps
+    return;
+  }
   const color = getComputedStyle(document.documentElement).getPropertyValue('--dial').trim() || '#fff';
   rhythm.freq ||= new Float32Array(an.frequencyBinCount);
   rhythm.wave ||= new Float32Array(an.fftSize);
@@ -734,7 +738,8 @@ function rhythmFrame(t) {
     ctx.beginPath(); ctx.arc(C, C, R + 6 * u * pulse, 0, 2 * Math.PI); ctx.stroke();
   }
   const form = S.rhythmForm;
-  if (form === 'barres') {
+  if (form === 'horizon') drawHorizon(t, level, pulse);
+  else if (form === 'barres') {
     // Néon : halo coloré (deux couches larges et transparentes) puis cœur fin presque blanc ;
     // la teinte suit la fréquence (basses magenta → aigus cyan). Pas de flou : reste fluide.
     const N = 64;
@@ -854,6 +859,50 @@ function rhythmFrame(t) {
       }
       ctx.globalCompositeOperation = 'source-over';
     }
+  }
+  ctx.globalAlpha = 1;
+}
+
+// Vue « onde horizontale » : barres néon symétriques, du bord de l'horloge vers la droite ;
+// des basses (cyan, près de l'horloge) aux aigus (violet, à droite). Chaque barre retombe
+// doucement. La partie déjà écoulée de la phase est plus vive, avec un trait à l'avancée.
+const waveCanvas = $('#wave-fx'), waveFx = waveCanvas?.getContext('2d');
+function drawHorizon(t, level, pulse) {
+  const k = devicePixelRatio || 1, W = Math.round(waveCanvas.clientWidth * k), H = Math.round(waveCanvas.clientHeight * k);
+  if (!W || !H) return;
+  if (waveCanvas.width !== W || waveCanvas.height !== H) { waveCanvas.width = W; waveCanvas.height = H; }
+  const ctx = waveFx, mid = H / 2, step = 7 * k, bw = 2.6 * k, n = Math.floor(W / step);
+  ctx.clearRect(0, 0, W, H);
+  const running = T.phase === 'focus' || T.phase === 'break';
+  const p = running && T.total ? clamp(1 - remaining() / T.total, 0, 1) : T.phase === 'done' ? 1 : 0;
+  rhythm.hz ||= [];
+  rhythm.hzMax ||= [];
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < n; i++) {
+    const f = i / Math.max(1, n - 1);
+    // Chaque barre a sa propre sensibilité (son maximum récent) : les aigus bougent aussi.
+    const raw = level ? level(Math.floor(2 * Math.pow(95, f))) : 0;
+    const top = rhythm.hzMax[i] = Math.max(raw, (rhythm.hzMax[i] || 0.2) * 0.997, 0.1);
+    const v = raw / top;
+    const s = rhythm.hz[i] = Math.max(v, (rhythm.hz[i] || 0) * 0.9);
+    const env = 0.6 + 0.4 * Math.sin(Math.PI * Math.min(1, f * 1.15)); // plus haut vers le milieu
+    const a = Math.max(1.5 * k, (0.03 + 0.97 * s ** 1.3) * mid * 0.94 * env * (1 + pulse * 0.12));
+    const x = i * step + (step - bw) / 2, hue = 188 + f * 87;
+    const done = x / W <= p;
+    ctx.globalAlpha = done ? 0.2 : 0.07;
+    ctx.fillStyle = `hsl(${hue} 100% 60%)`;
+    ctx.fillRect(x - bw * 0.8, mid - a - k, bw * 2.6, 2 * a + 2 * k); // halo
+    ctx.globalAlpha = done ? 0.95 : 0.4;
+    ctx.fillStyle = `hsl(${hue} 100% ${done ? 74 : 66}%)`;
+    ctx.fillRect(x, mid - a, bw, 2 * a);
+  }
+  // Ligne du milieu et trait à l'avancée du temps.
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 0.22; ctx.fillStyle = '#fff';
+  ctx.fillRect(0, mid - 0.5 * k, W, k);
+  if (running) {
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(p * W - k, mid - H * 0.42, 2 * k, H * 0.84);
   }
   ctx.globalAlpha = 1;
 }
@@ -1976,8 +2025,29 @@ selLook.addEventListener('change', () => {
   saveSettings(); syncForm(); applySettings();
 });
 
+// Paysage : téléphone couché, ou vue « onde horizontale » sur un écran plus large que haut.
+// Cette vue demande aussi à Android de rester en paysage (possible seulement pour l'appli
+// installée ou en plein écran ; ailleurs, la demande est refusée sans bruit).
+const landPhone = matchMedia('(orientation: landscape) and (max-height: 560px)');
+const landWide = matchMedia('(orientation: landscape)');
+let orientationLocked = false;
+function setLand() {
+  const horizon = S.dialStyle === 'rythme' && S.rhythmForm === 'horizon';
+  body.classList.toggle('horizon', horizon);
+  body.classList.toggle('land', landPhone.matches || (horizon && landWide.matches));
+  if (horizon && !orientationLocked) {
+    screen.orientation?.lock?.('landscape').then(() => { orientationLocked = true; }, () => {});
+  } else if (!horizon && orientationLocked) {
+    orientationLocked = false;
+    try { screen.orientation.unlock(); } catch { /* rien à libérer */ }
+  }
+}
+landPhone.addEventListener('change', setLand);
+landWide.addEventListener('change', setLand);
+
 function applySettings() {
   fillLook();
+  setLand();
   const st = document.documentElement.style;
   st.setProperty('--fg', S.textColor);
   st.setProperty('--dial', S.dialColor);

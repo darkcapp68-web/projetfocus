@@ -115,12 +115,21 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   cadran prend la hauteur qui reste au-dessus du lecteur (environ 230 px) ; rien ne se
   chevauche, la page défile seulement sur un très petit écran.
 - **Téléphone couché (paysage**, écran plus large que haut et moins de 560 px de haut ; 31/10,
-  demande de l'utilisateur : tout s'écrasait) : l'**horloge à gauche** (le cadran, dans son
-  style), à droite une **barre du temps** qui avance vers la droite (trait blanc de la couleur
+  demande de l'utilisateur : tout s'écrasait ; classe `land` posée en JS) : l'**horloge
+  collée à gauche** (le cadran, dans son style, qui prend la hauteur restant vraiment entre la
+  barre du haut et le lecteur, sans jamais faire déborder le bas), à droite une **barre du temps** qui avance vers la droite (trait blanc de la couleur
   du cadran, point lumineux en tête, minutes restantes au bout ; vide au repos), sous elle le
   message et les boutons du moment ; le **lecteur sur une seule ligne** en bas (la ligne
   « ce qui joue » dessous) ; barre du haut plus fine. Le bloc de droite (`#side`) ne change
   rien en portrait ni sur PC. Sobre : pas d'effet de plus.
+  **Vue « Rythme · Onde horizontale »** (31/10, d'après une image de l'utilisateur) : des
+  barres néon symétriques partent du bord de l'horloge vers la droite, des basses (cyan) aux
+  aigus (violet), chacune avec sa propre sensibilité ; la partie déjà écoulée de la phase est
+  plus vive, un trait blanc marque l'avancée (elle remplace la barre du temps) ; message
+  au-dessus, boutons dessous. Choisir cette vue **met en paysage** : disposition paysage dès
+  que l'écran est plus large que haut (PC compris), et demande à Android de rester couché
+  (`screen.orientation.lock`, accepté seulement pour l'appli installée ou en plein écran ;
+  libéré en changeant de vue). En portrait, l'onde passe sous l'horloge.
 - Info discrète en bas : « moment · phase · cycle » (ex. « Matinée · focus · 2/4 »).
 
 ## 3. Minuteur

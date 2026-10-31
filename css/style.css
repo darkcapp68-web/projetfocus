@@ -475,37 +475,56 @@ body.no-info #info { visibility: hidden; }
 /* Nouvelle version en ligne : un point bleu sur « Paramètres ». */
 #btn-settings.has-update::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: #8fd3ff; vertical-align: 2px; }
 
-/* ---------- Paysage sur téléphone ---------- */
-/* L'horloge à gauche ; à droite la barre du temps, le message et les boutons du moment ;
+/* ---------- Paysage ---------- */
+/* Classe « land » posée en JS : téléphone couché (plus large que haut, moins de 560 px de
+   haut), ou vue « onde horizontale » sur un écran plus large que haut (PC compris).
+   L'horloge à gauche ; à droite la barre du temps, le message et les boutons du moment ;
    le lecteur sur une seule ligne en bas. Ailleurs, le bloc de droite ne change rien. */
 #side { display: contents; }
-#timebar { display: none; }
-@media (orientation: landscape) and (max-height: 560px) {
-  html:root { --dial-size: min(calc(100dvh - 168px), 40vw, 380px); } /* passe avant la règle « max-height » plus bas */
-  #topbar { min-height: 0; padding-top: max(8px, env(safe-area-inset-top)); }
-  #stage { flex-direction: row; justify-content: center; gap: clamp(20px, 5vw, 56px); padding: 4px max(24px, env(safe-area-inset-left)); }
-  #side { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; flex: 0 1 460px; min-width: 0; }
-  #message { text-align: left; max-width: none; min-height: 0; }
-  #actions, #break-actions, #coach-list { justify-content: flex-start; }
-  #timebar { display: flex; align-items: center; gap: 14px; width: 100%; }
-  #timebar .track { position: relative; flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.2); }
-  #timebar .fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--tp, 0) * 100%); border-radius: 3px; background: var(--dial); }
-  #timebar .head {
-    position: absolute; top: 50%; left: calc(var(--tp, 0) * 100%);
-    width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%;
-    background: var(--dial); box-shadow: 0 0 10px var(--dial);
-  }
-  #timebar .left { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; opacity: 0.7; min-width: 4.2em; text-align: right; }
-  body.phase-idle #timebar .head { opacity: 0; }
-  footer { gap: 2px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-  #player { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; gap: 2px 28px; }
-  #player .group { display: flex; width: auto; max-width: none; gap: 8px; }
-  #player button.round { width: 42px; height: 42px; }
-  #player select { min-height: 40px; width: auto; max-width: 13em; }
-  #player input[type="range"] { width: 90px; height: 24px; zoom: 1.2; }
-  #now-playing { flex-basis: 100%; min-height: 1.4em; }
-  #sub { font-size: 11px; letter-spacing: 0.1em; text-align: center; max-width: 86%; }
+#timebar, #wave-fx { display: none; }
+body.land #topbar { min-height: 0; padding-top: max(8px, env(safe-area-inset-top)); }
+/* L'horloge prend la hauteur qui reste vraiment entre la barre du haut et le lecteur
+   (mesurée par le navigateur : police, barres d'Android…), sans déborder en bas. */
+body.land #stage {
+  container-type: size;
+  --dial-size: min(100cqh - 12px, 38cqw, 380px);
+  --gap: clamp(16px, 3vw, 40px);
+  flex-direction: row; justify-content: flex-start; gap: var(--gap);
+  padding: 4px max(16px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left));
 }
+body.land { overflow: hidden; }
+body.land #side { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; flex: 1 1 auto; min-width: 0; }
+body.land #message { text-align: left; max-width: none; min-height: 0; }
+body.land #actions, body.land #break-actions, body.land #coach-list { justify-content: flex-start; }
+body.land #timebar { display: flex; align-items: center; gap: 14px; width: 100%; }
+#timebar .track { position: relative; flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.2); }
+#timebar .fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--tp, 0) * 100%); border-radius: 3px; background: var(--dial); }
+#timebar .head {
+  position: absolute; top: 50%; left: calc(var(--tp, 0) * 100%);
+  width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%;
+  background: var(--dial); box-shadow: 0 0 10px var(--dial);
+}
+#timebar .left { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; opacity: 0.7; min-width: 4.2em; text-align: right; }
+body.phase-idle #timebar .head { opacity: 0; }
+body.land footer { gap: 2px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+body.land #player { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; gap: 2px 28px; }
+body.land #player .group { display: flex; width: auto; max-width: none; gap: 8px; }
+body.land #player button.round { width: 42px; height: 42px; }
+body.land #player select { min-height: 40px; width: auto; max-width: 13em; }
+body.land #player input[type="range"] { width: 90px; height: 24px; zoom: 1.2; }
+body.land #now-playing { flex-basis: 100%; min-height: 1.4em; }
+body.land #sub { font-size: 11px; letter-spacing: 0.1em; text-align: center; max-width: 86%; }
+
+/* Vue « onde horizontale » (mode Rythme) : l'onde part du bord de l'horloge vers la droite,
+   au milieu du bloc de droite (message au-dessus, boutons dessous) ; elle montre aussi
+   l'avancée du temps (partie jouée plus vive), à la place de la barre du temps. En portrait,
+   elle passe sous l'horloge. */
+body.horizon #wave-fx { display: block; width: min(92vw, 520px); height: 84px; }
+body.land.horizon #side { justify-content: center; align-self: stretch; }
+body.land.horizon #timebar { display: none; }
+body.land.horizon #message { order: 1; }
+body.land.horizon #wave-fx { order: 2; width: calc(100% + var(--gap)); margin-left: calc(-1 * var(--gap)); height: clamp(70px, 34cqh, 170px); }
+body.land.horizon #setup, body.land.horizon #actions, body.land.horizon #break-actions, body.land.horizon #coach-list { order: 3; }
 
 /* ---------- Petits écrans ---------- */
 @media (max-height: 560px) {
