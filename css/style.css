@@ -523,7 +523,8 @@ body.land #sub { font-size: 11px; letter-spacing: 0.1em; text-align: center; max
    l'avancée du temps (partie jouée plus vive), à la place de la barre du temps. En portrait,
    elle passe sous l'horloge. */
 body.horizon #wave-fx { display: block; width: min(92vw, 520px); height: 84px; }
-body.hero #wave-fx { height: 120px; }
+body.hero #wave-fx { height: 240px; }
+body.hero:not(.land) { --dial-size: max(160px, min(78vw, calc(100dvh - 610px), 380px)); } /* la bande du héros est deux fois plus haute : l horloge rétrécit un peu */
 body.land.horizon #side { justify-content: center; align-self: stretch; }
 body.land.horizon #timebar { display: none; }
 body.land.horizon #message { order: 1; }
