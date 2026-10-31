@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 19h23';
+const APP_VERSION = '31/10/2026 · 19h33';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -73,6 +73,12 @@ function sanitize(s) {
   // ou le Drive) repassent en Normal.
   if (s.dialStyle === 'brisure') s.dialStyle = 'standard';
   if (s.version < 12) s.version = 12;
+  // Version 13 : nouvelles radios techno / ambient (cochées, rien à faire : seules les
+  // radios listées dans hiddenStations sont masquées) ; celles de Radio Record arrivent décochées.
+  if (s.version < 13) {
+    for (const id of ['rectechno', 'recminimal', 'recambient']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
+    s.version = 13;
+  }
   return s;
 }
 

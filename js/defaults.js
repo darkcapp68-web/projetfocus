@@ -53,6 +53,16 @@ export const STATIONS = [
   { id: 'nts2', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio NTS 2', desc: 'NTS · sélections électro et expérimentales · sans pub', url: 'https://stream-relay-geo.ntslive.net/stream2' },
   { id: 'tlminimal', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Minimal', desc: 'technolovers.fm · minimal techno', url: 'https://stream.technolovers.fm/minimal' },
   { id: 'tldeephouse', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Deep House', desc: 'technolovers.fm · deep house', url: 'https://stream.technolovers.fm/deep-house' },
+  { id: 'tltechno', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Technolovers Techno', desc: 'technolovers.fm · techno', url: 'https://stream.technolovers.fm/techno' },
+  { id: 'hmtechno', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Hirschmilch Techno', desc: 'hirschmilch.de · techno · sans pub', url: 'https://hirschmilch.de:7000/techno.mp3' },
+  { id: 'hmprogressive', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Hirschmilch Progressive', desc: 'hirschmilch.de · progressive, psy douce · sans pub', url: 'https://hirschmilch.de:7000/progressive.mp3' },
+  { id: 'hmelectronic', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Hirschmilch Electronic', desc: 'hirschmilch.de · house, électro mélodique · sans pub', url: 'https://hirschmilch.de:7000/electronic.mp3' },
+  { id: 'hmchillout', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Hirschmilch Chillout', desc: 'hirschmilch.de · ambient, chillout · sans pub', url: 'https://hirschmilch.de:7000/chillout.mp3' },
+  { id: 'amambient', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio a.m. ambient', desc: 'stereoscenic.com · ambient planant · sans pub', url: 'https://radio.stereoscenic.com/ama-h' },
+  { id: 'ambientmodern', kind: 'stream', group: 'Radios électro (style Work with Paul)', name: 'Radio Ambient Modern', desc: 'stereoscenic.com · ambient, post-rock doux · sans pub', url: 'https://radio.stereoscenic.com/mod-h' },
+  { id: 'rectechno', kind: 'stream', group: 'Radios Record (Russie, pub probable)', name: 'Radio Record Techno (pub probable)', desc: 'Radio Record · techno · jingles en russe', url: 'https://radiorecord.hostingradio.ru/techno96.aacp' },
+  { id: 'recminimal', kind: 'stream', group: 'Radios Record (Russie, pub probable)', name: 'Radio Record Minimal (pub probable)', desc: 'Radio Record · minimal, tech house · jingles en russe', url: 'https://radiorecord.hostingradio.ru/mini96.aacp' },
+  { id: 'recambient', kind: 'stream', group: 'Radios Record (Russie, pub probable)', name: 'Radio Record Ambient (pub probable)', desc: 'Radio Record · ambient · jingles en russe', url: 'https://radiorecord.hostingradio.ru/ambient96.aacp' },
   { id: 'bwmirchi', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Mirchi Top 20 (pub probable)', desc: 'Radio Mirchi · tubes Bollywood du moment', url: 'https://drive.uber.radio/uber/bollywoodnow/icecast.audio' },
   { id: 'bw2010', kind: 'stream', group: 'Radios Bollywood (pub probable)', name: 'Radio Bollywood 2010s (pub probable)', desc: 'uber.radio · Bollywood des années 2010', url: 'https://drive.uber.radio/uber/bollywood2010s/icecast.audio' },
   { id: 'fmopera', kind: 'stream', group: 'Radios classique et opéra', name: 'Radio France Musique Opéra', desc: 'Radio France · opéra, chant · sans pub', url: 'https://icecast.radiofrance.fr/francemusiqueopera-midfi.mp3' },
@@ -66,7 +76,7 @@ export const STATIONS = [
 ];
 
 // Musiques gardées dans le menu (le reste est décoché, à recocher dans Paramètres).
-export const SHOWN_STATIONS = ['tlminimal', 'fmopera', 'fmclassiqueplus', 'fmbaroque', 'fmeasy', 'swissclassic'];
+export const SHOWN_STATIONS = ['tlminimal', 'tltechno', 'hmtechno', 'hmprogressive', 'hmelectronic', 'hmchillout', 'amambient', 'ambientmodern', 'fmopera', 'fmclassiqueplus', 'fmbaroque', 'fmeasy', 'swissclassic'];
 
 // Respiration guidée pendant la pause : étapes [« inspire » | « retiens » | « expire », secondes].
 // Cohérence cardiaque (méthode « 365 ») : 6 respirations par minute, 5 s / 5 s, sans retenue.
@@ -121,7 +131,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 12,
+  version: 13,
 
   // Temps
   focusMin: 25,
@@ -269,7 +279,8 @@ export const DEFAULTS = {
   autoStartAudio: true,
   // Musiques décochées dans Paramètres : absentes du menu du lecteur.
   // Les radios laut.fm passent de la publicité : décochées au départ.
-  // Seules Technolovers Minimal et les radios classiques sont cochées au départ.
+  // Cochées au départ : Technolovers Minimal, les radios techno / ambient sans pub ajoutées le
+  // 31/10 et les radios classiques.
   hiddenStations: STATIONS.map((st) => st.id).filter((id) => !SHOWN_STATIONS.includes(id)),
 
   // Affichage

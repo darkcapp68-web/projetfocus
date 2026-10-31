@@ -26,7 +26,8 @@ premier pour reprendre le travail).
 - Messages bienveillants (40), coach, notifications, plein écran (désactivé par défaut).
 - Son : lecteur avec menu groupé, playlists CC0 embarquées (lofi, ambient) gardées hors
   ligne, radios testées (Technolovers Minimal, France Musique Opéra / Classique Plus /
-  Baroque / Easy Classique, Radio Swiss Classic cochées ; les autres décochées), musique de
+  Baroque / Easy Classique, Radio Swiss Classic cochées ; 31/10 : 7 radios techno / ambient
+  sans pub ajoutées et cochées, 3 Radio Record décochées (pub probable) ; les autres décochées), musique de
   pause au choix (musique douce générée par défaut), bruits générés (pluie, orage, vent,
   neige, café) avec bouton lecture / pause.
 - Arrêter coupe tout ; Démarrer relance tout ; recharger la page repart de zéro.
@@ -67,7 +68,7 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
    - respiration par le mot seul (nouveau défaut, 31/10) ou par les couleurs : à juger sur le téléphone ;
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
-   - radios classiques : lesquelles garder ;
+   - radios classiques, et nouvelles radios techno / ambient (31/10) : lesquelles garder ;
    - couleurs : ajouter un moment « Nuit profonde » indigo vers 2 h (sinon le fond tire sur
      le brun-rouge vers 3 h du matin) ?
 4. **Optionnel** : abonnement DI.FM Premium un jour → je peux ajouter la saisie de la clé

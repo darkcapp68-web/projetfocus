@@ -173,7 +173,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
     Musiques et sons → Réglages avancés → Bibliothèque hors ligne pour télécharger / retirer une playlist entière.
   - Radios testées (lisibles depuis un autre site) : chill (I♥Chillhop, Chillsynth, Radio
     Paradise Mellow, laut.fm lofi), électro (Technolovers Minimal / Deep House, FIP Electro,
-    Intergalactic FM, NTS 1 et 2, Ambient Sleeping Pill, laut.fm minimal / ambient),
+    Intergalactic FM, NTS 1 et 2, Ambient Sleeping Pill, laut.fm minimal / ambient ;
+    ajoutées le 31/10 pour avoir du choix, sans pub et cochées : Technolovers Techno,
+    Hirschmilch Techno / Progressive / Electronic / Chillout, a.m. ambient, Ambient Modern ;
+    Radio Record Techno / Minimal / Ambient, jingles en russe, pub probable, décochées),
     Bollywood (Mirchi Top 20, Bollywood 2010s, pub probable), classique et opéra (France
     Musique Opéra / Classique Plus / Baroque / Easy Classique, Radio Swiss Classic).
   - SomaFM (Groove Salad, Deep Space One, Fluid) : refuse la lecture depuis un autre site →
@@ -181,7 +184,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   - Noms : « Playlist … » pour l'embarqué, « Radio … » pour les radios (pas d'ambiguïté).
   - **Cases à cocher par musique** (Paramètres → Musiques et sons → Musiques du menu) : seules les
     cochées apparaissent dans le lecteur. **Actuellement cochées : Technolovers Minimal
-    (musique par défaut) et les 5 radios classiques.**
+    (musique par défaut), les 7 radios techno / ambient ajoutées le 31/10 et les 5 radios
+    classiques.**
   - **Plus de « Mes liens »** (retiré le 31/10, décision de l'utilisateur : YouTube joué dans
     l'appli a été essayé puis retiré, et ouvrir YouTube / Spotify dans un onglet ne sert à
     rien, il a leurs applis). **Une nouvelle radio s'ajoute avec Claude**, dans
@@ -217,7 +221,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 12).
+  enregistrés (version actuelle : 13).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
   des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans
