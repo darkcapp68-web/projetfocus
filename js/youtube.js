@@ -115,6 +115,7 @@ export class YouTubePlayer extends EventTarget {
   _cue(ref, index, start) {
     // Une playlist ouverte depuis un de ses morceaux (Mix « RD… ») commence par ce morceau.
     this._startAt = ref.list && ref.video && !index && !start ? ref.video : null;
+    this._looped = false;
     if (ref.list) this.player.loadPlaylist({ list: ref.list, listType: 'playlist', index, startSeconds: start });
     else this.player.loadVideoById({ videoId: ref.video, startSeconds: start });
     if (this._paused) this.player.pauseVideo();
@@ -152,7 +153,8 @@ export class YouTubePlayer extends EventTarget {
     this._fails = 0;
     this._on = true;
     this._lastTitle = this.title;
-    if (this.isPlaylist) { this.player.setLoop(true); this.player.setShuffle(false); }
+    // Boucle sur la playlist, posée une fois (la redemander fait repartir le morceau au début).
+    if (this.isPlaylist && !this._looped) { this._looped = true; this.player.setLoop(true); }
     this._emit('play');
     this._emit('playing');
   }
