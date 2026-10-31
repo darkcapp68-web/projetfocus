@@ -121,7 +121,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 11,
+  version: 12,
 
   // Temps
   focusMin: 25,

@@ -63,7 +63,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   puis reste jusqu'au rechargement. Le spectre est compensé du volume du lecteur et ramené à
   l'échelle des dernières secondes : une musique calme ou jouée bas bouge autant qu'une
   forte.
-  « **Brisure** » (idée de l'utilisateur, 30/10) : pendant le focus, un **éclair** ou une
+  « **Brisure** » — **mis de côté le 31/10** (décision de l'utilisateur : « pas top », sans
+  savoir dire pourquoi ; retiré du choix du cadran, réglages déjà enregistrés repassés en
+  Normal, code et réglages gardés dans `js/app.js` pour plus tard). Ce qu'il faisait (idée de
+  l'utilisateur, 30/10) : pendant le focus, un **éclair** ou une
   **fissure** (réglage « Aspect », éclair par défaut) part du centre du cadran sur tout l'écran
   (canevas `#crack-fx`) en 6 à 9 branches qui se **ramifient au hasard en chemin** et
   **poussent en continu**, à vitesse constante le long des branches ; les derniers bouts
@@ -214,7 +217,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 11).
+  enregistrés (version actuelle : 12).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
   des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans

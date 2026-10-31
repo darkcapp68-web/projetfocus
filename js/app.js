@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 18h55';
+const APP_VERSION = '31/10/2026 · 19h23';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -69,6 +69,10 @@ function sanitize(s) {
   // Version 11 : la respiration se voit par le mot qui grandit, l'écran ne bouge plus
   // (au choix : les couleurs, les deux, ou un voile sombre).
   if (s.version < 11) { s.breathShow = 'word'; s.version = 11; }
+  // Version 12 : le mode « Brisure » est mis de côté ; ceux qui l'avaient (même par un import
+  // ou le Drive) repassent en Normal.
+  if (s.dialStyle === 'brisure') s.dialStyle = 'standard';
+  if (s.version < 12) s.version = 12;
   return s;
 }
 

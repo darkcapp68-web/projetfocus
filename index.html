@@ -218,7 +218,7 @@
 
     <details class="sec">
       <summary>Apparence <small>cadran, couleurs, écran</small></summary>
-      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option><option value="brisure">Brisure (un éclair ou une fissure se ramifie pendant le focus)</option></select></label>
+      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option><!-- Brisure : mis de côté le 31/10 (décision de l'utilisateur), code gardé dans js/app.js --></select></label>
       <label data-if="dialStyle=rythme">Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option></select></label>
       <label data-if="dialStyle=brisure">Aspect<select data-k="crackLook"><option value="eclair">Éclair</option><option value="fissure">Fissure</option></select></label>
       <label data-if="dialStyle=brisure">Teinte du tracé<select data-k="crackShade"><option value="sombre">Noire</option><option value="clair">Claire (néon blanc)</option><option value="faille">Faille (elle s'ouvre sur un ciel étoilé)</option></select></label>
