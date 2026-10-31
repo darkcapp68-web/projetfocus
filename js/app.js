@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 20h05';
+const APP_VERSION = '31/10/2026 · 20h20';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -243,6 +243,18 @@ function drawDial(sec) {
   knob.style.opacity = min <= 0 ? 0 : 1;
   // Niveau liquide : plein à 60 min, vide à 0 (le cercle va de y = 25 à y = 275).
   if (liquidLevel) liquidLevel.style.transform = `translateY(${275 - (min / 60) * 250}px)`;
+  drawTimebar(sec);
+}
+
+// Paysage : la barre du temps avance vers la droite (vide au repos, pleine à la fin de la
+// phase), avec les minutes qui restent au bout.
+const timebar = $('#timebar'), timebarLeft = $('#timebar .left');
+function drawTimebar(sec) {
+  const running = T.phase === 'focus' || T.phase === 'break';
+  const p = running ? clamp(1 - sec / (T.total || 1), 0, 1) : T.phase === 'done' ? 1 : 0;
+  timebar.style.setProperty('--tp', p.toFixed(4));
+  const left = `${Math.ceil(Math.max(0, sec) / 60)} min`;
+  if (timebarLeft.textContent !== left) timebarLeft.textContent = left;
 }
 
 /* ---------- Mode rêveur : système solaire (focus) et vague (pause) ---------- */
