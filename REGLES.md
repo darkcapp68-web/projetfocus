@@ -130,6 +130,21 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   que l'écran est plus large que haut (PC compris), et demande à Android de rester couché
   (`screen.orientation.lock`, accepté seulement pour l'appli installée ou en plein écran ;
   libéré en changeant de vue). En portrait, l'onde passe sous l'horloge.
+- **Vue « Rythme · Petit héros »** (31/10, idée de l'utilisateur : « comme sur les jeux idle, un
+  petit perso qui avance et fait des choses sans s'arrêter ») : une bande de pixels (canevas
+  `#wave-fx`, sous l'horloge en portrait, à droite en paysage ; la vue ne force pas le paysage)
+  où un petit chevalier court sans fin dans un décor qui défile (étoiles, deux rangées de
+  collines, arbres, buissons, fleurs). **Deux pas par temps du BPM** (allure de 80 BPM sans
+  musique), **un saut sur chaque temps fort**, le décor accélère un peu sur le temps. Il
+  **ramasse des pièces** (+1), **bat des slimes** (+3, coup d'épée) et **ouvre des coffres**
+  (+10) ; les pièces s'additionnent en haut à gauche avec le **niveau** (niveau = 1 + √(pièces / 15),
+  barre de progression ; le casque et l'écharpe changent de couleur à chaque niveau, « NIVEAU n ! »
+  avec des étincelles). Pièces et slimes battus sont gardés sur l'appareil
+  (`localStorage` `projetfocus.heros`, pas dans les réglages ni sur Drive). **Focus** : il
+  avance vers le **drapeau d'arrivée** au fil du temps (l'avancée remplace la barre du temps) ;
+  en fin de focus il saute de joie. **Pause** : il s'assoit au **feu de camp** et dort (« z »), le
+  décor s'arrête, le feu bat au rythme. Même sans musique il court. Code : `drawHero()` dans
+  `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
   coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport
   `maximum-scale=1, user-scalable=no` et `touch-action: manipulation`.

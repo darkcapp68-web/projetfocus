@@ -13,6 +13,10 @@ premier pour reprendre le travail).
   message et boutons à droite, lecteur sur une ligne ; le bas ne déborde plus ; vue « Rythme ·
   Onde horizontale » qui met en paysage (onde néon de l'horloge vers la droite) ; à juger sur
   le téléphone.
+- Vue « Rythme · Petit héros » (31/10, idée de l'utilisateur, style jeu idle) : un chevalier en
+  pixels court au rythme du BPM, ramasse des pièces, bat des slimes, ouvre des coffres, gagne des
+  niveaux, avance vers un drapeau pendant le focus et s'endort au feu de camp en pause ; à juger
+  sur le téléphone (vitesse, taille, ce qu'on y ajoute).
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.
