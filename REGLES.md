@@ -174,19 +174,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   - **Cases à cocher par musique** (Paramètres → Musiques et sons → Musiques du menu) : seules les
     cochées apparaissent dans le lecteur. **Actuellement cochées : Technolovers Minimal
     (musique par défaut) et les 5 radios classiques.**
-  - « Mes liens » (une ligne « Nom | https://… », le nom apparaît dans le menu) : flux audio
-    directs, et **vidéos ou playlists YouTube jouées dans l'appli** (31/10, `js/youtube.js`,
-    lecteur officiel de YouTube) : **dans l'ordre et en boucle**, jamais au hasard ;
-    « suivant » dans le lecteur. Un **Mix** (`list=RD…`, fabriqué par YouTube) joue aussi, mais
-    hors de YouTube il est **refait à chaque ouverture** (autres morceaux, sans celui du lien,
-    testé le 31/10) : pour un ordre fixe, une vraie playlist (`list=PL…`, publique ou non
-    répertoriée). Pilotées
-    comme une radio : Démarrer, pause, reprise au même morceau et à la seconde près, Arrêter.
-    La vidéo reste **visible** dans un coin (200 × 200 px, règle de YouTube) tant qu'elle joue.
-    Limites : YouTube refuse de jouer depuis `localhost` / `127.0.0.1` (tester sur le site
-    publié) ; certains morceaux sont interdits hors de YouTube par leur maison de disques (la
-    playlist passe au suivant) ; sur le téléphone, la lecture s'arrête si l'appli passe en
-    arrière-plan ; pas d'analyse pour le mode Rythme. Spotify, Deezer… s'ouvrent dans un onglet.
+  - « Mes liens » : flux audio directs ajoutés par l'utilisateur (YouTube / Spotify →
+    ouverts dans un onglet).
 - **Musique de la pause** (choix retenu) : musique douce générée par l'appli (par défaut,
   façon « ascenseur », jouée même si rien ne jouait avant), même musique que le focus plus
   bas, silence, ou n'importe quelle playlist / radio cochée. En pause, le lecteur affiche la
@@ -300,7 +289,6 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 | `js/app.js` | minuteur, cadran, couleurs, respiration, messages, coach, lecteur, Paramètres, migrations |
 | `js/audio.js` | radio / playlists, musique de pause générée, bruits générés, dings, tic-tac |
 | `js/sync.js` | sauvegarde / reprise sur Google Drive (à la main) |
-| `js/youtube.js` | lecteur YouTube intégré (« Mes liens »), qui imite l'élément `<audio>` |
 | `js/defaults.js` | valeurs par défaut, radios, playlists, respirations, messages |
 | `sw.js` | hors ligne |
 | `music/` | 16 MP3 CC0 (voir `CREDITS.md`) |
