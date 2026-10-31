@@ -119,8 +119,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   collée à gauche** (le cadran, dans son style, qui prend la hauteur restant vraiment entre la
   barre du haut et le lecteur, sans jamais faire déborder le bas), à droite une **barre du temps** qui avance vers la droite (trait blanc de la couleur
   du cadran, point lumineux en tête, minutes restantes au bout ; vide au repos), sous elle le
-  message et les boutons du moment ; le **lecteur sur une seule ligne** en bas (la ligne
-  « ce qui joue » dessous) ; barre du haut plus fine. Le bloc de droite (`#side`) ne change
+  message et les boutons du moment ; le **lecteur sur une seule ligne** en bas, la musique
+  élargie vers la gauche pour lire son nom en entier (la ligne « ce qui joue » dessous) ; barre du haut plus fine. Le bloc de droite (`#side`) ne change
   rien en portrait ni sur PC. Sobre : pas d'effet de plus.
   **Vue « Rythme · Onde horizontale »** (31/10, d'après une image de l'utilisateur) : des
   barres néon symétriques partent du bord de l'horloge vers la droite, des basses (cyan) aux
@@ -130,6 +130,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   que l'écran est plus large que haut (PC compris), et demande à Android de rester couché
   (`screen.orientation.lock`, accepté seulement pour l'appli installée ou en plein écran ;
   libéré en changeant de vue). En portrait, l'onde passe sous l'horloge.
+- **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
+  coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport
+  `maximum-scale=1, user-scalable=no` et `touch-action: manipulation`.
 - Info discrète en bas : « moment · phase · cycle » (ex. « Matinée · focus · 2/4 »).
 
 ## 3. Minuteur

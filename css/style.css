@@ -14,7 +14,7 @@
 
 html, body { height: 100%; margin: 0; }
 
-html { background: var(--bg); transition: background-color 2s ease; }
+html { background: var(--bg); transition: background-color 2s ease; touch-action: manipulation; } /* pas de zoom au double toucher */
 
 body {
   min-height: 100dvh;
@@ -507,8 +507,11 @@ body.land #timebar { display: flex; align-items: center; gap: 14px; width: 100%;
 #timebar .left { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; opacity: 0.7; min-width: 4.2em; text-align: right; }
 body.phase-idle #timebar .head { opacity: 0; }
 body.land footer { gap: 2px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-body.land #player { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; gap: 2px 28px; }
+body.land #player { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; gap: 2px 28px; }
 body.land #player .group { display: flex; width: auto; max-width: none; gap: 8px; }
+/* La musique prend toute la place qui reste, vers la gauche : son nom se lit en entier. */
+body.land #player .group:first-child { flex: 1 1 0; min-width: 0; }
+body.land #player .group:first-child select { flex: 1 1 0; min-width: 0; max-width: none; }
 body.land #player button.round { width: 42px; height: 42px; }
 body.land #player select { min-height: 40px; width: auto; max-width: 13em; }
 body.land #player input[type="range"] { width: 90px; height: 24px; zoom: 1.2; }
