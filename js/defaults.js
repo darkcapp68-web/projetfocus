@@ -121,7 +121,7 @@ export const MESSAGE_POOLS = [
 ];
 
 export const DEFAULTS = {
-  version: 10,
+  version: 11,
 
   // Temps
   focusMin: 25,
@@ -165,8 +165,10 @@ export const DEFAULTS = {
   pulseOn: true,
   breathPattern: 'coherence', // voir BREATHS
   breathLabels: true, // « inspire / retiens / expire » sous le temps
-  breathGrow: true, // le mot grandit à l'inspiration et rétrécit à l'expiration
-  breathColors: true, // une teinte par étape (sauf simple pulsation)
+  // Ce qui montre la respiration (sauf simple pulsation) : 'word' (le mot grandit et rétrécit,
+  // l'écran ne bouge pas), 'colors' (une teinte par étape, le mot garde sa taille), 'both' ou
+  // 'veil' (voile sombre, sans couleurs).
+  breathShow: 'word',
   breathInspireColor: '#8fd3ff', // bleu ciel
   breathHoldColor: '#ffd36e', // doré
   breathExpireColor: '#000000', // assombrit

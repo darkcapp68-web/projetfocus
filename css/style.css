@@ -75,6 +75,8 @@ html body:not(.ui) .ctl { opacity: 0; }
   transform-origin: 50% 0;
 }
 #breath.on { opacity: 0.75; }
+/* Quand seul le mot montre la respiration, il est bien lisible. */
+body.breath-word #breath.on { opacity: 1; }
 
 /* ---------- Haut ---------- */
 #topbar {

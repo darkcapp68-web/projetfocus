@@ -161,16 +161,15 @@
       <label>Respiration guidée (l'écran respire)<input type="checkbox" data-k="pulseOn"></label>
       <label data-if="pulseOn">Rythme<select data-k="breathPattern" id="sel-breath"></select></label>
       <label data-if="pulseOn breathPattern=simple">Une respiration toutes les (s)<span class="rng"><input type="range" min="1" max="12" step="0.5" data-k="pulseSeconds"><output></output></span></label>
-      <label data-if="pulseOn breathLabels breathPattern!=simple">Le mot grandit à l'inspiration, rétrécit à l'expiration<input type="checkbox" data-k="breathGrow"></label>
-      <label data-if="pulseOn">Une couleur par étape<input type="checkbox" data-k="breathColors"></label>
-      <label data-if="pulseOn breathColors">… couleur de l'inspiration<input type="color" data-k="breathInspireColor"></label>
-      <label data-if="pulseOn breathColors">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
-      <label data-if="pulseOn breathColors">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
+      <label data-if="pulseOn breathPattern!=simple">La respiration se voit par<select data-k="breathShow"><option value="word">le mot (il grandit, l'écran ne bouge pas)</option><option value="colors">les couleurs (le mot garde sa taille)</option><option value="both">le mot et les couleurs</option><option value="veil">un voile sombre (sans couleurs)</option></select></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de l'inspiration<input type="color" data-k="breathInspireColor"></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
       <label>Coach<select data-k="coachMode"><option value="one">Une action à la fois</option><option value="none">Aucune action</option></select></label>
       <details class="more">
         <summary>Réglages avancés <small>consignes, plein écran, notification, coach</small></summary>
-        <label data-if="pulseOn breathPattern!=simple">Afficher « inspire / expire »<input type="checkbox" data-k="breathLabels"></label>
-        <label data-if="pulseOn !breathColors">Assombrissement sans couleurs (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
+        <label data-if="pulseOn breathPattern!=simple breathShow!=word">Afficher « inspire / expire »<input type="checkbox" data-k="breathLabels"></label>
+        <label data-if="pulseOn breathShow=veil|breathPattern=simple">Assombrissement sans couleurs (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
         <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
         <label>Maintenir pour reprendre (secondes)<input type="number" min="1" max="10" data-k="holdSeconds"></label>
         <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>

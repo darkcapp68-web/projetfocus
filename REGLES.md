@@ -115,14 +115,19 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 - **Respiration guidée** (l'écran « respire »), par défaut **cohérence cardiaque 5 s / 5 s**
   (6 respirations par minute ; une pause de 5 min = une séance « 365 »). Autres rythmes :
   apaisante 4/6, carrée 4-4-4-4, 4-7-8, ou simple pulsation (sans consignes).
-  Avec « une couleur par étape » (par défaut), l'écran prend **exactement les couleurs
+  **La respiration se voit par** (réglage, 31/10, demande de l'utilisateur : soit les
+  couleurs avec un mot de taille fixe, soit un mot qui exprime vraiment le mouvement sur un
+  écran immobile) : « **le mot** » (par défaut : le mot grandit jusqu'à 3 fois et rétrécit,
+  bien lisible, toujours affiché ; l'écran ne bouge pas), « les couleurs » (le mot garde sa
+  taille), « le mot et les couleurs » (l'ancien comportement, mot jusqu'à 2,4 fois) ou « un
+  voile sombre ». Avec les couleurs, l'écran prend **exactement les couleurs
   choisies** dans Paramètres → Pause (pas un voile mélangé à la couleur de pause) : inspire →
   **bleu ciel**, retiens → **doré** puis ne bouge plus, expire → **noir**. La première
   inspiration part de la couleur de pause. Sur une teinte claire, texte et cadran passent en
   sombre (à mi-chemin de l'étape). « inspire / retiens / expire » écrit sous le temps
-  (réglable) ; **le mot grandit pendant l'inspiration** (jusqu'à 2,4 fois, sur toute la durée
-  de l'étape), **rétrécit pendant l'expiration** et garde sa taille quand on retient (30/10,
-  demande de l'utilisateur ; réglage « Le mot grandit… », coché par défaut). Sans couleurs : voile sombre dont l'intensité est réglable. Le rythme choisi
+  (réglable) ; quand le mot bouge, **il grandit pendant l'inspiration** (sur toute la durée
+  de l'étape), **rétrécit pendant l'expiration** et garde sa taille quand on retient.
+  Voile sombre : son intensité est réglable. Le rythme choisi
   s'affiche sous le temps (« pause · cohérence cardiaque »).
   La respiration s'arrête quand la pause est finie.
 - **Une action du coach** à la fois (liste modifiable), deux autres proposées au toucher.
@@ -196,13 +201,13 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   chaque section ne montre que l'essentiel (30 réglages visibles au lieu de 65), le reste est
   replié dans « **Réglages avancés** » ; et **un réglage n'apparaît que s'il sert**
   (attribut `data-if` dans `index.html`, lu par `showRelevant()` : « Forme » seulement en
-  mode Rythme, « Fondu lent » seulement en Normal, couleurs de respiration seulement avec
-  « une couleur par étape », couleur fixe seulement sans dégradé…). Aucun réglage n'a été
+  mode Rythme, « Fondu lent » seulement en Normal, couleurs de respiration seulement quand
+  les couleurs montrent la respiration, couleur fixe seulement sans dégradé…). Aucun réglage n'a été
   supprimé.
 - Tout est enregistré sur l'appareil (localStorage, clé `projetfocus.settings`), avec un
   numéro de **version** : chaque changement de comportement par défaut passe par une
   **migration** dans `sanitize()` (`js/app.js`) pour s'appliquer aussi aux réglages déjà
-  enregistrés (version actuelle : 10).
+  enregistrés (version actuelle : 11).
 - « Revenir aux valeurs par défaut » (garde l'ID client Google), export / import JSON.
 - **Sauvegarde Google Drive, à la main** (décision de l'utilisateur : rester simple, après
   des conflits avec la synchronisation automatique, abandonnée) : deux boutons dans

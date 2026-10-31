@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 17h44';
+const APP_VERSION = '31/10/2026 · 17h52';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -67,6 +67,9 @@ function sanitize(s) {
   if (s.version < 9) { if (s.controlsDelay === 4) s.controlsDelay = 10; s.version = 9; }
   // Version 10 : les styles « liquide » et « orbites » deviennent le mode « rêveur ».
   if (s.version < 10) { if (s.dialStyle !== 'standard') s.dialStyle = 'reveur'; s.version = 10; }
+  // Version 11 : la respiration se voit par le mot qui grandit, l'écran ne bouge plus
+  // (au choix : les couleurs, les deux, ou un voile sombre).
+  if (s.version < 11) { s.breathShow = 'word'; s.version = 11; }
   return s;
 }
 
@@ -910,7 +913,8 @@ function breathStep(k) {
   const steps = breathSteps();
   const [kind, sec] = steps[k % steps.length];
   const dark = S.pulseIntensity / 100;
-  if (kind && S.breathColors) {
+  const show = S.breathShow, colors = show === 'colors' || show === 'both', grow = show === 'word' || show === 'both';
+  if (kind && colors) {
     // Une teinte par étape : inspire, retiens, expire.
     const color = kind === 'inspire' ? S.breathInspireColor : kind === 'retiens' ? S.breathHoldColor : S.breathExpireColor;
     const glide = kind === 'retiens' ? Math.min(1.5, sec) : sec;
@@ -918,16 +922,18 @@ function breathStep(k) {
     // Le texte change de teinte à mi-chemin, quand le fond a assez changé.
     clearTimeout(inkTimer);
     inkTimer = setTimeout(() => breathInk(color), glide * 500);
+  } else if (kind && show === 'word') {
+    // Seul le mot montre la respiration : l'écran ne bouge pas.
   } else if (kind === 'inspire' || (!kind && k % 2 === 0)) setPulse(0, sec);
   else if (kind === 'expire' || !kind) setPulse(dark, sec);
   breathEl.textContent = kind;
-  breathEl.classList.toggle('on', !!kind && S.breathLabels);
+  breathEl.classList.toggle('on', !!kind && (S.breathLabels || show === 'word'));
   // Le mot grandit pendant toute l'inspiration, rétrécit pendant l'expiration, et garde sa
-  // taille quand on retient.
-  if (S.breathGrow && (kind === 'inspire' || kind === 'expire')) {
+  // taille quand on retient (plus grand quand il est seul à montrer le mouvement).
+  if (grow && (kind === 'inspire' || kind === 'expire')) {
     breathEl.style.transitionDuration = `0.8s, ${sec}s`;
-    breathEl.style.transform = kind === 'inspire' ? 'scale(2.4)' : 'scale(1)';
-  } else if (!S.breathGrow) breathEl.style.transform = '';
+    breathEl.style.transform = kind === 'inspire' ? `scale(${show === 'word' ? 3 : 2.4})` : 'scale(1)';
+  } else if (!grow) breathEl.style.transform = '';
   breathTimer = setTimeout(() => breathStep(k + 1), sec * 1000);
 }
 
@@ -935,7 +941,10 @@ function breathStart() {
   breathOn = true;
   // On part « poumons vides » : écran sombre ; en couleurs, la première inspiration
   // glisse de la couleur de pause vers la teinte d'inspiration.
-  if (S.breathColors) setPulse(0, 0, S.breathInspireColor);
+  const word = S.breathShow === 'word' && breathSteps()[0][0];
+  body.classList.toggle('breath-word', !!word);
+  if (S.breathShow === 'colors' || S.breathShow === 'both') setPulse(0, 0, S.breathInspireColor);
+  else if (word) setPulse(0, 0);
   else setPulse(S.pulseIntensity / 100, 0);
   void pulseEl.offsetWidth; // pose ce départ tout de suite, sans transition
   breathTimer = setTimeout(() => breathStep(0), 50); // laisse l'écran sombre s'afficher d'abord
@@ -948,6 +957,7 @@ function breathStop() {
   clearTimeout(inkTimer);
   breathInk(null);
   breathEl.classList.remove('on');
+  body.classList.remove('breath-word');
   breathEl.style.transitionDuration = '';
   breathEl.style.transform = '';
 }

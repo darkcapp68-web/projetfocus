@@ -1,4 +1,4 @@
-# projetfocus — point de chantier (30/10/2026)
+# projetfocus — point de chantier (31/10/2026)
 
 Toutes les règles de fonctionnement et les décisions sont dans **REGLES.md** (à lire en
 premier pour reprendre le travail).
@@ -18,8 +18,9 @@ premier pour reprendre le travail).
 - Pause : couleur au hasard, respiration guidée (cohérence cardiaque 5/5 par défaut ;
   apaisante, carrée, 4-7-8) avec une teinte par étape, une action du coach, maintenir pour reprendre,
   bouton Arrêter, compte à rebours en tic-tac dans les 10 dernières secondes, 3 dings,
-  reprise automatique du focus après 5 s. Le mot « inspire » grandit pendant l'inspiration
-  et rétrécit à l'expiration (30/10).
+  reprise automatique du focus après 5 s. Réglage « La respiration se voit par » (31/10) :
+  le mot qui grandit et rétrécit sur un écran immobile (par défaut), les couleurs avec un
+  mot de taille fixe, les deux, ou un voile sombre.
 - Messages bienveillants (40), coach, notifications, plein écran (désactivé par défaut).
 - Son : lecteur avec menu groupé, playlists CC0 embarquées (lofi, ambient) gardées hors
   ligne, radios testées (Technolovers Minimal, France Musique Opéra / Classique Plus /
@@ -61,7 +62,7 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
    - **couleurs de la cohérence cardiaque : à revoir** (30/10, l'utilisateur les trouve à
      retravailler ; aujourd'hui bleu ciel à l'inspiration, noir à l'expiration) : lui demander
      ce qui ne va pas avant de changer quoi que ce soit ;
-   - mot qui grandit à l'inspiration, Brisure (fluidité, vitesse, tracé noir) : à juger sur le téléphone ;
+   - respiration par le mot seul (nouveau défaut, 31/10) ou par les couleurs, Brisure (fluidité, vitesse, tracé noir) : à juger sur le téléphone ;
    - tic-tac du compte à rebours, sons de pluie / orage / vent / neige / café, musique
      douce de pause : trop fort ? pas assez naturel ?
    - radios classiques : lesquelles garder ;
