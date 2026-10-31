@@ -80,6 +80,11 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
 
 ## Idées en réserve
 
+- **Playlist « Mes musiques » reliée au Drive** (31/10, à faire quand l'utilisateur aura ses
+  MP3, achetés : Bandcamp, Qobuz, iTunes, ou ses CD) : dossier « projetfocus-musique » dans
+  son Drive, « Ajouter mes MP3 » (envoyés par l'appli, portée `drive.file`) ou « Choisir dans
+  mon Drive » (sélecteur Google), « Récupérer mes musiques » à la main sur chaque appareil
+  (gardés hors ligne), aléatoire ou dans l'ordre, boucle. Jamais de MP3 dans le dépôt public.
 
 - **Cadres du mode Rêveur** : le cadre en engrenages est intégré (29/10). D'autres images
   de cadre (méditation, anneau) ont été essayées dans `perso/cadres.html` (dossier `perso/`
