@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 18h37';
+const APP_VERSION = '31/10/2026 · 18h38';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -35,7 +35,6 @@ function sanitize(s) {
     (p) => p && typeof p.name === 'string' && /^\d\d:\d\d$/.test(p.hour) && /^#[0-9a-f]{6}$/i.test(p.color));
   if (!okDay) s.dayColors = clone(DEFAULTS.dayColors);
   s.coachActions = s.coachActions.filter((x) => typeof x === 'string' && x.trim());
-  s.customLinks = s.customLinks.filter((x) => typeof x === 'string' && x.trim());
   s.hiddenStations = s.hiddenStations.filter((x) => typeof x === 'string');
   for (const k of Object.keys(s.messages)) s.messages[k] = s.messages[k].filter((x) => typeof x === 'string' && x.trim());
   // Version 2 : la pause enchaîne toute seule sur le focus (3 « ding », puis 5 s).
@@ -56,7 +55,7 @@ function sanitize(s) {
   }
   // Version 7 : on ne garde que Technolovers Minimal et le classique (le reste est décoché).
   if (s.version < 7) {
-    s.hiddenStations = [...STATIONS.map((st) => st.id), ...s.customLinks.map((_, i) => 'perso' + i)]
+    s.hiddenStations = STATIONS.map((st) => st.id)
       .filter((id) => !SHOWN_STATIONS.includes(id));
     s.defaultRadio = 'tlminimal';
     s.version = 7;
@@ -1019,16 +1018,12 @@ const chime = () => audio.chime(S.chime, S.chimeVol / 100);
 const selStation = $('#sel-station'), selNoise = $('#sel-noise');
 const volMusic = $('#vol-music'), volNoise = $('#vol-noise');
 
+// Les radios s'ajoutent dans js/defaults.js (testées avant : lecture depuis un autre site, pub).
 function allStations() {
-  const own = S.customLinks.map((line, i) => {
-    const [name, url] = line.includes('|') ? line.split('|').map((x) => x.trim()) : ['Lien ' + (i + 1), line.trim()];
-    return { id: 'perso' + i, group: 'Mes liens', name: name || 'Lien ' + (i + 1), url, desc: 'perso' };
-  }).filter((s) => /^https?:\/\//i.test(s.url) && isStreamable(s.url)); // flux audio seulement (pas YouTube, Spotify…)
-  return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: PLAYLISTS[s.id].tracks } : s)), ...own];
+  return STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: PLAYLISTS[s.id].tracks } : s));
 }
 
-const isStreamable = (url) => !/youtube\.com|youtu\.be|spotify\.com|deezer\.com|soundcloud\.com|music\.apple\.com|somafm\.com\/[a-z]/i.test(url);
-const kindOf = (st) => st.kind || (isStreamable(st.url) ? 'stream' : 'link');
+const kindOf = (st) => st.kind;
 
 function fillSelect(sel, items, value, none) {
   sel.innerHTML = '';
@@ -1646,7 +1641,6 @@ function onField(el, committed) {
   if (committed && el.type === 'number') el.value = v;
   saveSettings();
   showRelevant();
-  if (el.dataset.k === 'customLinks') fillStationSelects();
   if (el.dataset.k === 'notifyOn' && v) askNotifyPermission();
   if (el.dataset.k === 'breakMusic' && onBreak()) pauseAudio();
   applySettings();

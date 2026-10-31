@@ -267,7 +267,6 @@ export const DEFAULTS = {
   defaultRadio: 'tlminimal',
   defaultNoise: 'none',
   autoStartAudio: true,
-  customLinks: [], // une ligne par lien : « Nom | https://… »
   // Musiques décochées dans Paramètres : absentes du menu du lecteur.
   // Les radios laut.fm passent de la publicité : décochées au départ.
   // Seules Technolovers Minimal et les radios classiques sont cochées au départ.

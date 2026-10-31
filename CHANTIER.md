@@ -95,7 +95,7 @@ signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json
 
 - YouTube joué dans l'appli : essayé puis **retiré** le 31/10 (décision de l'utilisateur : ne
   marchait pas chez lui ; les Mix YouTube sont refaits à chaque ouverture hors de YouTube, et
-  YouTube refuse de jouer depuis `localhost`). Les liens YouTube, Spotify… sont ignorés ;
+  YouTube refuse de jouer depuis `localhost`). « Mes liens » est retiré aussi (une radio s'ajoute avec Claude) ;
   on reste sur les radios.
 
 - Chrome bloque le son sans geste : après un rechargement, rien ne joue avant Démarrer
