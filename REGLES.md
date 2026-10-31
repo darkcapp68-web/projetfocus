@@ -33,7 +33,14 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   affichée en bas, un toucher arrête).
 - **Cadran** façon minuteur de cuisine : arc blanc de 5 px sur cercle translucide de 5 px, point
   en tête, graduations seulement pendant le réglage. On le tourne pour régler 1 à 60 min ;
-  l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Apparence) :
+  l'arc se vide dans le sens des aiguilles d'une montre. **Style du cadran** (Paramètres → Apparence,
+  et aussi le menu **« Affichage »** en haut à gauche de l'écran principal, 31/10, demande de
+  l'utilisateur : style et forme du mode Rythme dans une seule liste, « Rythme · Jauge
+  arc-en-ciel »…, en dragée comme le lecteur, visible avec les autres contrôles même pendant
+  le focus ; sur le téléphone, menu et « Paramètres » en première ligne, préréglages et
+  cycles en seconde ; **cases à cocher** dans Apparence → « Affichages du menu » pour n'y
+  garder que quelques affichages, tous cochés par défaut, l'affichage en cours y reste
+  toujours ; réglage `hiddenLooks`) :
   « **Normal** » (par défaut, l'arc et les chiffres ; pendant le focus, **fondu lent** : le
   cadran s'efface presque (12 %) puis revient, 16 s aller-retour, et redevient entièrement
   visible dès que les contrôles s'affichent ; réglable) ou « **Rêveur** » : le cadran est posé
@@ -56,6 +63,13 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   barres, onde, **goutte** (par défaut), sonar ou étincelles, toutes en **néon** (cœur clair
   et halo, magenta → violet → bleu → cyan : selon la fréquence pour les barres, autour du
   cercle pour l'onde et la goutte, avec l'âge pour le sonar, au hasard pour les étincelles).
+  Deux formes **arc-en-ciel de puissance** (31/10, idée de l'utilisateur) : 7 anneaux
+  concentriques, des basses (rouge, dedans) aux aigus (violet, dehors), chacun selon la
+  puissance de sa bande (sensibilité propre à chaque anneau) ; sur chaque temps fort, une
+  vague les traverse du centre vers l'extérieur (au rythme du BPM). « **Anneaux** » : les
+  cercles entiers s'allument et s'épaississent ; « **Jauge arc-en-ciel** » : chaque anneau
+  part du bas et remonte des deux côtés selon la puissance (le tour complet quand ça cogne),
+  puis redescend doucement comme un vumètre.
   Le **temps** aussi est en néon (cœur blanc, halo magenta → violet → cyan) et s'illumine sur
   chaque temps fort. L'analyse (`audio.analyser`,
   `enableAnalysis()` dans `js/audio.js`) fait passer la musique par le moteur audio, en mode

@@ -89,7 +89,18 @@ body.breath-word #breath.on { opacity: 1; }
   padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   min-height: 56px;
 }
+#top-left { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
 #quick { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+#sel-look { font-size: 13px; min-height: 36px; max-width: 15em; }
+/* Téléphone : menu « Affichage » et « Paramètres » sur la première ligne, préréglages et
+   cycles sur la seconde. */
+@media (max-width: 680px) {
+  #topbar { flex-wrap: wrap; row-gap: 8px; }
+  #top-left { display: contents; }
+  #sel-look { order: 1; max-width: calc(100% - 7.5em); }
+  #btn-settings { order: 2; }
+  #quick { order: 3; flex-basis: 100%; }
+}
 #quick > button { font-size: 13px; padding: 0.35em 0.9em; }
 .cycles { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; margin-left: 4px; }
 .cycles .round { width: 1.9em; height: 1.9em; }
@@ -238,6 +249,14 @@ body:not(.phase-idle) #setup { display: none; }
   text-wrap: balance;
 }
 #message.coach { font-size: 19px; opacity: 0.95; }
+/* Mode Rythme : les anneaux débordent sous le cadran ; le message passe devant, sur une
+   pastille de la couleur du fond, pour se détacher. */
+body.dial-rythme #message:not(:empty) {
+  position: relative;
+  padding: 0.35em 0.9em;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+}
 
 /* Respiration sur une teinte claire : texte sombre, plus opaque, cadran plus marqué
    (la graisse de la police reste la même partout). */
@@ -321,8 +340,9 @@ footer {
    (un retour à la ligne « flex » ne se faisait pas quand le menu était court). */
 #player .group { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; gap: 4px 10px; width: 300px; }
 #player select { max-width: 14em; }
-/* Menus du lecteur en « dragée » pleine : capsule au fond translucide, flèche dessinée. */
-#player select {
+/* Menus du lecteur (et de l'affichage) en « dragée » pleine : capsule au fond translucide,
+   flèche dessinée. */
+#player select, #sel-look {
   -webkit-appearance: none;
   appearance: none;
   border: 0;
@@ -333,8 +353,8 @@ footer {
   transition: background-color 0.3s;
   text-overflow: ellipsis;
 }
-#player select:hover { background-color: rgba(255, 255, 255, 0.22); }
-body.ink-dark #player select {
+#player select:hover, #sel-look:hover { background-color: rgba(255, 255, 255, 0.22); }
+body.ink-dark #player select, body.ink-dark #sel-look {
   background-color: rgba(0, 0, 0, 0.12);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }

@@ -9,8 +9,12 @@ premier pour reprendre le travail).
 - Un seul écran : fond qui suit l'heure en dégradé continu (OKLab), cadran à tourner,
   temps au centre, contrôles qui apparaissent au toucher. Démo « journée en accéléré ».
 - Focus / pause / cycles / pause longue, préréglages 25/5 et 50/10.
+- Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
+  choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
+  n'y garder que ceux qu'on aime.
 - 3 styles de cadran (Apparence) : Normal (fondu lent), Rêveur (engrenages, atome, vague),
-  Rythme (réagit à la musique). **Brisure mise de côté le 31/10** (retirée du choix, code
+  Rythme (réagit à la musique ; formes « Anneaux » et « Jauge arc-en-ciel » ajoutées le
+  31/10, à juger). **Brisure mise de côté le 31/10** (retirée du choix, code
   gardé pour plus tard ; ce qu'elle faisait, 30/10 : un éclair ou une fissure se ramifie et
   pousse en continu depuis le centre, rebondit sur les bords, vitesse réglable, s'efface en
   pause ; version 1 retenue après des essais saccadés ; fluidité sur téléphone à confirmer ;

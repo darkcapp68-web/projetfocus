@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 19h33';
+const APP_VERSION = '31/10/2026 · 20h05';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -36,6 +36,7 @@ function sanitize(s) {
   if (!okDay) s.dayColors = clone(DEFAULTS.dayColors);
   s.coachActions = s.coachActions.filter((x) => typeof x === 'string' && x.trim());
   s.hiddenStations = s.hiddenStations.filter((x) => typeof x === 'string');
+  s.hiddenLooks = s.hiddenLooks.filter((x) => typeof x === 'string');
   for (const k of Object.keys(s.messages)) s.messages[k] = s.messages[k].filter((x) => typeof x === 'string' && x.trim());
   // Version 2 : la pause enchaîne toute seule sur le focus (3 « ding », puis 5 s).
   if (s.version < 2) { s.autoChain = true; s.version = 2; }
@@ -785,6 +786,41 @@ function rhythmFrame(t) {
       const hue = 300 - age * 110; // naît magenta, finit cyan
       neon(ctx, u * (1 - age * 0.6), () => { ctx.beginPath(); ctx.arc(C, C, R + (4 + age * 75) * u, 0, 2 * Math.PI); },
         (light) => `hsl(${hue} 100% ${light}%)`, (1 - age) * 0.8);
+    }
+  } else if (form === 'anneaux' || form === 'jauge') {
+    // Arc-en-ciel de puissance : 7 anneaux, des basses (rouge, dedans) aux aigus (violet,
+    // dehors), chacun allumé selon la puissance de sa bande ; sur chaque temps fort, une vague
+    // traverse les anneaux du centre vers l'extérieur (ils battent au rythme du BPM).
+    const edges = [1, 3, 6, 12, 24, 48, 96, 190], hues = [0, 28, 52, 120, 190, 228, 275];
+    if (beat) rhythm.rings.push(t);
+    rhythm.rings = rhythm.rings.filter((r0) => t - r0 < 700);
+    rhythm.ringMax ||= new Array(7).fill(0.2);
+    for (let i = 0; i < 7; i++) {
+      // Chaque anneau a sa propre sensibilité (son maximum récent) : les aigus, plus faibles,
+      // s'allument aussi.
+      const raw = band(edges[i], edges[i + 1]);
+      rhythm.ringMax[i] = Math.max(raw, rhythm.ringMax[i] * 0.997, 0.08);
+      const v = raw / rhythm.ringMax[i];
+      let wave = 0;
+      for (const r0 of rhythm.rings) {
+        const age = (t - r0) / 700, at = age * 8 - 0.5; // l'anneau que la vague traverse
+        wave = Math.max(wave, Math.max(0, 1 - Math.abs(i - at)) * (1 - age));
+      }
+      const power = Math.min(1, v * v * 1.2 + wave * 0.7);
+      const r = R + (9 + i * 10) * u, paint = (light) => `hsl(${hues[i]} 100% ${light}%)`;
+      if (form === 'anneaux') {
+        neon(ctx, u * (0.45 + power * 0.9), () => { ctx.beginPath(); ctx.arc(C, C, r, 0, 2 * Math.PI); }, paint, 0.12 + power * 0.88);
+        continue;
+      }
+      // Jauge : l'anneau part du bas et remonte des deux côtés selon la puissance (le tour
+      // complet quand ça cogne), puis redescend doucement, comme un vumètre. Un trait discret
+      // montre l'anneau entier.
+      rhythm.ringLvl ||= new Array(7).fill(0);
+      const lvl = rhythm.ringLvl[i] = Math.max(power, rhythm.ringLvl[i] - 0.025);
+      ctx.globalAlpha = 0.08; ctx.lineWidth = u; ctx.strokeStyle = paint(70);
+      ctx.beginPath(); ctx.arc(C, C, r, 0, 2 * Math.PI); ctx.stroke();
+      const span = Math.max(0.02, lvl) * Math.PI;
+      neon(ctx, u * (0.7 + lvl * 0.6), () => { ctx.beginPath(); ctx.arc(C, C, r, Math.PI / 2 - span, Math.PI / 2 + span); }, paint, 0.35 + lvl * 0.65);
     }
   } else if (form === 'etincelles') {
     if (beat) {
@@ -1897,7 +1933,39 @@ function fmt(sec) {
 
 function setText(el, t) { if (el.textContent !== t) el.textContent = t; }
 
+// Menu « Affichage » en haut à gauche : style du cadran et forme du mode Rythme en une liste
+// (les formes sont reprises du menu des Paramètres). Seuls les affichages cochés dans
+// Paramètres → Apparence → Affichages du menu y figurent, plus celui en cours.
+const selLook = $('#sel-look');
+const LOOKS = [
+  { id: 'standard', name: 'Normal' },
+  { id: 'reveur', name: 'Rêveur' },
+  ...[...$('[data-k="rhythmForm"]').options].map((o) => ({ id: 'rythme:' + o.value, name: 'Rythme · ' + o.text.replace(/ \(.*\)$/, ''), group: 'Rythme (réagit à la musique)' })),
+];
+const currentLook = () => (S.dialStyle === 'rythme' ? 'rythme:' + S.rhythmForm : S.dialStyle);
+function fillLook() {
+  const cur = currentLook();
+  fillSelect(selLook, LOOKS.filter((l) => l.id === cur || !S.hiddenLooks.includes(l.id)), cur);
+  $('#look-picks').innerHTML = LOOKS.map((l) =>
+    `<label class="pick">${l.name}<input type="checkbox" data-look="${l.id}"${S.hiddenLooks.includes(l.id) ? '' : ' checked'}></label>`).join('');
+}
+$('#look-picks').addEventListener('change', (e) => {
+  const id = e.target.dataset.look;
+  if (!id) return;
+  S.hiddenLooks = S.hiddenLooks.filter((x) => x !== id);
+  if (!e.target.checked) S.hiddenLooks.push(id);
+  saveSettings();
+  fillLook();
+});
+selLook.addEventListener('change', () => {
+  const [style, form] = selLook.value.split(':');
+  S.dialStyle = style;
+  if (form) S.rhythmForm = form;
+  saveSettings(); syncForm(); applySettings();
+});
+
 function applySettings() {
+  fillLook();
   const st = document.documentElement.style;
   st.setProperty('--fg', S.textColor);
   st.setProperty('--dial', S.dialColor);

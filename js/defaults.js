@@ -163,7 +163,8 @@ export const DEFAULTS = {
   dialColor: '#ffffff',
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
   dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause), rythme ou brisure (fissure qui se ramifie)
-  rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar ou etincelles
+  rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar, etincelles, anneaux ou jauge
+  hiddenLooks: [], // affichages décochés du menu « Affichage » ('reveur', 'rythme:barres'…)
   crackSpeed: '0.5', // mode brisure : part des branches parcourue à la fin du focus (1, 0.5, 0.3)
   crackLook: 'eclair', // mode brisure : 'eclair' (néon, frappe rapide, flash) ou 'fissure'
   crackWidth: '1', // mode brisure : épaisseur des traits (0.6 fine, 1 normale, 1.8 épaisse, 3 très épaisse)
