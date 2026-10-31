@@ -176,8 +176,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
     (musique par défaut) et les 5 radios classiques.**
   - « Mes liens » (une ligne « Nom | https://… », le nom apparaît dans le menu) : flux audio
     directs, et **vidéos ou playlists YouTube jouées dans l'appli** (31/10, `js/youtube.js`,
-    lecteur officiel de YouTube) : **dans l'ordre et en boucle**, jamais au hasard ; un Mix
-    (`list=RD…`) commence par le morceau du lien ; « suivant » dans le lecteur. Pilotées
+    lecteur officiel de YouTube) : **dans l'ordre et en boucle**, jamais au hasard ;
+    « suivant » dans le lecteur. Un **Mix** (`list=RD…`, fabriqué par YouTube) joue aussi, mais
+    hors de YouTube il est **refait à chaque ouverture** (autres morceaux, sans celui du lien,
+    testé le 31/10) : pour un ordre fixe, une vraie playlist (`list=PL…`, publique ou non
+    répertoriée). Pilotées
     comme une radio : Démarrer, pause, reprise au même morceau et à la seconde près, Arrêter.
     La vidéo reste **visible** dans un coin (200 × 200 px, règle de YouTube) tant qu'elle joue.
     Limites : YouTube refuse de jouer depuis `localhost` / `127.0.0.1` (tester sur le site
