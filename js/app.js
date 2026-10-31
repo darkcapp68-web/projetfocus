@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 18h36';
+const APP_VERSION = '31/10/2026 · 18h37';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1023,7 +1023,7 @@ function allStations() {
   const own = S.customLinks.map((line, i) => {
     const [name, url] = line.includes('|') ? line.split('|').map((x) => x.trim()) : ['Lien ' + (i + 1), line.trim()];
     return { id: 'perso' + i, group: 'Mes liens', name: name || 'Lien ' + (i + 1), url, desc: 'perso' };
-  }).filter((s) => /^https?:\/\//i.test(s.url));
+  }).filter((s) => /^https?:\/\//i.test(s.url) && isStreamable(s.url)); // flux audio seulement (pas YouTube, Spotify…)
   return [...STATIONS.map((s) => (s.kind === 'tracks' ? { ...s, tracks: PLAYLISTS[s.id].tracks } : s)), ...own];
 }
 

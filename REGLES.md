@@ -174,8 +174,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   - **Cases à cocher par musique** (Paramètres → Musiques et sons → Musiques du menu) : seules les
     cochées apparaissent dans le lecteur. **Actuellement cochées : Technolovers Minimal
     (musique par défaut) et les 5 radios classiques.**
-  - « Mes liens » : flux audio directs ajoutés par l'utilisateur (YouTube / Spotify →
-    ouverts dans un onglet).
+  - « Mes liens » : **flux audio directs seulement**, ajoutés par l'utilisateur (« Nom |
+    https://… »). Les liens YouTube, Spotify, Deezer… sont ignorés (31/10, décision de
+    l'utilisateur : les ouvrir dans un onglet ne sert à rien, il a l'appli ; YouTube joué dans
+    l'appli a été essayé puis retiré). On reste sur les radios.
 - **Musique de la pause** (choix retenu) : musique douce générée par l'appli (par défaut,
   façon « ascenseur », jouée même si rien ne jouait avant), même musique que le focus plus
   bas, silence, ou n'importe quelle playlist / radio cochée. En pause, le lecteur affiche la
