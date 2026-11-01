@@ -1096,7 +1096,7 @@ function drawHero(t, beat, pulse) {
     if (hero.nextX < wx) hero.nextX = wx + 30;
     while (hero.nextX < wx + LW + 24) heroSpawn();
     if (hero.charge >= HERO_BOSS_AT && !hero.things.some((e) => e.k === 'boss')) {
-      // Jauge pleine : le roi slime arrive par la droite, on lui fait de la place.
+      // Jauge pleine : le boss arrive par la droite, on lui fait de la place.
       const bx = wx + LW + 8, hp = 14 + Math.min(16, hero.bosses * 2);
       hero.things = hero.things.filter((e) => e.x < bx - 30 || e.x > bx + 40 || e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
       const type = HERO_BOSSES[Math.floor(Math.random() * HERO_BOSSES.length)];
