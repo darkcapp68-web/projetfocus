@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h37';
+const APP_VERSION = '01/11/2026 · 13h44';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -983,7 +983,7 @@ function drawHero(t, beat, pulse) {
   ctx.clearRect(0, 0, W, H);
   const rect = (x, y, w, h, c, a = 1) => { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.fillRect(Math.round(x) * px, Math.round(y) * px, w * px, h * px); };
   const batAt = (bx, by, up, dir) => { // chauve-souris, ailes en haut ou en bas
-    const c = '#2a2238', d = up ? -1 : 1;
+    const c = '#7a68a8', d = up ? -1 : 1;
     rect(bx, by, 3, 2, c); rect(bx, by - 1, 1, 1, c); rect(bx + 2, by - 1, 1, 1, c);
     rect(bx + (dir > 0 ? 2 : 0), by, 1, 1, '#ff5470');
     rect(bx - 2, by + d, 2, 1, c); rect(bx - 3, by + 2 * d, 1, 1, c); rect(bx + 3, by + d, 2, 1, c); rect(bx + 5, by + 2 * d, 1, 1, c);
@@ -1029,28 +1029,53 @@ function drawHero(t, beat, pulse) {
   }
   hero.level = lvl;
 
-  // Décor lointain : étoiles, montagnes, collines
-  for (let i = 0, n = gy > 28 ? 34 : 18; i < n; i++) {
+  // Décor lointain : ciel (jour ou nuit), étoiles, montagnes, collines
+  const far = gy > 28; // bande haute : lune et grandes montagnes au loin
+  const ridgeH = (x, par, base, amp, f1, f2) => {
+    const xp = x + wx * par;
+    return Math.round(base + amp * (Math.sin(xp * f1) * 0.6 + Math.sin(xp * f2 + 1.3) * 0.4));
+  };
+  const sc = Math.min(1, gy / 33); // bande basse (pause zoomée) : collines plus basses, le ciel reste visible
+  const FAR = [0.05, Math.round(gy * 0.55), 7, 0.09, 0.21], MID = [0.12, Math.round(15 * sc), 6 * sc, 0.045, 0.11];
+  const skyTop = (x) => gy - Math.max(far ? ridgeH(x, ...FAR) : 0, ridgeH(x, ...MID));
+  // Ciel marqué quelle que soit la couleur du moment (le reste garde la teinte du fond) : jour
+  // et soleil pendant le focus, nuit étoilée et lune pendant la pause.
+  const night = camp;
+  const sky = ctx.createLinearGradient(0, 0, 0, gy * px);
+  if (night) { sky.addColorStop(0, '#070b24'); sky.addColorStop(1, '#2b3170'); }
+  else { sky.addColorStop(0, '#2f6fd0'); sky.addColorStop(1, '#9fd4ff'); }
+  ctx.globalAlpha = 0.94; ctx.fillStyle = sky;
+  for (let x = 0; x < LW; x++) ctx.fillRect(x * px, 0, px, skyTop(x) * px);
+  const ax = LW - (far ? 16 : 11), ay = far ? 5 : 2; // soleil ou lune, en haut à droite
+  if (night) {
+    ctx.globalCompositeOperation = 'lighter';
+    rect(ax + 1, ay, 4, 1, '#fff6d8', 0.7); rect(ax, ay + 1, 6, 4, '#fff6d8', 0.7); rect(ax + 1, ay + 5, 4, 1, '#fff6d8', 0.7);
+    ctx.globalCompositeOperation = 'source-over';
+    rect(ax + 1, ay + 2, 1, 1, '#000', 0.12); rect(ax + 3, ay + 3, 2, 1, '#000', 0.1);
+  } else {
+    const sh = Math.round(Math.sin(t / 900));
+    rect(ax - 2, ay + 2, 1, 2, '#fff3a0', 0.6); rect(ax + 7, ay + 2, 1, 2, '#fff3a0', 0.6);
+    rect(ax + 2, ay - 2 - sh, 2, 1, '#fff3a0', 0.6); rect(ax + 2, ay + 7 + sh, 2, 1, '#fff3a0', 0.6);
+    rect(ax + 1, ay, 4, 1, '#ffd23f'); rect(ax, ay + 1, 6, 4, '#ffd23f'); rect(ax + 1, ay + 5, 4, 1, '#ffd23f');
+    rect(ax + 1, ay + 1, 2, 1, '#fff6b0');
+    for (let i = 0; i < 3; i++) { // nuages qui passent lentement
+      const cx = ((i * 71 - wx * 0.03 - t * 0.0015) % (LW + 30) + LW + 30) % (LW + 30) - 15, cy = 3 + ((i * 7) % Math.max(3, gy - 26));
+      rect(cx, cy, 9, 2, '#ffffff', 0.75); rect(cx + 2, cy - 1, 4, 1, '#ffffff', 0.75); rect(cx + 1, cy + 2, 7, 1, '#e6f1ff', 0.6);
+    }
+  }
+  for (let i = 0, n = night ? (far ? 34 : 18) : 0; i < n; i++) {
     const sx = (Math.imul(i + 1, 2654435761) >>> 0) % LW, sy = 2 + (Math.imul(i + 7, 2246822519) >>> 0) % Math.max(4, gy - 18);
-    rect(sx, sy, 1, 1, '#fff', 0.15 + 0.35 * Math.abs(Math.sin(t / 700 + i * 2.1)));
+    if (sy < skyTop(sx) - 1) rect(sx, sy, 1, 1, '#fff', 0.3 + 0.5 * Math.abs(Math.sin(t / 700 + i * 2.1)));
   }
   const ridge = (par, base, amp, f1, f2, a) => {
     for (let x = 0; x < LW; x++) {
-      const xp = x + wx * par;
-      const h = Math.round(base + amp * (Math.sin(xp * f1) * 0.6 + Math.sin(xp * f2 + 1.3) * 0.4));
+      const h = ridgeH(x, par, base, amp, f1, f2);
       rect(x, gy - h, 1, h, '#000', a);
     }
   };
-  if (gy > 28) { // bande haute (pause en paysage) : lune et grandes montagnes au loin
-    const mx = LW - 16, my = 5;
-    ctx.globalCompositeOperation = 'lighter';
-    rect(mx + 1, my, 4, 1, '#fff6d8', 0.5); rect(mx, my + 1, 6, 4, '#fff6d8', 0.5); rect(mx + 1, my + 5, 4, 1, '#fff6d8', 0.5);
-    ctx.globalCompositeOperation = 'source-over';
-    rect(mx + 1, my + 2, 1, 1, '#000', 0.12); rect(mx + 3, my + 3, 2, 1, '#000', 0.1);
-    ridge(0.05, Math.round(gy * 0.55), 7, 0.09, 0.21, 0.08);
-  }
-  ridge(0.12, 15, 6, 0.045, 0.11, 0.13);
-  ridge(0.35, 8, 4, 0.08, 0.19, 0.2);
+  if (far) ridge(...FAR, 0.08);
+  ridge(...MID, 0.13);
+  ridge(0.35, Math.round(8 * sc), 4 * sc, 0.08, 0.19, 0.2);
   // Sol
   rect(0, gy, LW, LH - gy, '#000', 0.4);
   rect(0, gy, LW, 1, '#fff', 0.4);

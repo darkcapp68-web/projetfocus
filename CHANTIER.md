@@ -23,6 +23,7 @@ premier pour reprendre le travail).
   la pause prend plus de hauteur (ciel, lune, montagnes). Ensuite : message écrit dans le ciel en
   paysage, ruines au hasard en pause, six sortes d'ennemis (dont chauves-souris et fantômes).
   Puis : boutons sous l'horloge en paysage, le héros ne traverse plus le roi slime.
+  Ciel marqué : jour et soleil en focus, nuit étoilée et lune en pause.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

@@ -161,7 +161,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   ils étaient trop bas sur le PC), les idées du coach sous la bande ; le message s'écrit **dans le
   ciel** du décor (en haut à droite, sans pastille) ; la bande est **aussi haute que l'horloge** : en focus les pixels
   gardent leur taille (on voit plus de ciel), en pause 40 pixels de haut au lieu de 20 dès que la
-  bande dépasse 250 px ; lune et grandes montagnes au loin quand le ciel est assez haut ; de temps en temps une **chauve-souris**
+  bande dépasse 250 px ; grandes montagnes au loin quand le ciel est assez haut ; **ciel marqué** quelle que soit la couleur du moment (01/11, le reste garde la teinte du fond) : **jour** bleu avec soleil et nuages pendant le focus, **nuit** étoilée avec lune pendant la pause ; collines abaissées dans la pause zoomée pour garder du ciel ; de temps en temps une **chauve-souris**
   traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
