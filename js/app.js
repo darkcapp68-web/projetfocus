@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h11';
+const APP_VERSION = '01/11/2026 · 17h14';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -934,6 +934,8 @@ const hero = (() => {
   };
 })();
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
+// Gemmes : couleur, reflet, teinte des étincelles
+const HERO_GEMS = [['#ff3b6b', '#ffc2d1', 345], ['#3bd1ff', '#c9f4ff', 195], ['#4fe37a', '#c9ffd6', 140], ['#b57bff', '#e6d1ff', 270]];
 const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190, wolf: 220 };
 const HERO_RUINS = ['wall', 'columns', 'arch', 'tower'];
 // Boss du dehors et boss de la grotte
@@ -1010,7 +1012,9 @@ function heroSpawn() {
   // De temps en temps (toutes les deux ou trois minutes de marche), une grotte à traverser.
   if (!hero.cave && x > 400 && !hero.things.some((e) => e.k === 'boss') && Math.random() < 0.025) hero.cave = { x0: x + 40, x1: x + 180 + Math.random() * 140 };
   const cv = hero.cave, inCave = cv && x > cv.x0 - 16 && x < cv.x1 + 16;
-  if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
+  // Une pièce sur quinze environ est une gemme (vaut 10).
+  const gem = () => (Math.random() < 1 / 15 ? HERO_GEMS[Math.floor(Math.random() * HERO_GEMS.length)] : null);
+  if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', gem: gem(), x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
   else if (r < 0.52) {
     // Dehors, une aventure « normale » ; sous terre, ce qui fait peur.
     const q = Math.random(), k = inCave ? (q < 0.4 ? 'skeleton' : q < 0.75 ? 'bat' : 'ghost')
@@ -1019,7 +1023,7 @@ function heroSpawn() {
   }
   else if (r < 0.58) hero.things.push({ k: 'chest', x });
   else if (r < 0.67 || (inCave && r < 0.75)) hero.things.push({ k: 'rock', x, w: 5 + Math.floor(Math.random() * 3) });
-  else if (inCave) hero.things.push({ k: 'coin', x, y: 3 });
+  else if (inCave) hero.things.push({ k: 'coin', gem: gem(), x, y: 3 });
   else if (r < 0.8) hero.things.push({ k: 'tree', x, v: Math.floor(Math.random() * 3) }); // sapin, chêne ou bouleau
   else if (r < 0.9) hero.things.push({ k: 'bush', x });
   else if (Math.random() < 0.3) hero.things.push({ k: 'deer', x }); // biche qui broute, et s'enfuit
@@ -1231,8 +1235,8 @@ function drawHero(t, beat, pulse) {
     const near = sx - hx;
     if (e.k === 'coin' && !e.dead && near < 5 && near > -4) {
       e.dead = t - 999;
-      heroGain(1, sx, gy - e.y - 4);
-      for (let j = 0; j < 3; j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 48 });
+      heroGain(e.gem ? 10 : 1, sx, gy - e.y - 4);
+      for (let j = 0; j < (e.gem ? 8 : 3); j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: e.gem ? e.gem[2] : 48 });
     } else if (e.foe && !e.dead && ((!struck && near < (heroClass() === 'mage' ? 34 : 24) && near > 0) || (near < 7 && near > -2))) {
       // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
       struck = true;
@@ -1326,6 +1330,11 @@ function drawHero(t, beat, pulse) {
         rect(sx + 9, y0 - 17, 2, 1, '#ff5470');
       }
       rect(sx, gy - 23, 20, 1, '#000', 0.5); rect(sx, gy - 23, Math.max(0, Math.round(20 * e.hp / e.max)), 1, '#ff5470');
+    } else if (e.k === 'coin' && e.gem) { // gemme taillée qui scintille
+      const y = gy - e.y - 5, [c, l] = e.gem, tw = (t / 400 + e.x) % 3 < 0.25;
+      rect(sx, y, 3, 1, c); rect(sx - 1, y + 1, 5, 2, c); rect(sx, y + 3, 3, 1, c); rect(sx + 1, y + 4, 1, 1, c);
+      rect(sx, y + 1, 1, 1, l); rect(sx + 1, y, 1, 1, l, 0.8);
+      if (tw) { rect(sx + 3, y - 2, 1, 3, '#ffffff', 0.9); rect(sx + 2, y - 1, 3, 1, '#ffffff', 0.9); }
     } else if (e.k === 'coin') {
       const y = gy - e.y - 4, w = Math.abs(Math.cos(t / 260 + e.x)) > 0.35 ? 3 : 1;
       rect(sx + (3 - w) / 2, y, w, 4, '#ffd23f');
@@ -1388,14 +1397,19 @@ function drawHero(t, beat, pulse) {
     } else if (e.k === 'chest') {
       rect(sx, gy - 5, 8, 5, '#a8642a'); rect(sx, gy - 3, 8, 1, '#5b3414'); rect(sx + 3, gy - 4, 2, 2, '#ffd23f');
       if (e.open) { rect(sx, gy - 8, 8, 3, '#8a4f1e'); rect(sx + 1, gy - 5, 6, 1, '#ffe27a'); }
-    } else if (e.k === 'tree' && e.v === 1) { // chêne : tronc large, feuillage rond
-      rect(sx + 3, gy - 7, 3, 7, '#6b4423'); rect(sx + 2, gy - 1, 5, 1, '#6b4423');
-      rect(sx + 2, gy - 15, 5, 1, '#3f8f3a'); rect(sx, gy - 14, 9, 2, '#3f8f3a'); rect(sx - 1, gy - 12, 11, 4, '#3f8f3a'); rect(sx, gy - 8, 9, 1, '#3f8f3a');
-      rect(sx + 1, gy - 13, 2, 1, '#7ddc8a', 0.6); rect(sx + 6, gy - 10, 2, 1, '#2a6b2a'); rect(sx + 2, gy - 9, 2, 1, '#2a6b2a');
-    } else if (e.k === 'tree' && e.v === 2) { // bouleau : tronc blanc tacheté, petit feuillage clair
-      rect(sx + 3, gy - 10, 1, 10, '#ece8dc'); rect(sx + 3, gy - 7, 1, 1, '#1a1a2e'); rect(sx + 3, gy - 3, 1, 1, '#1a1a2e');
-      rect(sx + 2, gy - 15, 3, 1, '#a8d64a'); rect(sx + 1, gy - 14, 5, 3, '#a8d64a'); rect(sx + 2, gy - 11, 3, 1, '#a8d64a');
-      rect(sx + 4, gy - 9, 2, 1, '#ece8dc'); rect(sx + 5, gy - 10, 1, 1, '#a8d64a'); rect(sx + 2, gy - 13, 1, 1, '#e6f59a', 0.8);
+    } else if (e.k === 'tree' && e.v === 1) { // chêne : tronc trapu, large feuillage rond
+      const lf = '#3f8f3a', dk = '#2a6b2a', tr = '#6b4423';
+      rect(sx + 6, gy - 8, 3, 8, tr); rect(sx + 5, gy - 1, 5, 1, tr); rect(sx + 4, gy - 9, 2, 1, tr); rect(sx + 9, gy - 9, 2, 1, tr);
+      rect(sx + 3, gy - 17, 9, 1, lf); rect(sx, gy - 16, 15, 2, lf); rect(sx - 2, gy - 14, 19, 3, lf); rect(sx - 1, gy - 11, 17, 1, lf); rect(sx + 1, gy - 10, 13, 1, lf);
+      rect(sx + 1, gy - 15, 3, 1, '#7ddc8a', 0.6); rect(sx + 9, gy - 16, 2, 1, '#7ddc8a', 0.5);
+      rect(sx + 11, gy - 12, 3, 1, dk); rect(sx + 2, gy - 11, 3, 1, dk); rect(sx + 7, gy - 13, 2, 1, dk);
+    } else if (e.k === 'tree' && e.v === 2) { // bouleau : haut tronc blanc tacheté, feuillage clair et étroit
+      const lf = '#a8d64a', wt = '#ece8dc';
+      rect(sx + 3, gy - 20, 1, 20, wt); for (const y of [17, 13, 9, 5, 2]) rect(sx + 3, gy - y, 1, 1, '#1a1a2e');
+      rect(sx + 4, gy - 14, 2, 1, wt); rect(sx + 2, gy - 10, 1, 1, wt);
+      rect(sx + 2, gy - 27, 3, 1, lf); rect(sx + 1, gy - 26, 5, 6, lf); rect(sx + 2, gy - 20, 3, 2, lf);
+      rect(sx + 5, gy - 16, 2, 3, lf); rect(sx, gy - 12, 2, 2, lf);
+      rect(sx + 2, gy - 25, 1, 1, '#e6f59a', 0.8); rect(sx + 4, gy - 22, 1, 1, '#7aa82e');
     } else if (e.k === 'tree') { // sapin
       rect(sx + 3, gy - 6, 2, 6, '#6b4423');
       rect(sx + 3, gy - 15, 2, 2, '#2f8f4e'); rect(sx + 2, gy - 13, 4, 2, '#2f8f4e'); rect(sx + 1, gy - 11, 6, 2, '#2f8f4e'); rect(sx, gy - 9, 8, 3, '#2f8f4e');

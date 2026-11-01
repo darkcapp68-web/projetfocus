@@ -31,6 +31,7 @@ premier pour reprendre le travail).
   (slimes, champignons, gobelins, loups, biche qui s'enfuit, aigle qui plane) ; sous terre ce qui
   fait peur (squelettes, chauves-souris, fantômes, yeux rouges, toiles, obscurité autour du héros).
   Boss : roi slime ou chat dehors, squelette géant ou golem de pierre dans la grotte.
+  Gemmes (une pièce sur quinze, vaut 10) ; bouleaux plus hauts, chênes plus larges.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

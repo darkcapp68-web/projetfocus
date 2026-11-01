@@ -185,7 +185,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   plus claires (01/11 : sans contour, il ne se détachait pas du fond). **Boss selon l'endroit**
   (`HERO_BOSSES.out` / `.cave`) : dehors roi slime ou chat géant, dans la grotte squelette géant ou
   **golem de pierre** ; pas de grosse araignée (souhait de l'utilisateur ; les petites des toiles
-  restent) ; pas de grotte qui commence sous un boss. **Trois arbres** au hasard : sapin,
+  restent) ; pas de grotte qui commence sous un boss. **Gemmes** : une pièce sur quinze environ
+  (`HERO_GEMS`, rouge, bleue, verte ou violette) vaut 10. Arbres : bouleau haut (27 pixels),
+  chêne large (19 pixels), sapin. **Trois arbres** au hasard : sapin,
   chêne, bouleau (`v` de la chose `tree`). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
