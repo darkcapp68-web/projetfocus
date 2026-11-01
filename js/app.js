@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '31/10/2026 · 20h45';
+const APP_VERSION = '01/11/2026 · 13h04';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -913,15 +913,19 @@ function drawHorizon(t, level, pulse) {
 
 /* ---------- Vue « Petit héros » (mode Rythme, façon jeu idle) ---------- */
 // Un petit chevalier en pixels court sans s'arrêter dans un décor qui défile : deux pas par temps
-// du BPM (80 BPM sans musique), un saut sur chaque temps fort. Il ramasse des pièces, bat des
-// slimes, ouvre des coffres ; pièces et niveau sont gardés sur l'appareil. Pendant le focus il
-// avance vers le drapeau d'arrivée au fil du temps ; en pause il se repose au coin du feu.
+// du BPM (80 BPM sans musique). Chaque temps donne un coup d'épée au slime à portée, sinon remplit
+// la jauge de combat ; il ne saute qu'un temps sur quatre. Jauge pleine : un roi slime arrive et
+// se bat à coups d'épée sur le rythme. Il ramasse des pièces, ouvre des coffres ; pièces, niveau
+// et jauge sont gardés sur l'appareil. Pendant le focus il avance vers le drapeau d'arrivée au fil
+// du temps ; en pause il se repose au coin du feu.
 const LS_HERO = 'projetfocus.heros';
+const HERO_BOSS_AT = 150; // temps (ou slimes et coffres) avant l'arrivée du roi slime
 const hero = (() => {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(LS_HERO)) || {}; } catch { /* rien d'enregistré */ }
   return {
-    coins: saved.coins | 0, kills: saved.kills | 0, dirty: false, lastSave: 0,
+    coins: saved.coins | 0, kills: saved.kills | 0, bosses: saved.bosses | 0, charge: Math.min(HERO_BOSS_AT, +saved.charge || 0),
+    dirty: false, lastSave: 0, beats: 0, vbeat: 0, hopT: -1e4, fight: false,
     wx: 0, hx: 0, f: 2.4, step: 0, last: 0, nextX: 40, things: [], parts: [], atk: -1e4, phase: '', level: 0,
   };
 })();
@@ -983,10 +987,20 @@ function drawHero(t, beat, pulse) {
   else hero.hx += arrive ? (target - hero.hx) : Math.min(target - hero.hx, 22 * dt / 1000);
   if (camp && hero.phase !== 'break') hero.things = hero.things.filter((e) => e.k === 'tree' || e.k === 'bush' || e.k === 'flower'); // au camp, plus de pièces ni d'ennemis
   hero.phase = phase;
-  const walking = !camp || target - hero.hx > 0.5;
+  const fight = hero.fight; // face au roi slime : le monde s'arrête le temps du combat
+  const walking = (!camp || target - hero.hx > 0.5) && !fight;
   const sitting = camp && !walking;
   const speed = hero.f * 3.5 * (1 + pulse * 0.25); // pixels logiques par seconde
-  if (!camp && phase !== 'done') hero.wx += speed * dt / 1000;
+  if (!camp && phase !== 'done' && !fight) hero.wx += speed * dt / 1000;
+  // Temps : ceux de la musique, ou un temps régulier à 80 BPM sans musique.
+  let tick = beat;
+  if (!audio.musicOn && t - hero.vbeat > 750) { hero.vbeat = t; tick = true; }
+  if (tick && !sitting) {
+    hero.beats++;
+    if (beat && hero.beats % 4 === 0 && !fight) hero.hopT = t; // un saut par mesure seulement
+  }
+  const out = camp || phase === 'done';
+  const charge = (n) => { if (!out && !fight) { hero.charge = Math.min(HERO_BOSS_AT, hero.charge + n); hero.dirty = true; } };
   if (walking) hero.step += hero.f * dt / 1000;
   const wx = hero.wx, hx = Math.round(hero.hx);
 
@@ -1024,29 +1038,66 @@ function drawHero(t, beat, pulse) {
   }
 
   // Choses du monde
-  if (!camp && phase !== 'done') {
+  if (!out) {
     if (hero.nextX < wx) hero.nextX = wx + 30;
     while (hero.nextX < wx + LW + 24) heroSpawn();
+    if (hero.charge >= HERO_BOSS_AT && !hero.things.some((e) => e.k === 'boss')) {
+      // Jauge pleine : le roi slime arrive par la droite, on lui fait de la place.
+      const bx = wx + LW + 8, hp = 14 + Math.min(16, hero.bosses * 2);
+      hero.things = hero.things.filter((e) => e.x < bx - 30 || e.x > bx + 40 || e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
+      hero.things.push({ k: 'boss', x: bx, hp, max: hp, hit: -1e4 });
+      hero.nextX = Math.max(hero.nextX, bx + 40);
+      hero.parts.push({ k: 'txt', x: LW / 2 - 14, y: gy - 24, vy: -0.004, t0: t, txt: 'UN ROI SLIME !', big: true });
+    }
   }
   const things = hero.things;
+  let struck = !tick, fightNow = false;
   for (let i = things.length - 1; i >= 0; i--) {
     const e = things[i], sx = e.x - wx;
-    if (sx < -14 || (e.dead && t - e.dead > 220)) { things.splice(i, 1); continue; }
+    if (sx < -24 || (e.dead && t - e.dead > 220)) { things.splice(i, 1); continue; }
     const near = sx - hx;
     if (e.k === 'coin' && !e.dead && near < 5 && near > -4) {
       e.dead = t - 999;
       heroGain(1, sx, gy - e.y - 4);
       for (let j = 0; j < 3; j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 48 });
-    } else if (e.k === 'slime' && !e.dead && near < 15 && near > 0) {
+    } else if (e.k === 'slime' && !e.dead && ((!struck && near < 24 && near > 0) || (near < 7 && near > -2))) {
+      // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
+      struck = true;
       e.dead = t; hero.atk = t; hero.kills++;
-      heroGain(3, sx, gy - 10);
+      heroGain(3, sx, gy - 10); charge(4);
       for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3, vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
     } else if (e.k === 'chest' && !e.open && near < 10 && near > 0) {
-      e.open = t; heroGain(10, sx, gy - 11);
+      e.open = t; heroGain(10, sx, gy - 11); charge(6);
       for (let j = 0; j < 8; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 5, vx: (Math.random() - 0.5) * 0.009, vy: -0.003 - Math.random() * 0.005, t0: t, hue: 48 });
+    } else if (e.k === 'boss' && !e.dead && near < 17) {
+      fightNow = true;
+      if (!struck) { // un coup par temps
+        struck = true;
+        e.hp--; e.hit = t; hero.atk = t;
+        for (let j = 0; j < 5; j++) hero.parts.push({ k: 'spark', x: sx + 2, y: gy - 6 - Math.random() * 6, vx: Math.random() * 0.008, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 290 });
+        if (e.hp <= 0) {
+          e.dead = t; hero.bosses++; hero.kills++; hero.charge = 0;
+          heroGain(50, sx, gy - 20);
+          hero.parts.push({ k: 'txt', x: LW / 2 - 12, y: gy - 26, vy: -0.004, t0: t, txt: 'VICTOIRE !', big: true });
+          for (let j = 0; j < 26; j++) hero.parts.push({ k: 'spark', x: sx + 10, y: gy - 8, vx: (Math.random() - 0.5) * 0.016, vy: -0.003 - Math.random() * 0.008, t0: t, hue: j % 2 ? 48 : 290 });
+        }
+      }
     }
-    if (e.dead && e.k === 'coin') continue;
-    if (e.k === 'coin') {
+    if (e.dead && (e.k === 'coin' || e.k === 'boss')) continue;
+    if (e.k === 'boss') {
+      // Roi slime : 20 × 14 pixels, couronne, sourcils froncés, barre de vie
+      const sq = Math.round(Math.sin(t / 300) * 0.7 + 0.7), flash = t - e.hit < 110;
+      const c = flash ? '#ffffff' : 'hsl(285 65% 52%)', y0 = gy + sq;
+      rect(sx + 5, y0 - 15, 10, 1, c); rect(sx + 3, y0 - 14, 14, 1, c); rect(sx + 2, y0 - 13, 16, 2, c);
+      rect(sx + 1, y0 - 11, 18, 3, c); rect(sx, y0 - 8, 20, 8 - sq, c);
+      rect(sx + 4, y0 - 13, 2, 1, '#fff', 0.55); rect(sx + 3, y0 - 12, 1, 2, '#fff', 0.4);
+      rect(sx + 4, y0 - 9, 3, 1, '#1a1a2e'); rect(sx + 13, y0 - 9, 3, 1, '#1a1a2e');
+      rect(sx + 5, y0 - 8, 2, 2, '#1a1a2e'); rect(sx + 13, y0 - 8, 2, 2, '#1a1a2e');
+      rect(sx + 8, y0 - 4, 4, 1, '#1a1a2e');
+      rect(sx + 6, y0 - 17, 8, 2, '#ffd23f'); rect(sx + 6, y0 - 19, 1, 2, '#ffd23f'); rect(sx + 9, y0 - 19, 2, 2, '#ffd23f'); rect(sx + 13, y0 - 19, 1, 2, '#ffd23f');
+      rect(sx + 9, y0 - 17, 2, 1, '#ff5470');
+      rect(sx, gy - 23, 20, 1, '#000', 0.5); rect(sx, gy - 23, Math.max(0, Math.round(20 * e.hp / e.max)), 1, '#ff5470');
+    } else if (e.k === 'coin') {
       const y = gy - e.y - 4, w = Math.abs(Math.cos(t / 260 + e.x)) > 0.35 ? 3 : 1;
       rect(sx + (3 - w) / 2, y, w, 4, '#ffd23f');
       if (w === 3) rect(sx + 1, y + 1, 1, 2, '#fff6b0');
@@ -1070,6 +1121,9 @@ function drawHero(t, beat, pulse) {
       rect(sx + 1, gy - 3, 1, 3, '#2f8f4e'); rect(sx, gy - 4, 3, 1, c); rect(sx + 1, gy - 5, 1, 3, c);
     }
   }
+
+  hero.fight = fightNow;
+  if (tick && !struck) charge(1); // temps sans ennemi à portée : la jauge se remplit
 
   // Arrivée : drapeau pendant le focus
   if (arrive) {
@@ -1095,7 +1149,8 @@ function drawHero(t, beat, pulse) {
     H: HERO_HELM[(lvl - 1) % HERO_HELM.length], S: '#f2c9a0', D: '#1a1a2e', B: '#3b6fd4', L: '#3b3f6b', R: HERO_SCARF[(lvl - 1) % HERO_SCARF.length],
   };
   const atk = t - hero.atk < 230;
-  const hop = phase === 'done' ? Math.abs(Math.sin(t / 130)) * 6 : (!sitting && pulse > 0 ? Math.sin(Math.PI * (1 - pulse)) * 5 : 0);
+  const hopA = (t - hero.hopT) / 350;
+  const hop = phase === 'done' ? Math.abs(Math.sin(t / 130)) * 6 : (!sitting && hopA < 1 ? Math.sin(Math.PI * hopA) * 5 : 0);
   const air = hop > 0.8;
   const top = gy - 12 - Math.round(hop) + (sitting ? 3 : 0);
   const fr = Math.floor(hero.step) % 2;
@@ -1148,11 +1203,19 @@ function drawHero(t, beat, pulse) {
   ctx.fillText(`${hero.coins}   niv. ${lvl}`, 17 * k, 11.5 * k);
   ctx.globalAlpha = 0.22; ctx.fillRect(4 * k, 20 * k, 60 * k, 2 * k);
   ctx.globalAlpha = 0.85; ctx.fillRect(4 * k, 20 * k, 60 * k * clamp((hero.coins - base) / (next - base), 0, 1), 2 * k);
+  // Jauge de combat : pleine, le roi slime arrive (elle clignote)
+  const full = hero.charge >= HERO_BOSS_AT;
+  ctx.fillStyle = '#ff5470';
+  ctx.globalAlpha = 0.22; ctx.fillRect(4 * k, 25 * k, 60 * k, 2 * k);
+  ctx.globalAlpha = full ? 0.55 + 0.45 * Math.abs(Math.sin(t / 200)) : 0.85;
+  ctx.fillRect(4 * k, 25 * k, 60 * k * hero.charge / HERO_BOSS_AT, 2 * k);
+  ctx.font = `600 ${Math.round(9 * k)}px system-ui, sans-serif`;
+  ctx.globalAlpha = 0.8; ctx.fillText(hero.bosses ? `boss ×${hero.bosses}` : 'boss', 68 * k, 26.5 * k);
   ctx.textBaseline = 'alphabetic';
   ctx.globalAlpha = 1;
   if (hero.dirty && t - hero.lastSave > 4000) {
     hero.dirty = false; hero.lastSave = t;
-    try { localStorage.setItem(LS_HERO, JSON.stringify({ coins: hero.coins, kills: hero.kills })); } catch { /* stockage indisponible */ }
+    try { localStorage.setItem(LS_HERO, JSON.stringify({ coins: hero.coins, kills: hero.kills, bosses: hero.bosses, charge: Math.round(hero.charge) })); } catch { /* stockage indisponible */ }
   }
 }
 

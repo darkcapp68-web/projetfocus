@@ -16,7 +16,9 @@ premier pour reprendre le travail).
 - Vue « Rythme · Petit héros » (31/10, idée de l'utilisateur, style jeu idle) : un chevalier en
   pixels court au rythme du BPM, ramasse des pièces, bat des slimes, ouvre des coffres, gagne des
   niveaux, avance vers un drapeau pendant le focus et s'endort au feu de camp en pause ; à juger
-  sur le téléphone (vitesse, taille, ce qu'on y ajoute).
+  sur le téléphone (vitesse, taille, ce qu'on y ajoute). 01/11 : les temps donnent des coups
+  d'épée ou remplissent une jauge de combat, un saut par mesure seulement ; jauge pleine, un roi
+  slime arrive et se bat sur le rythme (seuil 150 et points de vie à régler selon le ressenti).
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.
