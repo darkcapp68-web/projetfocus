@@ -68,7 +68,9 @@ par Google Drive.
 le site sur le téléphone comme une appli (icône sur l'écran d'accueil), ce qui suffit. Le
 projet Android Studio `android/` reste dans le dépôt pour plus tard (il resterait : clé de
 signature hors dépôt, dépôt `darkcapp68-web.github.io` avec `assetlinks.json`, voir
-`android/README.md`).
+`android/README.md`). 01/11 : l'APK plantait au démarrage (déclaration de `ManageDataLauncherActivity`
+manquante), corrigé et essayé sur l'émulateur ; il ne change rien à la rotation (Chrome y
+exige aussi le plein écran).
 
 ## En cours
 
