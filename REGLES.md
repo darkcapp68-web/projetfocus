@@ -163,7 +163,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   ciel** du décor (en haut à droite, sur un fond noir à 20 % pour bien le lire) ; la bande est **aussi haute que l'horloge** : en focus les pixels
   gardent leur taille (on voit plus de ciel), en pause 40 pixels de haut au lieu de 20 dès que la
   bande dépasse 250 px ; grandes montagnes au loin quand le ciel est assez haut ; **ciel marqué** quelle que soit la couleur du moment (01/11, le reste garde la teinte du fond) : **jour** bleu avec soleil et nuages pendant le focus, **nuit** étoilée avec lune pendant la pause ; collines abaissées dans la pause zoomée pour garder du ciel ; de temps en temps une **chauve-souris**
-  traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans
+  traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Comme l'onde horizontale, cette vue **met en paysage** (01/11 : demande
+  à Android de rester couché, appli installée seulement ; la vue en portrait reste là sinon). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
   coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport

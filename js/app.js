@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h54';
+const APP_VERSION = '01/11/2026 · 14h04';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -2512,9 +2512,9 @@ function setLand() {
   body.classList.toggle('horizon', wide);
   body.classList.toggle('hero', wide && !horizon);
   body.classList.toggle('land', landPhone.matches || (wide && landWide.matches));
-  if (horizon && !orientationLocked) {
+  if (wide && !orientationLocked) {
     screen.orientation?.lock?.('landscape').then(() => { orientationLocked = true; }, () => {});
-  } else if (!horizon && orientationLocked) {
+  } else if (!wide && orientationLocked) {
     orientationLocked = false;
     try { screen.orientation.unlock(); } catch { /* rien à libérer */ }
   }
