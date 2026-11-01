@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h19';
+const APP_VERSION = '01/11/2026 · 13h30';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -914,7 +914,8 @@ function drawHorizon(t, level, pulse) {
 /* ---------- Vue « Petit héros » (mode Rythme, façon jeu idle) ---------- */
 // Un petit chevalier en pixels court sans s'arrêter dans un décor qui défile : deux pas par temps
 // du BPM (80 BPM sans musique). Chaque temps donne un coup d'épée au slime à portée, sinon remplit
-// la jauge de combat ; il ne saute que par-dessus les rochers. Jauge pleine : un roi slime arrive et
+// la jauge de combat ; il ne saute que par-dessus les rochers. Ennemis variés : slimes,
+// champignons, gobelins, squelettes, chauves-souris, fantômes ; en pause, ruines au hasard. Jauge pleine : un roi slime arrive et
 // se bat à coups d'épée sur le rythme. Il ramasse des pièces, ouvre des coffres ; pièces, niveau
 // et jauge sont gardés sur l'appareil. Pendant le focus il avance vers le drapeau d'arrivée au fil
 // du temps ; en pause il se repose au coin du feu.
@@ -930,6 +931,8 @@ const hero = (() => {
   };
 })();
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
+const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190 };
+const HERO_RUINS = ['wall', 'columns', 'arch', 'tower'];
 const HERO_HELM = ['#c3cbe0', '#5aa9ff', '#ff6b6b', '#ffd23f', '#b57bff', '#4fe3b0'];
 const HERO_SCARF = ['#e63946', '#ff9f1c', '#2ec4b6', '#f72585', '#ffffff', '#ff6b6b'];
 const HERO_BODY = [
@@ -953,7 +956,10 @@ function heroSpawn() {
   const r = Math.random();
   const x = hero.nextX;
   if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
-  else if (r < 0.52) hero.things.push({ k: 'slime', x, hue: 90 + Math.floor(Math.random() * 200) });
+  else if (r < 0.52) {
+    const q = Math.random(), k = q < 0.38 ? 'slime' : q < 0.52 ? 'mushroom' : q < 0.66 ? 'goblin' : q < 0.78 ? 'skeleton' : q < 0.9 ? 'bat' : 'ghost';
+    hero.things.push({ k, foe: true, x, hue: k === 'slime' ? 90 + Math.floor(Math.random() * 200) : HERO_FOE_HUE[k] });
+  }
   else if (r < 0.58) hero.things.push({ k: 'chest', x });
   else if (r < 0.67) hero.things.push({ k: 'rock', x, w: 5 + Math.floor(Math.random() * 3) });
   else if (r < 0.8) hero.things.push({ k: 'tree', x });
@@ -966,15 +972,22 @@ function drawHero(t, beat, pulse) {
   const k = devicePixelRatio || 1, W = Math.round(waveCanvas.clientWidth * k), H = Math.round(waveCanvas.clientHeight * k);
   if (!W || !H) return;
   if (waveCanvas.width !== W || waveCanvas.height !== H) { waveCanvas.width = W; waveCanvas.height = H; }
-  // 40 pixels de haut ; en pause, zoom ×2 sur le camp (20 pixels de haut, les côtés sortent du
-  // cadre), sauf si la bande est grande (pause en paysage, CSS) : on y voit plus de ciel.
-  const rows = T.phase === 'break' && H < 250 * k ? 20 : 40;
-  const ctx = waveFx, px = Math.max(1, Math.round(H / rows)), LW = Math.ceil(W / px), LH = Math.ceil(H / px);
+  // 40 pixels de haut ; une bande plus grande que 240 px (paysage, CSS) garde la taille des
+  // pixels et montre plus de ciel. En pause, zoom ×2 sur le camp (20 pixels de haut, les côtés
+  // sortent du cadre), ou 40 pixels de haut si la bande est grande.
+  const px = Math.max(1, T.phase === 'break' ? Math.round(H / (H < 250 * k ? 20 : 40)) : Math.round(Math.min(H, 240 * k) / 40));
+  const ctx = waveFx, LW = Math.ceil(W / px), LH = Math.ceil(H / px);
   const gy = LH - 7; // sol
   const dt = hero.last ? clamp(t - hero.last, 0, 60) : 16;
   hero.last = t;
   ctx.clearRect(0, 0, W, H);
   const rect = (x, y, w, h, c, a = 1) => { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.fillRect(Math.round(x) * px, Math.round(y) * px, w * px, h * px); };
+  const batAt = (bx, by, up, dir) => { // chauve-souris, ailes en haut ou en bas
+    const c = '#2a2238', d = up ? -1 : 1;
+    rect(bx, by, 3, 2, c); rect(bx, by - 1, 1, 1, c); rect(bx + 2, by - 1, 1, 1, c);
+    rect(bx + (dir > 0 ? 2 : 0), by, 1, 1, '#ff5470');
+    rect(bx - 2, by + d, 2, 1, c); rect(bx - 3, by + 2 * d, 1, 1, c); rect(bx + 3, by + d, 2, 1, c); rect(bx + 5, by + 2 * d, 1, 1, c);
+  };
 
   const phase = T.phase;
   const running = phase === 'focus' || phase === 'break';
@@ -989,7 +1002,10 @@ function drawHero(t, beat, pulse) {
   const target = arrive ? LW * 0.14 + p * (LW - 20 - LW * 0.14) : camp ? LW / 2 - 12 : LW * 0.2;
   if (target < hero.hx || (phase !== hero.phase && !camp)) hero.hx = target;
   else hero.hx += arrive ? (target - hero.hx) : Math.min(target - hero.hx, 22 * dt / 1000);
-  if (camp && hero.phase !== 'break') hero.things = hero.things.filter((e) => e.k === 'tree' || e.k === 'bush' || e.k === 'flower'); // au camp, plus de pièces ni d'ennemis
+  if (camp && hero.phase !== 'break') { // au camp, plus de pièces ni d'ennemis ; des ruines au hasard derrière
+    hero.things = hero.things.filter((e) => e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
+    hero.ruin = Math.random() < 0.75 ? HERO_RUINS[Math.floor(Math.random() * HERO_RUINS.length)] : null;
+  }
   hero.phase = phase;
   const fight = hero.fight; // face au roi slime : le monde s'arrête le temps du combat
   const walking = (!camp || target - hero.hx > 0.5) && !fight;
@@ -1069,12 +1085,12 @@ function drawHero(t, beat, pulse) {
       e.dead = t - 999;
       heroGain(1, sx, gy - e.y - 4);
       for (let j = 0; j < 3; j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 48 });
-    } else if (e.k === 'slime' && !e.dead && ((!struck && near < 24 && near > 0) || (near < 7 && near > -2))) {
+    } else if (e.foe && !e.dead && ((!struck && near < 24 && near > 0) || (near < 7 && near > -2))) {
       // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
       struck = true;
       e.dead = t; hero.atk = t; hero.kills++;
-      heroGain(3, sx, gy - 10); charge(4);
-      for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3, vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
+      heroGain(e.k === 'skeleton' || e.k === 'ghost' ? 4 : 3, sx, gy - 10); charge(4);
+      for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3 - (e.k === 'bat' ? 7 : 0), vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
     } else if (e.k === 'rock' && !e.jumped && near < 11 && !fight) {
       // Saut par-dessus le rocher : assez long pour qu'il passe dessous
       e.jumped = true; hero.hopT = t;
@@ -1114,8 +1130,34 @@ function drawHero(t, beat, pulse) {
       const y = gy - e.y - 4, w = Math.abs(Math.cos(t / 260 + e.x)) > 0.35 ? 3 : 1;
       rect(sx + (3 - w) / 2, y, w, 4, '#ffd23f');
       if (w === 3) rect(sx + 1, y + 1, 1, 2, '#fff6b0');
+    } else if (e.foe && e.dead) { // petit nuage quand il disparaît
+      const fy = e.k === 'bat' ? gy - 8 : gy;
+      rect(sx - 1, fy - 6, 10, 1, '#fff', 0.8); rect(sx + 1, fy - 8, 6, 1, '#fff', 0.5);
+    } else if (e.k === 'mushroom') {
+      const b = Math.round(Math.sin(t / 260 + e.x) * 0.5 + 0.5);
+      rect(sx + 2, gy - 3, 4, 3, '#f1e3c8'); rect(sx + 2, gy - 2, 1, 1, '#1a1a2e'); rect(sx + 5, gy - 2, 1, 1, '#1a1a2e');
+      rect(sx + 1, gy - 6 + b, 6, 1, '#e23b3b'); rect(sx, gy - 5 + b, 8, 2, '#e23b3b');
+      rect(sx + 2, gy - 6 + b, 1, 1, '#fff'); rect(sx + 5, gy - 5 + b, 1, 1, '#fff'); rect(sx + 1, gy - 4 + b, 1, 1, '#fff', 0.8);
+    } else if (e.k === 'goblin') {
+      const st = Math.floor(t / 180 + e.x) % 2, c = '#5dbb4a';
+      rect(sx + 1, gy - 9, 5, 4, c); rect(sx, gy - 8, 1, 2, c); rect(sx + 6, gy - 8, 1, 2, c);
+      rect(sx + 2, gy - 8, 1, 1, '#ffd23f'); rect(sx + 4, gy - 8, 1, 1, '#ffd23f'); rect(sx + 2, gy - 6, 3, 1, '#1a1a2e');
+      rect(sx + 1, gy - 5, 5, 3, '#7a4a2a'); rect(sx + 1 + st, gy - 2, 1, 2, c); rect(sx + 4 - st, gy - 2, 1, 2, c);
+      rect(sx - 1, gy - 7, 1, 4, '#8a5a2b'); rect(sx - 2, gy - 8, 2, 2, '#6b4423'); // gourdin
+    } else if (e.k === 'skeleton') {
+      const st = Math.floor(t / 200 + e.x) % 2, c = '#ece6d6';
+      rect(sx + 1, gy - 11, 5, 4, c); rect(sx + 2, gy - 10, 1, 1, '#1a1a2e'); rect(sx + 4, gy - 10, 1, 1, '#1a1a2e'); rect(sx + 2, gy - 8, 3, 1, '#9a9488');
+      rect(sx + 3, gy - 7, 1, 5, c); rect(sx + 1, gy - 6, 5, 1, c); rect(sx + 2, gy - 4, 3, 1, c);
+      rect(sx + 2 + st, gy - 2, 1, 2, c); rect(sx + 4 - st, gy - 2, 1, 2, c);
+      rect(sx - 1, gy - 7, 1, 5, '#b8c0cc'); rect(sx - 1, gy - 8, 1, 1, '#ffffff'); // épée rouillée
+    } else if (e.k === 'bat') {
+      batAt(sx + 2, gy - 9 + Math.sin(t / 200 + e.x) * 1.5, Math.floor(t / 110 + e.x) % 2 === 0, -1);
+    } else if (e.k === 'ghost') {
+      const fy = gy - 4 + Math.round(Math.sin(t / 300 + e.x) * 1.5), c = '#e8f4ff';
+      rect(sx + 2, fy - 7, 4, 1, c, 0.8); rect(sx + 1, fy - 6, 6, 5, c, 0.8);
+      rect(sx + 1, fy - 1, 1, 1, c, 0.8); rect(sx + 3, fy - 1, 2, 1, c, 0.8); rect(sx + 6, fy - 1, 1, 1, c, 0.8);
+      rect(sx + 2, fy - 5, 1, 2, '#1a1a2e'); rect(sx + 5, fy - 5, 1, 2, '#1a1a2e'); rect(sx + 3, fy - 2, 2, 1, '#1a1a2e', 0.6);
     } else if (e.k === 'slime') {
-      if (e.dead) { rect(sx - 1, gy - 6, 10, 1, '#fff', 0.8); rect(sx + 1, gy - 8, 6, 1, '#fff', 0.5); continue; }
       const sq = Math.round(Math.sin(t / 220 + e.x) * 0.6 + 0.6), c = `hsl(${e.hue} 70% 55%)`;
       rect(sx + 2, gy - 5 + sq, 4, 1, c); rect(sx + 1, gy - 4 + sq, 6, 1, c); rect(sx, gy - 3 + sq, 8, 3 - sq, c);
       rect(sx + 2, gy - 4 + sq, 1, 1, '#fff', 0.6);
@@ -1148,6 +1190,32 @@ function drawHero(t, beat, pulse) {
     const fx = LW - 8, wv = Math.round(Math.sin(t / 180));
     rect(fx, gy - 15, 1, 15, '#e8e8f0');
     rect(fx + 1, gy - 15, 5, 1, '#ff5470'); rect(fx + 1, gy - 14, 5 + wv, 1, '#ff5470'); rect(fx + 1, gy - 13, 4, 1, '#ff5470');
+  }
+  // Ruines derrière le camp (une au hasard à chaque pause, ou rien)
+  if (camp && hero.ruin) {
+    const c0 = Math.round(LW / 2), st = '#8b8f9e', dk = '#5d6170', a = 0.85;
+    if (hero.ruin === 'wall') { // pan de mur écroulé, à gauche du héros
+      const x0 = c0 - 34, tops = [9, 11, 12, 10, 8, 8, 6, 5, 6, 4, 3, 3, 2, 2];
+      tops.forEach((h, i) => rect(x0 + i, gy - h, 1, h, st, a));
+      for (let y = 2; y < 12; y += 2) for (let x = (y / 2) % 2 ? 0 : 2; x < 14; x += 4) if (y < tops[x]) rect(x0 + x, gy - y, 1, 1, dk, a);
+      rect(x0 + 15, gy - 1, 2, 1, st, a); rect(x0 + 18, gy - 1, 1, 1, st, a);
+    } else if (hero.ruin === 'columns') { // deux colonnes, l'une brisée
+      for (const [x0, h] of [[c0 - 26, 16], [c0 + 16, 9]]) {
+        rect(x0, gy - h, 4, h, st, a); rect(x0 + 1, gy - h, 1, h, '#a9adbb', a); rect(x0 + 3, gy - h, 1, h, dk, a);
+        rect(x0 - 1, gy - 1, 6, 1, dk, a);
+        if (h > 12) { rect(x0 - 1, gy - h - 1, 6, 1, st, a); rect(x0 - 1, gy - h - 2, 6, 1, dk, a); }
+        else { rect(x0, gy - h - 1, 1, 1, st, a); rect(x0 + 2, gy - h - 1, 2, 1, st, a); }
+      }
+      rect(c0 + 22, gy - 2, 5, 2, st, a); // morceau tombé
+    } else if (hero.ruin === 'arch') { // arche de pierre au-dessus du camp
+      const x0 = c0 - 22, w = 44, h = 22;
+      rect(x0, gy - h + 4, 3, h - 4, st, a); rect(x0 + w - 3, gy - h + 4, 3, h - 4, st, a);
+      for (let i = 0; i < w; i++) rect(x0 + i, Math.round(gy - h + 4 - Math.sin(i / (w - 1) * Math.PI) * 5), 1, 3, i % 4 ? st : dk, a);
+    } else { // tour en ruine au loin, à droite
+      const x0 = c0 + 18;
+      rect(x0, gy - 18, 8, 18, st, 0.6); rect(x0, gy - 20, 2, 2, st, 0.6); rect(x0 + 4, gy - 20, 2, 2, st, 0.6); rect(x0 + 7, gy - 19, 1, 1, st, 0.6);
+      rect(x0 + 3, gy - 14, 2, 3, '#1a1a2e', 0.6); rect(x0 + 3, gy - 7, 2, 3, '#ffd23f', 0.35 + 0.15 * Math.sin(t / 400));
+    }
   }
   // Feu de camp pendant la pause
   if (camp) {
@@ -1206,11 +1274,7 @@ function drawHero(t, beat, pulse) {
     const b = hero.bat, age = t - b.t0, bx = b.dir > 0 ? -6 + age * b.s : LW + 6 - age * b.s;
     if (!camp || bx < -8 || bx > LW + 8) hero.bat = null;
     else {
-      const by = b.y + Math.sin(age / 240) * 3, up = Math.floor(age / 110) % 2 === 0;
-      rect(bx, by, 3, 2, '#2a2238'); rect(bx, by - 1, 1, 1, '#2a2238'); rect(bx + 2, by - 1, 1, 1, '#2a2238');
-      rect(bx + (b.dir > 0 ? 2 : 0), by, 1, 1, '#ff5470');
-      if (up) { rect(bx - 2, by - 1, 2, 1, '#2a2238'); rect(bx - 3, by - 2, 1, 1, '#2a2238'); rect(bx + 3, by - 1, 2, 1, '#2a2238'); rect(bx + 5, by - 2, 1, 1, '#2a2238'); }
-      else { rect(bx - 2, by + 1, 2, 1, '#2a2238'); rect(bx - 3, by + 2, 1, 1, '#2a2238'); rect(bx + 3, by + 1, 2, 1, '#2a2238'); rect(bx + 5, by + 2, 1, 1, '#2a2238'); }
+      batAt(bx, b.y + Math.sin(age / 240) * 3, Math.floor(age / 110) % 2 === 0, b.dir);
     }
   }
 

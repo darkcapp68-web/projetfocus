@@ -20,7 +20,8 @@ premier pour reprendre le travail).
   d'épée ou remplissent une jauge de combat ; jauge pleine, un roi slime arrive et se bat sur le
   rythme (seuil 150 et points de vie à régler selon le ressenti). Il ne saute plus que par-dessus
   des rochers ; en pause, zoom ×2 sur le camp et chauve-souris au hasard (à juger) ; en paysage,
-  la pause prend plus de hauteur (ciel, lune, montagnes).
+  la pause prend plus de hauteur (ciel, lune, montagnes). Ensuite : message écrit dans le ciel en
+  paysage, ruines au hasard en pause, six sortes d'ennemis (dont chauves-souris et fantômes).
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.
