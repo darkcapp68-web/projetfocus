@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h27';
+const APP_VERSION = '01/11/2026 · 17h31';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1505,7 +1505,7 @@ function drawHero(t, beat, pulse) {
   }
   const sw = sitting ? 0 : fr; // l'écharpe (ou la cape) flotte
   if (col.R) { rect(hx + 1, top + 4 + sw, 2, 1, col.R); rect(hx - 1 + sw, top + 4 + sw, 2, 1, col.R); }
-  else { rect(hx + 1, top + 3, 1, 5, col.H); rect(hx - sw, top + 5 + sw, 1, 3, col.H); } // cape du mage
+  else { rect(hx + 1, top + 3, 1, 6, col.H); rect(hx, top + 4, 1, 5, col.H); rect(hx - 1, top + 6 + sw, 1, 2, col.H); } // cape du mage, sans trou quand elle flotte
   if (sitting) {
     rect(hx + 3, top + 8, 5, 1, col.L); rect(hx + 6, top + 9, 4, 1, col.L); rect(hx + 9, top + 9, 1, 1, '#5b3414');
   } else if (air) {
