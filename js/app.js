@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 14h26';
+const APP_VERSION = '01/11/2026 · 14h59';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -949,6 +949,44 @@ const HERO_BODY = [
   '...BBBBB.',
   '...DDDDD.',
 ];
+// Trois héros au choix (Paramètres → Apparence) : chevalier (casque, épée ; frappe deux fois plus
+// fort les boss), mage (chapeau pointu, robe, bâton ; boule de feu qui touche de plus loin),
+// voleur (capuche, masque, dague ; une pièce de plus par ennemi, coffres plus riches).
+// Les lignes au-dessus de la tête (chapeau) sont dans `hat`, dessinées avant le corps.
+const HERO_CLASSES = {
+  chevalier: { body: HERO_BODY, hat: [], head: HERO_HELM, body2: ['#3b6fd4'], scarf: HERO_SCARF, legs: '#3b3f6b' },
+  mage: {
+    hat: ['.....H...', '....HH...', '...HHHH..'],
+    body: [
+      '..HHHHHHH',
+      '...SSSDS.',
+      '...SSSSS.',
+      '..BBBBBB.',
+      '..BBYBBB.',
+      '..BBBBBB.',
+      '..BBBBBB.',
+      '..BBBBBB.',
+    ],
+    head: ['#7b4fd6', '#3b6fd4', '#c0397a', '#2b8a8a', '#d6a33b', '#5a5f8a'],
+    body2: ['#5a3fa8'], scarf: null, legs: '#4a3a7a',
+  },
+  voleur: {
+    hat: [],
+    body: [
+      '...HHHH..',
+      '..HHHHHH.',
+      '..HDDDWD.',
+      '..HSSSSS.',
+      '...BBBBB.',
+      '...BYBBB.',
+      '...BBBBB.',
+      '...DDDDD.',
+    ],
+    head: ['#2f6b3a', '#3a3f52', '#6b2f3a', '#2f4f6b', '#5b4a2a', '#4a2f6b'],
+    body2: ['#7a4a2a'], scarf: ['#9be37a', '#ffd23f', '#5aa9ff', '#ff9f1c', '#ffffff', '#f72585'], legs: '#3a2f2a',
+  },
+};
+const heroClass = () => HERO_CLASSES[S.heroClass] ? S.heroClass : 'chevalier';
 
 function heroGain(n, x, y) {
   hero.coins += n;
@@ -1116,25 +1154,27 @@ function drawHero(t, beat, pulse) {
       e.dead = t - 999;
       heroGain(1, sx, gy - e.y - 4);
       for (let j = 0; j < 3; j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 48 });
-    } else if (e.foe && !e.dead && ((!struck && near < 24 && near > 0) || (near < 7 && near > -2))) {
+    } else if (e.foe && !e.dead && ((!struck && near < (heroClass() === 'mage' ? 34 : 24) && near > 0) || (near < 7 && near > -2))) {
       // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
       struck = true;
       e.dead = t; hero.atk = t; hero.kills++;
-      heroGain(e.k === 'skeleton' || e.k === 'ghost' ? 4 : 3, sx, gy - 10); charge(4);
+      heroGain((e.k === 'skeleton' || e.k === 'ghost' ? 4 : 3) + (heroClass() === 'voleur' ? 1 : 0), sx, gy - 10); charge(4);
+      hero.atkTo = sx + 4; hero.atkY = e.k === 'bat' ? gy - 9 : gy - 4;
       for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3 - (e.k === 'bat' ? 7 : 0), vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
     } else if (e.k === 'rock' && !e.jumped && near < 11 && !fight) {
       // Saut par-dessus le rocher : assez long pour qu'il passe dessous
       e.jumped = true; hero.hopT = t;
       hero.hopD = clamp((near + e.w + 2) / Math.max(speed, 1) * 1000, 400, 1500);
     } else if (e.k === 'chest' && !e.open && near < 10 && near > 0) {
-      e.open = t; heroGain(10, sx, gy - 11); charge(6);
+      e.open = t; heroGain(heroClass() === 'voleur' ? 15 : 10, sx, gy - 11); charge(6);
       for (let j = 0; j < 8; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 5, vx: (Math.random() - 0.5) * 0.009, vy: -0.003 - Math.random() * 0.005, t0: t, hue: 48 });
     } else if (e.k === 'boss' && !e.dead && near < 17) {
       fightNow = true;
       if (near < 14) e.x = wx + hx + 14; // le héros avance avec le temps : le roi recule, sans se laisser traverser
       if (!struck) { // un coup par temps
         struck = true;
-        e.hp--; e.hit = t; hero.atk = t;
+        e.hp -= heroClass() === 'chevalier' ? 2 : 1; e.hit = t; hero.atk = t;
+        hero.atkTo = sx + 3; hero.atkY = gy - 10;
         for (let j = 0; j < 5; j++) hero.parts.push({ k: 'spark', x: sx + 2, y: gy - 6 - Math.random() * 6, vx: Math.random() * 0.008, vy: -0.002 - Math.random() * 0.004, t0: t, hue: bossHue(e) });
         if (e.hp <= 0) {
           e.dead = t; hero.bosses++; hero.kills++; hero.charge = 0;
@@ -1298,8 +1338,10 @@ function drawHero(t, beat, pulse) {
   }
 
   // Le héros
+  const cls = heroClass(), kit = HERO_CLASSES[cls], li = (lvl - 1) % 6;
   const col = {
-    H: HERO_HELM[(lvl - 1) % HERO_HELM.length], S: '#f2c9a0', D: '#1a1a2e', B: '#3b6fd4', L: '#3b3f6b', R: HERO_SCARF[(lvl - 1) % HERO_SCARF.length],
+    H: kit.head[li], S: '#f2c9a0', D: '#1a1a2e', B: kit.body2[0], L: kit.legs, W: '#ffffff', Y: '#ffd23f',
+    R: kit.scarf ? kit.scarf[li] : null,
   };
   const atk = t - hero.atk < 230;
   const hopA = (t - hero.hopT) / hero.hopD;
@@ -1307,11 +1349,14 @@ function drawHero(t, beat, pulse) {
   const air = hop > 0.8;
   const top = gy - 12 - Math.round(hop) + (sitting ? 3 : 0);
   const fr = Math.floor(hero.step) % 2;
-  HERO_BODY.forEach((row, ry) => {
-    for (let rx = 0; rx < row.length; rx++) if (row[rx] !== '.') rect(hx + rx, top + ry, 1, 1, col[row[rx]]);
+  const hatTop = top - kit.hat.length;
+  [...kit.hat, ...kit.body].forEach((row, ry) => {
+    for (let rx = 0; rx < row.length; rx++) if (row[rx] !== '.') rect(hx + rx, hatTop + ry, 1, 1, col[row[rx]]);
   });
-  const sw = sitting ? 0 : fr; // l'écharpe flotte
-  rect(hx + 1, top + 4 + sw, 2, 1, col.R); rect(hx - 1 + sw, top + 4 + sw, 2, 1, col.R);
+  if (cls === 'mage') rect(hx + 5, top - 2, 1, 1, '#ffd23f', 0.6 + 0.4 * Math.sin(t / 300)); // étoile du chapeau
+  const sw = sitting ? 0 : fr; // l'écharpe (ou la cape) flotte
+  if (col.R) { rect(hx + 1, top + 4 + sw, 2, 1, col.R); rect(hx - 1 + sw, top + 4 + sw, 2, 1, col.R); }
+  else { rect(hx + 1, top + 3, 1, 5, col.H); rect(hx - sw, top + 5 + sw, 1, 3, col.H); } // cape du mage
   if (sitting) {
     rect(hx + 3, top + 8, 5, 1, col.L); rect(hx + 6, top + 9, 4, 1, col.L); rect(hx + 9, top + 9, 1, 1, '#5b3414');
   } else if (air) {
@@ -1321,12 +1366,28 @@ function drawHero(t, beat, pulse) {
   } else {
     rect(hx + 4, top + 8, 2, 4, col.L); rect(hx + 6, top + 8, 2, 4, col.L); rect(hx + 4, top + 11, 4, 1, '#5b3414');
   }
-  if (atk) { // coup d'épée et croissant blanc
+  const a = 1 - (t - hero.atk) / 230, o = sitting ? 2 : 0;
+  if (cls === 'mage') { // bâton à boule lumineuse ; en attaque, une boule de feu file vers l'ennemi
+    rect(hx + 9, top - 1 + o, 1, 11 - o, '#8a5a2b');
+    const glow = atk ? 1 : 0.55 + 0.25 * Math.sin(t / 260);
+    ctx.globalCompositeOperation = 'lighter';
+    rect(hx + 8, top - 3 + o, 3, 2, '#7fe0ff', glow); rect(hx + 9, top - 4 + o, 1, 1, '#ffffff', glow);
+    if (atk && hero.atkTo != null) {
+      const q = 1 - a, bx = hx + 10 + (hero.atkTo - hx - 10) * Math.min(1, q * 1.6), by = top - 2 + (hero.atkY - top + 2) * Math.min(1, q * 1.6);
+      for (let i = 1; i < 5; i++) rect(bx - i * 2, by + Math.round(Math.sin(i + t / 40)), 1, 1, '#ff9f1c', 0.6 * (1 - i / 5));
+      rect(bx - 1, by - 1, 3, 3, '#ff7b1c'); rect(bx, by, 1, 1, '#fff6b0');
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  } else if (cls === 'voleur') { // dague courte ; en attaque, deux coups rapides
+    if (atk) {
+      const k2 = Math.floor((1 - a) * 4) % 2;
+      rect(hx + 8, top + 5 + k2, 5, 1, '#e8f0ff'); rect(hx + 7, top + 4 + k2, 1, 3, '#5b3414');
+      for (const [dx, dy] of [[13, 3], [14, 4], [14, 5], [13, 6]]) rect(hx + dx, top + dy + k2, 1, 1, '#fff', a * 0.9);
+    } else { rect(hx + 8, top + 5 + o, 1, 3, '#e8f0ff'); rect(hx + 8, top + 8 + o, 1, 1, '#5b3414'); }
+  } else if (atk) { // coup d'épée et croissant blanc
     rect(hx + 8, top + 5, 7, 1, '#e8f0ff'); rect(hx + 7, top + 4, 1, 3, '#c9a227');
-    const a = 1 - (t - hero.atk) / 230;
     for (const [dx, dy] of [[14, 1], [15, 2], [16, 3], [16, 4], [16, 5], [16, 6], [15, 7], [14, 8]]) rect(hx + dx, top + dy, 1, 1, '#fff', a * 0.9);
   } else {
-    const o = sitting ? 2 : 0;
     rect(hx + 9, top + 2 + o, 1, 5, '#e8f0ff'); rect(hx + 8, top + 7 + o, 3, 1, '#c9a227');
   }
   if (sitting) {

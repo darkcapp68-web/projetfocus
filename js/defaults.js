@@ -164,6 +164,7 @@ export const DEFAULTS = {
   radioResume: 'direct', // radio reprise après une pause : 'direct' ou 'continuer' (là où elle s'était arrêtée)
   dialStyle: 'standard', // standard (« Normal »), reveur (système solaire en focus, vague en pause), rythme ou brisure (fissure qui se ramifie)
   rhythmForm: 'goutte', // mode rythme : barres, onde, goutte, sonar, etincelles, anneaux ou jauge
+  heroClass: 'chevalier', // vue « Petit héros » : chevalier, mage ou voleur
   hiddenLooks: [], // affichages décochés du menu « Affichage » ('reveur', 'rythme:barres'…)
   crackSpeed: '0.5', // mode brisure : part des branches parcourue à la fin du focus (1, 0.5, 0.3)
   crackLook: 'eclair', // mode brisure : 'eclair' (néon, frappe rapide, flash) ou 'fissure'

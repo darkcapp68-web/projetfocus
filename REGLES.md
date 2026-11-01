@@ -167,7 +167,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   coucher l'écran que pour une page **en plein écran** (vérifié sur le téléphone : « The page needs
   to be fullscreen ») : sur un téléphone (pointeur tactile), choisir l'une de ces deux vues, ou
   toucher l'écran ensuite, passe en plein écran puis en paysage ; changer de vue rend la rotation
-  et ferme ce plein écran (le geste retour d'Android le ferme aussi) ; rien ne change sur le PC. Le plein écran se demande **au relâcher du doigt** (`pointerup`) : à l'appui (`pointerdown`), Chrome ne compte pas le geste et refuse (trouvé sur l'émulateur Android le 01/11, puis vérifié : plein écran + paysage au premier toucher). Code : `drawHero()` dans
+  et ferme ce plein écran (le geste retour d'Android le ferme aussi) ; rien ne change sur le PC. Le plein écran se demande **au relâcher du doigt** (`pointerup`) : à l'appui (`pointerdown`), Chrome ne compte pas le geste et refuse (trouvé sur l'émulateur Android le 01/11, puis vérifié : plein écran + paysage au premier toucher). **Trois héros au choix** (01/11, Paramètres → Apparence → « Héros », réglage `heroClass`) :
+  **chevalier** (casque, épée ; deux fois plus de dégâts aux boss), **mage** (chapeau pointu étoilé,
+  robe, cape, bâton lumineux ; boule de feu qui touche les ennemis de plus loin), **voleur**
+  (capuche, masque, dague, deux coups rapides ; +1 pièce par ennemi, coffres à 15 au lieu de 10) ;
+  couleurs qui changent à chaque niveau pour les trois. Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
   coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport
