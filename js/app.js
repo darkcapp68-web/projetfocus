@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h25';
+const APP_VERSION = '01/11/2026 · 17h27';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -934,6 +934,11 @@ const hero = (() => {
   };
 })();
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
+// Sorts du mage : il change de sort tous les 3 niveaux (boule de feu, flèche de glace,
+// télékinésie, puis on recommence) ; tous les 9 niveaux, le sort grossit et porte plus loin.
+// Plus rien n'évolue après le niveau 30.
+const MAGE_SPELLS = ['BOULE DE FEU', 'FLÈCHE DE GLACE', 'TÉLÉKINÉSIE'];
+const mageSpell = (lvl) => { const l = Math.min(lvl, 30); return { k: Math.floor((l - 1) / 3) % 3, tier: Math.floor((l - 1) / 9) }; };
 // Gemmes : couleur, reflet, teinte des étincelles
 const HERO_GEMS = [['#ff3b6b', '#ffc2d1', 345], ['#3bd1ff', '#c9f4ff', 195], ['#4fe37a', '#c9ffd6', 140], ['#b57bff', '#e6d1ff', 270]];
 const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190, wolf: 220 };
@@ -1089,6 +1094,7 @@ function drawHero(t, beat, pulse) {
   const lvl = heroLevel(hero.coins);
   if (hero.level && lvl > hero.level) {
     hero.parts.push({ k: 'txt', x: hx - 4, y: gy - 22, vy: -0.01, t0: t, txt: 'NIVEAU ' + lvl + ' !', big: true });
+    if (heroClass() === 'mage' && lvl <= 30 && (lvl - 1) % 3 === 0) hero.parts.push({ k: 'txt', x: hx - 4, y: gy - 17, vy: -0.01, t0: t, txt: MAGE_SPELLS[mageSpell(lvl).k] + (lvl % 9 === 1 ? ' +' : '') });
     for (let i = 0; i < 10; i++) hero.parts.push({ k: 'spark', x: hx + 5, y: gy - 8, vx: (Math.random() - 0.5) * 0.008, vy: -0.003 - Math.random() * 0.005, t0: t, hue: Math.random() * 360 });
   }
   hero.level = lvl;
@@ -1237,7 +1243,7 @@ function drawHero(t, beat, pulse) {
       e.dead = t - 999;
       heroGain(e.gem ? 10 : 1, sx, gy - e.y - 4);
       for (let j = 0; j < (e.gem ? 8 : 3); j++) hero.parts.push({ k: 'spark', x: sx + 1, y: gy - e.y, vx: (Math.random() - 0.5) * 0.006, vy: -0.002 - Math.random() * 0.004, t0: t, hue: e.gem ? e.gem[2] : 48 });
-    } else if (e.foe && !e.dead && ((!struck && near < (heroClass() === 'mage' ? 34 : 24) && near > 0) || (near < 7 && near > -2))) {
+    } else if (e.foe && !e.dead && ((!struck && near < (heroClass() === 'mage' ? 34 + 3 * mageSpell(lvl).tier : 24) && near > 0) || (near < 7 && near > -2))) {
       // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
       struck = true;
       e.dead = t; hero.atk = t; hero.kills++;
@@ -1259,7 +1265,7 @@ function drawHero(t, beat, pulse) {
       if (near < 14) e.x = wx + hx + 14; // le héros avance avec le temps : le roi recule, sans se laisser traverser
       if (!struck) { // un coup par temps
         struck = true;
-        e.hp -= heroClass() === 'chevalier' ? 2 : 1; e.hit = t; hero.atk = t;
+        e.hp -= heroClass() === 'chevalier' ? 2 : heroClass() === 'mage' && mageSpell(lvl).tier >= 2 ? 2 : 1; e.hit = t; hero.atk = t;
         hero.atkTo = sx + 3; hero.atkY = gy - 10;
         for (let j = 0; j < 5; j++) hero.parts.push({ k: 'spark', x: sx + 2, y: gy - 6 - Math.random() * 6, vx: Math.random() * 0.008, vy: -0.002 - Math.random() * 0.004, t0: t, hue: bossHue(e) });
         if (e.hp <= 0) {
@@ -1514,15 +1520,32 @@ function drawHero(t, beat, pulse) {
     rect(hx + 4, top + 4, 4, 4, '#c9a227'); rect(hx + 5, top + 8, 2, 1, '#c9a227');
     rect(hx + 5, top + 5, 2, 3, '#2f5fc4'); rect(hx + 5, top + 5, 1, 1, '#ffffff', 0.7);
   }
-  if (cls === 'mage') { // bâton à boule lumineuse ; en attaque, une boule de feu file vers l'ennemi
+  if (cls === 'mage') { // bâton à boule lumineuse (couleur du sort) ; en attaque, le sort du niveau
+    const sp = mageSpell(lvl), r = sp.tier, orb = ['#ff9f1c', '#7fe0ff', '#c77dff'][sp.k];
     rect(hx + 9, top - 1 + o, 1, 11 - o, '#8a5a2b');
     const glow = atk ? 1 : 0.55 + 0.25 * Math.sin(t / 260);
     ctx.globalCompositeOperation = 'lighter';
-    rect(hx + 8, top - 3 + o, 3, 2, '#7fe0ff', glow); rect(hx + 9, top - 4 + o, 1, 1, '#ffffff', glow);
+    rect(hx + 8, top - 3 + o, 3, 2, orb, glow); rect(hx + 9, top - 4 + o, 1, 1, '#ffffff', glow);
     if (atk && hero.atkTo != null) {
-      const q = 1 - a, bx = hx + 10 + (hero.atkTo - hx - 10) * Math.min(1, q * 1.6), by = top - 2 + (hero.atkY - top + 2) * Math.min(1, q * 1.6);
-      for (let i = 1; i < 5; i++) rect(bx - i * 2, by + Math.round(Math.sin(i + t / 40)), 1, 1, '#ff9f1c', 0.6 * (1 - i / 5));
-      rect(bx - 1, by - 1, 3, 3, '#ff7b1c'); rect(bx, by, 1, 1, '#fff6b0');
+      const q = 1 - a, f = Math.min(1, q * 1.6), x0 = hx + 10, y0 = top - 2;
+      const bx = x0 + (hero.atkTo - x0) * f, by = y0 + (hero.atkY - y0) * f;
+      if (sp.k === 0) { // boule de feu, plus grosse tous les 9 niveaux
+        for (let i = 1; i < 5 + r; i++) rect(bx - i * 2, by + Math.round(Math.sin(i + t / 40)), 1 + (r > 1 ? 1 : 0), 1, '#ff9f1c', 0.6 * (1 - i / (5 + r)));
+        rect(bx - 1 - r, by - 1 - r, 3 + 2 * r, 3 + 2 * r, '#ff7b1c'); rect(bx - Math.floor(r / 2), by - Math.floor(r / 2), 1 + r, 1 + r, '#fff6b0');
+      } else if (sp.k === 1) { // flèche de glace : pointe blanche, hampe bleu clair, givre derrière
+        const dx = hero.atkTo - x0, dy = hero.atkY - y0, n = Math.hypot(dx, dy) || 1, ux = dx / n, uy = dy / n, len = 5 + 2 * r;
+        for (let i = 0; i < len; i++) for (let w = -Math.floor(r / 2); w <= Math.floor(r / 2); w++) rect(bx - ux * i - uy * w, by - uy * i + ux * w, 1, 1, i < 2 ? '#ffffff' : '#9be8ff');
+        rect(bx + ux - uy, by + uy + ux, 1, 1, '#ffffff'); rect(bx + ux + uy, by + uy - ux, 1, 1, '#ffffff');
+        for (let i = 0; i < 3 + r; i++) rect(bx - ux * (len + 2 + i * 2) + Math.sin(i * 7 + t / 60), by - uy * (len + 2 + i * 2) + Math.cos(i * 5 + t / 60), 1, 1, '#d8f6ff', 0.5);
+      } else { // télékinésie : petits cercles violets qui tournent sur la cible
+        const cx = hero.atkTo, cy = hero.atkY, n = 3 + 2 * r, rad = 3 + r + (1 - q) * 2;
+        for (let i = 0; i < n; i++) {
+          const ang = i / n * Math.PI * 2 + t / 90;
+          ctx.globalAlpha = 0.9; ctx.strokeStyle = i % 2 ? '#c77dff' : '#e6b8ff'; ctx.lineWidth = Math.max(1, px * 0.5);
+          ctx.beginPath(); ctx.arc((cx + 0.5 + Math.cos(ang) * rad) * px, (cy + 0.5 + Math.sin(ang) * rad * 0.7) * px, (1 + (r > 1 ? 0.6 : 0)) * px, 0, Math.PI * 2); ctx.stroke();
+        }
+        rect(x0 + (cx - x0) * q * 0.5, y0 + (cy - y0) * q * 0.5, 1, 1, '#c77dff', 0.7); // filet d'énergie depuis le bâton
+      }
     }
     ctx.globalCompositeOperation = 'source-over';
   } else if (cls === 'voleur') { // dague courte ; en attaque, deux coups rapides

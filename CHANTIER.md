@@ -32,6 +32,8 @@ premier pour reprendre le travail).
   fait peur (squelettes, chauves-souris, fantômes, yeux rouges, toiles, obscurité autour du héros).
   Boss : roi slime ou chat dehors, squelette géant ou golem de pierre dans la grotte.
   Gemmes (une pièce sur quinze, vaut 10) ; bouleaux plus hauts, chênes plus larges.
+  Bouclier du chevalier, barbe du mage ; le mage change de sort avec les niveaux (feu, glace,
+  télékinésie), plus gros tous les 9 niveaux, jusqu'au niveau 30.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.
