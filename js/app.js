@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 16h52';
+const APP_VERSION = '01/11/2026 · 17h02';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1006,14 +1006,19 @@ function heroGain(n, x, y) {
 function heroSpawn() {
   const r = Math.random();
   const x = hero.nextX;
+  // De temps en temps (toutes les deux ou trois minutes de marche), une grotte à traverser.
+  if (!hero.cave && x > 400 && Math.random() < 0.025) hero.cave = { x0: x + 40, x1: x + 180 + Math.random() * 140 };
+  const cv = hero.cave, inCave = cv && x > cv.x0 - 16 && x < cv.x1 + 16;
   if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
   else if (r < 0.52) {
-    const q = Math.random(), k = q < 0.38 ? 'slime' : q < 0.52 ? 'mushroom' : q < 0.66 ? 'goblin' : q < 0.78 ? 'skeleton' : q < 0.9 ? 'bat' : 'ghost';
+    const q = Math.random(), k = inCave ? (q < 0.25 ? 'slime' : q < 0.5 ? 'skeleton' : q < 0.8 ? 'bat' : 'ghost')
+      : q < 0.38 ? 'slime' : q < 0.52 ? 'mushroom' : q < 0.66 ? 'goblin' : q < 0.78 ? 'skeleton' : q < 0.9 ? 'bat' : 'ghost';
     hero.things.push({ k, foe: true, x, hue: k === 'slime' ? 90 + Math.floor(Math.random() * 200) : HERO_FOE_HUE[k] });
   }
   else if (r < 0.58) hero.things.push({ k: 'chest', x });
-  else if (r < 0.67) hero.things.push({ k: 'rock', x, w: 5 + Math.floor(Math.random() * 3) });
-  else if (r < 0.8) hero.things.push({ k: 'tree', x });
+  else if (r < 0.67 || (inCave && r < 0.75)) hero.things.push({ k: 'rock', x, w: 5 + Math.floor(Math.random() * 3) });
+  else if (inCave) hero.things.push({ k: 'coin', x, y: 3 });
+  else if (r < 0.8) hero.things.push({ k: 'tree', x, v: Math.floor(Math.random() * 3) }); // sapin, chêne ou bouleau
   else if (r < 0.9) hero.things.push({ k: 'bush', x });
   else hero.things.push({ k: 'flower', x, hue: Math.floor(Math.random() * 360) });
   hero.nextX += 16 + Math.random() * 26;
@@ -1055,6 +1060,7 @@ function drawHero(t, beat, pulse) {
   else hero.hx += arrive ? (target - hero.hx) : Math.min(target - hero.hx, 22 * dt / 1000);
   if (camp && hero.phase !== 'break') { // au camp, plus de pièces ni d'ennemis ; des ruines au hasard derrière
     hero.things = hero.things.filter((e) => e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
+    hero.cave = null;
     hero.ruin = Math.random() < 0.75 ? HERO_RUINS[Math.floor(Math.random() * HERO_RUINS.length)] : null;
   }
   hero.phase = phase;
@@ -1136,6 +1142,43 @@ function drawHero(t, beat, pulse) {
     const sx = i * 7 - wx;
     if (h < 55) rect(sx, gy + 2 + h % 4, 2, 1, '#fff', 0.14);
     if (h > 80) rect(sx, gy - 1, 1, 1, '#9be37a', 0.8);
+  }
+
+  // Grotte : un massif rocheux qui cache le ciel, percé d'un souterrain (plafond à stalactites,
+  // torches qui vacillent, cristaux qui luisent).
+  const cv = hero.cave;
+  if (cv && cv.x1 + 16 < wx) hero.cave = null;
+  else if (cv && !camp) {
+    const A = 14, hsh = (n) => Math.imul(n, 2654435761) >>> 0, lights = [];
+    for (let x = 0; x < LW; x++) {
+      const X = Math.round(x + wx);
+      if (X < cv.x0 - A || X > cv.x1 + A) continue;
+      const u = Math.min(1, Math.min(X - (cv.x0 - A), cv.x1 + A - X) / A), top = Math.round(gy * (1 - u) * (1 - u) * (1 + u));
+      rect(x, top, 1, gy - top, '#3a3542', 0.97);
+      for (let y = top + 1; y < gy; y += 3) if (hsh(X * 31 + y) % 7 === 0) rect(x, y, 1, 1, '#57506a', 0.9);
+      if (X < cv.x0 || X > cv.x1) continue;
+      const d = Math.min(X - cv.x0, cv.x1 - X), h = hsh(X);
+      const cy = gy - Math.min(gy - 3, 19, 12 + Math.round(d * 1.2)) - h % 3;
+      rect(x, cy, 1, gy - cy, '#14111a', 0.97);
+      if (d > 6 && h % 9 === 0) rect(x, cy, 1, 2 + h % 3, '#3a3542', 0.97); // stalactite
+      if (d > 8 && X % 31 === 7) { // cristal
+        const c = `hsl(${h % 360} 80% 65%)`;
+        rect(x, gy - 2, 1, 2, c); rect(x + 1, gy - 3, 1, 3, c); rect(x + 1, gy - 3, 1, 1, '#fff', 0.8);
+        lights.push([x + 1, gy - 2, 4, `hsla(${h % 360} 80% 65% / 0.35)`]);
+      }
+      if (d > 10 && X % 48 === 0) { // torche
+        const fl = Math.floor(t / 120 + X) % 3 === 0 ? 1 : 0;
+        rect(x, gy - 10, 1, 3, '#6b4423'); rect(x, gy - 12 + fl, 1, 2 - fl, '#ffb02e'); rect(x, gy - 11, 1, 1, '#fff3a0');
+        lights.push([x + 0.5, gy - 11, 9 + fl, 'rgba(255, 160, 40, 0.4)']);
+      }
+    }
+    ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1; // halos ronds des torches et des cristaux
+    for (const [lx, ly, r, c] of lights) {
+      const g = ctx.createRadialGradient(lx * px, ly * px, 0, lx * px, ly * px, r * px);
+      g.addColorStop(0, c); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g; ctx.fillRect((lx - r) * px, (ly - r) * px, 2 * r * px, 2 * r * px);
+    }
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   // Choses du monde
@@ -1281,7 +1324,15 @@ function drawHero(t, beat, pulse) {
     } else if (e.k === 'chest') {
       rect(sx, gy - 5, 8, 5, '#a8642a'); rect(sx, gy - 3, 8, 1, '#5b3414'); rect(sx + 3, gy - 4, 2, 2, '#ffd23f');
       if (e.open) { rect(sx, gy - 8, 8, 3, '#8a4f1e'); rect(sx + 1, gy - 5, 6, 1, '#ffe27a'); }
-    } else if (e.k === 'tree') {
+    } else if (e.k === 'tree' && e.v === 1) { // chêne : tronc large, feuillage rond
+      rect(sx + 3, gy - 7, 3, 7, '#6b4423'); rect(sx + 2, gy - 1, 5, 1, '#6b4423');
+      rect(sx + 2, gy - 15, 5, 1, '#3f8f3a'); rect(sx, gy - 14, 9, 2, '#3f8f3a'); rect(sx - 1, gy - 12, 11, 4, '#3f8f3a'); rect(sx, gy - 8, 9, 1, '#3f8f3a');
+      rect(sx + 1, gy - 13, 2, 1, '#7ddc8a', 0.6); rect(sx + 6, gy - 10, 2, 1, '#2a6b2a'); rect(sx + 2, gy - 9, 2, 1, '#2a6b2a');
+    } else if (e.k === 'tree' && e.v === 2) { // bouleau : tronc blanc tacheté, petit feuillage clair
+      rect(sx + 3, gy - 10, 1, 10, '#ece8dc'); rect(sx + 3, gy - 7, 1, 1, '#1a1a2e'); rect(sx + 3, gy - 3, 1, 1, '#1a1a2e');
+      rect(sx + 2, gy - 15, 3, 1, '#a8d64a'); rect(sx + 1, gy - 14, 5, 3, '#a8d64a'); rect(sx + 2, gy - 11, 3, 1, '#a8d64a');
+      rect(sx + 4, gy - 9, 2, 1, '#ece8dc'); rect(sx + 5, gy - 10, 1, 1, '#a8d64a'); rect(sx + 2, gy - 13, 1, 1, '#e6f59a', 0.8);
+    } else if (e.k === 'tree') { // sapin
       rect(sx + 3, gy - 6, 2, 6, '#6b4423');
       rect(sx + 3, gy - 15, 2, 2, '#2f8f4e'); rect(sx + 2, gy - 13, 4, 2, '#2f8f4e'); rect(sx + 1, gy - 11, 6, 2, '#2f8f4e'); rect(sx, gy - 9, 8, 3, '#2f8f4e');
       rect(sx + 3, gy - 14, 1, 1, '#fff', 0.35);

@@ -26,7 +26,8 @@ premier pour reprendre le travail).
   Ciel marqué : jour et soleil en focus, nuit étoilée et lune en pause.
   Trois boss au hasard : roi slime (couleur au hasard), squelette géant, chat géant.
   Trois héros (Apparence → Héros) : chevalier, mage, voleur ; par défaut un autre au hasard
-  à chaque début de focus.
+  à chaque début de focus. Grottes à traverser de temps en temps (torches, cristaux, chauves-souris)
+  et trois sortes d'arbres au hasard (sapin, chêne, bouleau).
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

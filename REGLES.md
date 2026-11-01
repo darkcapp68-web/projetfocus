@@ -173,7 +173,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   (capuche, masque, dague, deux coups rapides ; +1 pièce par ennemi, coffres à 15 au lieu de 10) ;
   couleurs qui changent à chaque niveau pour les trois. Par défaut « Au hasard » (`hasard`,
   idée de l'utilisateur) : un héros différent du précédent à chaque début de focus (`pickHero()`
-  dans `startFocus`) ; version 14 des réglages : « chevalier » devient « hasard ». Code : `drawHero()` dans
+  dans `startFocus`) ; version 14 des réglages : « chevalier » devient « hasard ».
+  **Grottes** (01/11, idée de l'utilisateur) : environ toutes les deux ou trois minutes de marche
+  (`hero.cave`, tirée dans `heroSpawn`), un massif rocheux cache le ciel et un souterrain de
+  140 à 280 pixels se traverse (stalactites, torches à halo, cristaux) ; dedans, plutôt
+  chauves-souris, fantômes, squelettes, slimes, et pas d'arbres. **Trois arbres** au hasard : sapin,
+  chêne, bouleau (`v` de la chose `tree`). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
   coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport
