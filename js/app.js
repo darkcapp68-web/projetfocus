@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h14';
+const APP_VERSION = '01/11/2026 · 17h25';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1492,6 +1492,11 @@ function drawHero(t, beat, pulse) {
     for (let rx = 0; rx < row.length; rx++) if (row[rx] !== '.') rect(hx + rx, hatTop + ry, 1, 1, col[row[rx]]);
   });
   if (cls === 'mage') rect(hx + 5, top - 2, 1, 1, '#ffd23f', 0.6 + 0.4 * Math.sin(t / 300)); // étoile du chapeau
+  if (cls === 'mage') { // longue barbe blanche
+    const bd = '#eeeef6', bs = '#c4c4d4';
+    rect(hx + 3, top + 2, 5, 1, bd); rect(hx + 4, top + 3, 4, 1, bd); rect(hx + 4, top + 4, 3, 1, bd); rect(hx + 5, top + 5, 2, 1, bd); rect(hx + 5, top + 6, 1, 1, bs);
+    rect(hx + 4, top + 4, 1, 1, bs); rect(hx + 6, top + 2, 1, 1, '#1a1a2e', 0.5);
+  }
   const sw = sitting ? 0 : fr; // l'écharpe (ou la cape) flotte
   if (col.R) { rect(hx + 1, top + 4 + sw, 2, 1, col.R); rect(hx - 1 + sw, top + 4 + sw, 2, 1, col.R); }
   else { rect(hx + 1, top + 3, 1, 5, col.H); rect(hx - sw, top + 5 + sw, 1, 3, col.H); } // cape du mage
@@ -1505,6 +1510,10 @@ function drawHero(t, beat, pulse) {
     rect(hx + 4, top + 8, 2, 4, col.L); rect(hx + 6, top + 8, 2, 4, col.L); rect(hx + 4, top + 11, 4, 1, '#5b3414');
   }
   const a = 1 - (t - hero.atk) / 230, o = sitting ? 2 : 0;
+  if (cls === 'chevalier') { // bouclier bleu au bord doré, porté devant
+    rect(hx + 4, top + 4, 4, 4, '#c9a227'); rect(hx + 5, top + 8, 2, 1, '#c9a227');
+    rect(hx + 5, top + 5, 2, 3, '#2f5fc4'); rect(hx + 5, top + 5, 1, 1, '#ffffff', 0.7);
+  }
   if (cls === 'mage') { // bâton à boule lumineuse ; en attaque, une boule de feu file vers l'ennemi
     rect(hx + 9, top - 1 + o, 1, 11 - o, '#8a5a2b');
     const glow = atk ? 1 : 0.55 + 0.25 * Math.sin(t / 260);
