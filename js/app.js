@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 14h04';
+const APP_VERSION = '01/11/2026 · 14h08';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1632,6 +1632,7 @@ function breathStop() {
    ========================================================= */
 
 let weWentFullscreen = false, fullscreenPending = false;
+let landWant = false, landFs = false; // vue en bande sur téléphone : plein écran + paysage (voir setLand)
 
 function enterFullscreen() {
   if (!S.fullscreenOnBreak || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
@@ -1643,7 +1644,7 @@ function enterFullscreen() {
 
 function leaveFullscreen() {
   fullscreenPending = false;
-  if (weWentFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  if (weWentFullscreen && document.fullscreenElement && !landWant) document.exitFullscreen().catch(() => {}); // la vue paysage garde le plein écran
   weWentFullscreen = false;
 }
 
@@ -2141,6 +2142,7 @@ window.addEventListener('pointermove', (e) => {
 window.addEventListener('pointerdown', (e) => {
   poke();
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
+  if (landWant && !orientationLocked) lockLandscape();
 }, true);
 window.addEventListener('keydown', (e) => {
   poke();
@@ -2505,18 +2507,35 @@ selLook.addEventListener('change', () => {
 // installée ou en plein écran ; ailleurs, la demande est refusée sans bruit).
 const landPhone = matchMedia('(orientation: landscape) and (max-height: 560px)');
 const landWide = matchMedia('(orientation: landscape)');
+// Chrome sur Android ne couche l'écran que si la page est en plein écran : sur un téléphone, les
+// vues en bande (onde, petit héros) passent en plein écran puis en paysage, dès le choix de la vue
+// ou au toucher suivant (il faut un geste). Changer de vue rend la rotation et quitte ce plein écran.
+const touchPhone = matchMedia('(pointer: coarse)');
 let orientationLocked = false;
+function lockLandscape() {
+  if (!landWant || orientationLocked) return;
+  const lock = () => screen.orientation?.lock?.('landscape').then(() => { orientationLocked = true; }, () => {});
+  if (document.fullscreenElement || !document.documentElement.requestFullscreen) { lock(); return; }
+  document.documentElement.requestFullscreen().then(() => { landFs = true; lock(); }, () => {});
+}
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) { orientationLocked = false; landFs = false; } // sorti par le geste retour
+});
 function setLand() {
   const horizon = S.dialStyle === 'rythme' && S.rhythmForm === 'horizon';
   const wide = horizon || (S.dialStyle === 'rythme' && S.rhythmForm === 'heros'); // bande sous / à droite de l'horloge
   body.classList.toggle('horizon', wide);
   body.classList.toggle('hero', wide && !horizon);
   body.classList.toggle('land', landPhone.matches || (wide && landWide.matches));
-  if (wide && !orientationLocked) {
-    screen.orientation?.lock?.('landscape').then(() => { orientationLocked = true; }, () => {});
-  } else if (!wide && orientationLocked) {
-    orientationLocked = false;
-    try { screen.orientation.unlock(); } catch { /* rien à libérer */ }
+  landWant = wide && touchPhone.matches;
+  if (landWant) lockLandscape();
+  else {
+    if (orientationLocked) {
+      orientationLocked = false;
+      try { screen.orientation.unlock(); } catch { /* rien à libérer */ }
+    }
+    if (landFs && document.fullscreenElement && !weWentFullscreen) document.exitFullscreen().catch(() => {});
+    landFs = false;
   }
 }
 landPhone.addEventListener('change', setLand);
