@@ -547,7 +547,8 @@ body.land.hero #coach-list { grid-area: 3 / 2; justify-self: start; }
 body.land.hero #wave-fx { grid-area: 1 / 2 / 3 / 3; height: var(--dial-size); align-self: center; }
 body.land.hero #message:not(:empty) {
   grid-area: 1 / 2; z-index: 1; align-self: start; justify-self: end;
-  max-width: calc(100% - 120px); margin: 8px 10px 0 0; padding: 0; background: none;
+  max-width: calc(100% - 120px); margin: 8px 10px 0 0; padding: 0.25em 0.7em; border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2); /* fond léger : le texte se lit sur le ciel comme sur le soleil */
   text-align: right; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
 body.land.horizon #setup, body.land.horizon #actions, body.land.horizon #break-actions, body.land.horizon #coach-list { order: 3; }

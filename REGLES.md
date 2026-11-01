@@ -160,7 +160,7 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   **ruine au hasard** (pan de mur, deux colonnes dont une brisée, arche, tour au loin, ou rien une
   fois sur quatre). **En paysage** (focus et pause), les **boutons passent sous l'horloge** (01/11 :
   ils étaient trop bas sur le PC), les idées du coach sous la bande ; le message s'écrit **dans le
-  ciel** du décor (en haut à droite, sans pastille) ; la bande est **aussi haute que l'horloge** : en focus les pixels
+  ciel** du décor (en haut à droite, sur un fond noir à 20 % pour bien le lire) ; la bande est **aussi haute que l'horloge** : en focus les pixels
   gardent leur taille (on voit plus de ciel), en pause 40 pixels de haut au lieu de 20 dès que la
   bande dépasse 250 px ; grandes montagnes au loin quand le ciel est assez haut ; **ciel marqué** quelle que soit la couleur du moment (01/11, le reste garde la teinte du fond) : **jour** bleu avec soleil et nuages pendant le focus, **nuit** étoilée avec lune pendant la pause ; collines abaissées dans la pause zoomée pour garder du ciel ; de temps en temps une **chauve-souris**
   traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans
