@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 14h08';
+const APP_VERSION = '01/11/2026 · 14h26';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -2139,8 +2139,10 @@ window.addEventListener('pointermove', (e) => {
   lastMove = { x: e.clientX, y: e.clientY };
   poke();
 });
-window.addEventListener('pointerdown', (e) => {
-  poke();
+window.addEventListener('pointerdown', (e) => { poke(); }, true);
+// Plein écran et rotation demandent un geste : au doigt, Chrome ne le compte qu'au relâcher
+// (pointerup), pas à l'appui (vu sur l'émulateur : rien ne se passait à pointerdown).
+window.addEventListener('pointerup', () => {
   if (fullscreenPending && T.phase === 'break') enterFullscreen();
   if (landWant && !orientationLocked) lockLandscape();
 }, true);

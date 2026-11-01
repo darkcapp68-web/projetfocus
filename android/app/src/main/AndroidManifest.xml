@@ -63,6 +63,10 @@
 
         <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
 
+        <!-- Raccourci « Réglages du site » : sans cette déclaration, l'appli plantait au démarrage
+             (vu sur l'émulateur le 01/11/2026). -->
+        <activity android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity" />
+
         <!-- Si Chrome n'est pas installé : le site s'ouvre dans une vue web intégrée. -->
         <activity
             android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
