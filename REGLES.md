@@ -140,8 +140,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   au slime à portée (ou au contact si le temps tarde), sinon il **remplit la jauge de combat**
   (+1 par temps, +4 par slime, +6 par coffre ; barre rouge « boss » sous les pièces) ; il ne
   **saute que par-dessus les rochers** (01/11 : sauter sans raison faisait bizarre ; saut assez
-  long pour que le rocher passe dessous). **Jauge pleine (150)** : un **roi slime** (gros, couronné,
-  barre de vie) arrive par la droite, le décor s'arrête et le héros le frappe **un coup par
+  long pour que le rocher passe dessous). **Jauge pleine (150)** : un **boss tiré au hasard** arrive par la droite (01/11 :
+  **roi slime** couronné de couleur au hasard, **squelette géant** aux yeux rouges et grande épée, ou
+  **chat géant** assis, roux, gris, noir ou crème, qui cligne des yeux ; barre de vie au-dessus), le décor s'arrête et le héros le frappe **un coup par
   temps** (14 points de vie, +2 par roi déjà battu, 30 au plus ; le héros avance avec le temps,
   le roi recule pour ne pas être traversé) ; victoire : +50 pièces,
   « VICTOIRE ! », jauge à zéro, « boss ×n » compté. En pause le roi s'en va et revient après

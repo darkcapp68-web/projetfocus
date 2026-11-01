@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h44';
+const APP_VERSION = '01/11/2026 · 13h53';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -915,8 +915,8 @@ function drawHorizon(t, level, pulse) {
 // Un petit chevalier en pixels court sans s'arrêter dans un décor qui défile : deux pas par temps
 // du BPM (80 BPM sans musique). Chaque temps donne un coup d'épée au slime à portée, sinon remplit
 // la jauge de combat ; il ne saute que par-dessus les rochers. Ennemis variés : slimes,
-// champignons, gobelins, squelettes, chauves-souris, fantômes ; en pause, ruines au hasard. Jauge pleine : un roi slime arrive et
-// se bat à coups d'épée sur le rythme. Il ramasse des pièces, ouvre des coffres ; pièces, niveau
+// champignons, gobelins, squelettes, chauves-souris, fantômes ; en pause, ruines au hasard. Jauge pleine : un boss (roi slime, squelette
+// géant ou chat géant) arrive et se bat à coups d'épée sur le rythme. Il ramasse des pièces, ouvre des coffres ; pièces, niveau
 // et jauge sont gardés sur l'appareil. Pendant le focus il avance vers le drapeau d'arrivée au fil
 // du temps ; en pause il se repose au coin du feu.
 const LS_HERO = 'projetfocus.heros';
@@ -933,6 +933,10 @@ const hero = (() => {
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
 const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190 };
 const HERO_RUINS = ['wall', 'columns', 'arch', 'tower'];
+const HERO_BOSSES = ['slime', 'skeleton', 'cat'];
+// Robe du chat géant : couleur, ventre et museau
+const HERO_CATS = [['#f0a04b', '#ffe0b8'], ['#9aa0ac', '#e4e7ee'], ['#3a3340', '#e9e4ef'], ['#f4e3c3', '#ffffff']];
+const bossHue = (e) => (e.type === 'skeleton' ? 0 : e.type === 'cat' ? 35 : e.hue ?? 285);
 const HERO_HELM = ['#c3cbe0', '#5aa9ff', '#ff6b6b', '#ffd23f', '#b57bff', '#4fe3b0'];
 const HERO_SCARF = ['#e63946', '#ff9f1c', '#2ec4b6', '#f72585', '#ffffff', '#ff6b6b'];
 const HERO_BODY = [
@@ -1095,9 +1099,11 @@ function drawHero(t, beat, pulse) {
       // Jauge pleine : le roi slime arrive par la droite, on lui fait de la place.
       const bx = wx + LW + 8, hp = 14 + Math.min(16, hero.bosses * 2);
       hero.things = hero.things.filter((e) => e.x < bx - 30 || e.x > bx + 40 || e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
-      hero.things.push({ k: 'boss', x: bx, hp, max: hp, hit: -1e4 });
+      const type = HERO_BOSSES[Math.floor(Math.random() * HERO_BOSSES.length)];
+      const pal = type === 'cat' ? HERO_CATS[Math.floor(Math.random() * HERO_CATS.length)] : null;
+      hero.things.push({ k: 'boss', type, pal, hue: Math.floor(Math.random() * 360), x: bx, hp, max: hp, hit: -1e4 });
       hero.nextX = Math.max(hero.nextX, bx + 40);
-      hero.parts.push({ k: 'txt', x: LW / 2 - 14, y: gy - 24, vy: -0.004, t0: t, txt: 'UN ROI SLIME !', big: true });
+      hero.parts.push({ k: 'txt', x: LW / 2 - 14, y: gy - 24, vy: -0.004, t0: t, txt: { slime: 'UN ROI SLIME !', skeleton: 'UN SQUELETTE GÉANT !', cat: 'UN CHAT GÉANT !' }[type], big: true });
     }
   }
   const things = hero.things;
@@ -1129,28 +1135,63 @@ function drawHero(t, beat, pulse) {
       if (!struck) { // un coup par temps
         struck = true;
         e.hp--; e.hit = t; hero.atk = t;
-        for (let j = 0; j < 5; j++) hero.parts.push({ k: 'spark', x: sx + 2, y: gy - 6 - Math.random() * 6, vx: Math.random() * 0.008, vy: -0.002 - Math.random() * 0.004, t0: t, hue: 290 });
+        for (let j = 0; j < 5; j++) hero.parts.push({ k: 'spark', x: sx + 2, y: gy - 6 - Math.random() * 6, vx: Math.random() * 0.008, vy: -0.002 - Math.random() * 0.004, t0: t, hue: bossHue(e) });
         if (e.hp <= 0) {
           e.dead = t; hero.bosses++; hero.kills++; hero.charge = 0;
           heroGain(50, sx, gy - 20);
           hero.parts.push({ k: 'txt', x: LW / 2 - 12, y: gy - 26, vy: -0.004, t0: t, txt: 'VICTOIRE !', big: true });
-          for (let j = 0; j < 26; j++) hero.parts.push({ k: 'spark', x: sx + 10, y: gy - 8, vx: (Math.random() - 0.5) * 0.016, vy: -0.003 - Math.random() * 0.008, t0: t, hue: j % 2 ? 48 : 290 });
+          for (let j = 0; j < 26; j++) hero.parts.push({ k: 'spark', x: sx + 10, y: gy - 8, vx: (Math.random() - 0.5) * 0.016, vy: -0.003 - Math.random() * 0.008, t0: t, hue: j % 2 ? 48 : bossHue(e) });
         }
       }
     }
     if (e.dead && (e.k === 'coin' || e.k === 'boss')) continue;
     if (e.k === 'boss') {
-      // Roi slime : 20 × 14 pixels, couronne, sourcils froncés, barre de vie
-      const sq = Math.round(Math.sin(t / 300) * 0.7 + 0.7), flash = t - e.hit < 110;
-      const c = flash ? '#ffffff' : 'hsl(285 65% 52%)', y0 = gy + sq;
-      rect(sx + 5, y0 - 15, 10, 1, c); rect(sx + 3, y0 - 14, 14, 1, c); rect(sx + 2, y0 - 13, 16, 2, c);
-      rect(sx + 1, y0 - 11, 18, 3, c); rect(sx, y0 - 8, 20, 8 - sq, c);
-      rect(sx + 4, y0 - 13, 2, 1, '#fff', 0.55); rect(sx + 3, y0 - 12, 1, 2, '#fff', 0.4);
-      rect(sx + 4, y0 - 9, 3, 1, '#1a1a2e'); rect(sx + 13, y0 - 9, 3, 1, '#1a1a2e');
-      rect(sx + 5, y0 - 8, 2, 2, '#1a1a2e'); rect(sx + 13, y0 - 8, 2, 2, '#1a1a2e');
-      rect(sx + 8, y0 - 4, 4, 1, '#1a1a2e');
-      rect(sx + 6, y0 - 17, 8, 2, '#ffd23f'); rect(sx + 6, y0 - 19, 1, 2, '#ffd23f'); rect(sx + 9, y0 - 19, 2, 2, '#ffd23f'); rect(sx + 13, y0 - 19, 1, 2, '#ffd23f');
-      rect(sx + 9, y0 - 17, 2, 1, '#ff5470');
+      // Trois boss au hasard : roi slime (couleur au hasard), squelette géant, chat géant ;
+      // tous blanchissent sous le coup et ont leur barre de vie au-dessus.
+      const flash = t - e.hit < 110, dk = '#1a1a2e';
+      if (e.type === 'skeleton') {
+        const c = flash ? '#ffffff' : '#ece6d6', sh = '#b9b2a2', dy = Math.round(Math.sin(t / 320)), st = Math.floor(t / 400) % 2;
+        rect(sx + 5, gy - 21 + dy, 9, 6, c); rect(sx + 6, gy - 22 + dy, 7, 1, c); // crâne
+        rect(sx + 6, gy - 19 + dy, 2, 2, dk); rect(sx + 11, gy - 19 + dy, 2, 2, dk);
+        rect(sx + 7, gy - 18 + dy, 1, 1, '#ff5470'); rect(sx + 11, gy - 18 + dy, 1, 1, '#ff5470');
+        rect(sx + 9, gy - 17 + dy, 1, 1, dk);
+        rect(sx + 6, gy - 15 + dy, 7, 1, c); for (let i = 7; i < 13; i += 2) rect(sx + i, gy - 15 + dy, 1, 1, dk); // mâchoire
+        rect(sx + 9, gy - 14 + dy, 2, 8, sh); // colonne
+        for (const y of [13, 11, 9]) rect(sx + 6, gy - y + dy, 8, 1, c); // côtes
+        rect(sx + 4, gy - 13 + dy, 2, 6, c); rect(sx + 14, gy - 13 + dy, 2, 7, c); // bras
+        rect(sx + 7, gy - 6, 6, 2, c); // bassin
+        rect(sx + 7 + st, gy - 4, 2, 4, c); rect(sx + 11 - st, gy - 4, 2, 4, c);
+        rect(sx + 6 + st, gy - 1, 3, 1, sh); rect(sx + 11 - st, gy - 1, 3, 1, sh);
+        rect(sx + 1, gy - 8 + dy, 4, 1, '#8a5a2b'); rect(sx + 2, gy - 9 + dy, 1, 3, '#c9a227'); // grande épée
+        rect(sx + 2, gy - 20 + dy, 1, 11, '#c9d1dc'); rect(sx + 3, gy - 19 + dy, 1, 10, '#8f98a6'); rect(sx + 2, gy - 21 + dy, 1, 1, '#ffffff');
+      } else if (e.type === 'cat') {
+        const [c0, l0] = e.pal, c = flash ? '#ffffff' : c0, l = flash ? '#ffffff' : l0, w = Math.round(Math.sin(t / 250) * 1.5);
+        const blink = Math.floor(t / 2600) % 5 === 0 && t % 2600 < 160;
+        rect(sx + 7, gy - 10, 12, 10, c); rect(sx + 8, gy - 11, 9, 1, c); // corps assis
+        rect(sx + 2, gy - 8, 6, 6, c); rect(sx + 3, gy - 7, 4, 5, l); // poitrail
+        rect(sx + 2, gy - 2, 3, 2, l); rect(sx + 6, gy - 2, 3, 2, l); // pattes
+        rect(sx, gy - 16, 10, 8, c); rect(sx + 1, gy - 17, 8, 1, c); // tête
+        rect(sx + 1, gy - 19, 2, 2, c); rect(sx + 7, gy - 19, 2, 2, c); rect(sx + 1, gy - 18, 1, 1, '#ff9db5'); rect(sx + 8, gy - 18, 1, 1, '#ff9db5');
+        rect(sx + 2, gy - 12, 6, 3, l); // museau
+        if (blink) { rect(sx + 2, gy - 14, 2, 1, dk); rect(sx + 6, gy - 14, 2, 1, dk); }
+        else { rect(sx + 2, gy - 15, 2, 2, '#9be37a'); rect(sx + 6, gy - 15, 2, 2, '#9be37a'); rect(sx + 2, gy - 15, 1, 2, dk); rect(sx + 6, gy - 15, 1, 2, dk); }
+        rect(sx + 4, gy - 12, 2, 1, '#ff9db5'); rect(sx + 3, gy - 10, 1, 1, dk); rect(sx + 6, gy - 10, 1, 1, dk); rect(sx + 4, gy - 11, 2, 1, dk, 0.6);
+        rect(sx - 3, gy - 12, 4, 1, '#ffffff', 0.7); rect(sx - 3, gy - 10, 4, 1, '#ffffff', 0.7); // moustaches
+        rect(sx + 19, gy - 3, 2, 2, c); rect(sx + 20, gy - 5, 2, 2, c); rect(sx + 20 + w, gy - 7, 2, 2, c); rect(sx + 19 + w, gy - 9, 2, 2, c); // queue
+        for (let i = 9; i < 18; i += 3) rect(sx + i, gy - 9, 1, 3, dk, 0.15); // rayures
+      } else {
+        // Roi slime : 20 × 14 pixels, couronne, sourcils froncés
+        const sq = Math.round(Math.sin(t / 300) * 0.7 + 0.7);
+        const c = flash ? '#ffffff' : `hsl(${e.hue ?? 285} 65% 52%)`, y0 = gy + sq;
+        rect(sx + 5, y0 - 15, 10, 1, c); rect(sx + 3, y0 - 14, 14, 1, c); rect(sx + 2, y0 - 13, 16, 2, c);
+        rect(sx + 1, y0 - 11, 18, 3, c); rect(sx, y0 - 8, 20, 8 - sq, c);
+        rect(sx + 4, y0 - 13, 2, 1, '#fff', 0.55); rect(sx + 3, y0 - 12, 1, 2, '#fff', 0.4);
+        rect(sx + 4, y0 - 9, 3, 1, dk); rect(sx + 13, y0 - 9, 3, 1, dk);
+        rect(sx + 5, y0 - 8, 2, 2, dk); rect(sx + 13, y0 - 8, 2, 2, dk);
+        rect(sx + 8, y0 - 4, 4, 1, dk);
+        rect(sx + 6, y0 - 17, 8, 2, '#ffd23f'); rect(sx + 6, y0 - 19, 1, 2, '#ffd23f'); rect(sx + 9, y0 - 19, 2, 2, '#ffd23f'); rect(sx + 13, y0 - 19, 1, 2, '#ffd23f');
+        rect(sx + 9, y0 - 17, 2, 1, '#ff5470');
+      }
       rect(sx, gy - 23, 20, 1, '#000', 0.5); rect(sx, gy - 23, Math.max(0, Math.round(20 * e.hp / e.max)), 1, '#ff5470');
     } else if (e.k === 'coin') {
       const y = gy - e.y - 4, w = Math.abs(Math.cos(t / 260 + e.x)) > 0.35 ? 3 : 1;
