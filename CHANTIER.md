@@ -25,7 +25,8 @@ premier pour reprendre le travail).
   Puis : boutons sous l'horloge en paysage, le héros ne traverse plus le roi slime.
   Ciel marqué : jour et soleil en focus, nuit étoilée et lune en pause.
   Trois boss au hasard : roi slime (couleur au hasard), squelette géant, chat géant.
-  Trois héros au choix (Apparence → Héros) : chevalier, mage, voleur.
+  Trois héros (Apparence → Héros) : chevalier, mage, voleur ; par défaut un autre au hasard
+  à chaque début de focus.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

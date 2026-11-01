@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 14h59';
+const APP_VERSION = '01/11/2026 · 16h52';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -80,6 +80,9 @@ function sanitize(s) {
     for (const id of ['rectechno', 'recminimal', 'recambient']) if (!s.hiddenStations.includes(id)) s.hiddenStations.push(id);
     s.version = 13;
   }
+  // Version 14 : le héros est tiré au hasard à chaque focus (le choix fixe, ajouté une heure avant,
+  // reste possible).
+  if (s.version < 14) { if (s.heroClass === 'chevalier') s.heroClass = 'hasard'; s.version = 14; }
   return s;
 }
 
@@ -986,7 +989,13 @@ const HERO_CLASSES = {
     body2: ['#7a4a2a'], scarf: ['#9be37a', '#ffd23f', '#5aa9ff', '#ff9f1c', '#ffffff', '#f72585'], legs: '#3a2f2a',
   },
 };
-const heroClass = () => HERO_CLASSES[S.heroClass] ? S.heroClass : 'chevalier';
+// « Au hasard » : un nouveau héros (différent du précédent) à chaque début de focus.
+let heroPick = Object.keys(HERO_CLASSES)[Math.floor(Math.random() * 3)];
+function pickHero() {
+  const others = Object.keys(HERO_CLASSES).filter((c) => c !== heroPick);
+  heroPick = others[Math.floor(Math.random() * others.length)];
+}
+const heroClass = () => HERO_CLASSES[S.heroClass] ? S.heroClass : heroPick;
 
 function heroGain(n, x, y) {
   hero.coins += n;
@@ -2015,6 +2024,7 @@ function startFocus(afterBreak) {
   T.total = S.focusMin * 60;
   T.endAt = Date.now() + T.total * 1000;
   T.pausedRemaining = null;
+  pickHero();
   leaveFullscreen();
   keepAwake(true);
   audio.leaveBreak(S.musicVolWork / 100);
