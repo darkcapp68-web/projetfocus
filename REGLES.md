@@ -177,7 +177,11 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   **Grottes** (01/11, idée de l'utilisateur) : environ toutes les deux ou trois minutes de marche
   (`hero.cave`, tirée dans `heroSpawn`), un massif rocheux cache le ciel et un souterrain de
   140 à 280 pixels se traverse (stalactites, torches à halo, cristaux) ; dedans, plutôt
-  chauves-souris, fantômes, squelettes, slimes, et pas d'arbres. **Trois arbres** au hasard : sapin,
+  squelettes, chauves-souris et fantômes, yeux rouges qui clignent, toiles d'araignée, obscurité
+  qui se resserre autour du héros (souterrain « flippant », souhait de l'utilisateur), pas d'arbres.
+  Dehors, des choses « normales » : slimes, champignons, gobelins, **loups** (ennemi, +4), **biche**
+  qui broute puis s'enfuit en bondissant quand le héros approche (on ne la combat pas), **aigle**
+  qui plane de temps en temps dans le ciel (`hero.eagle`). **Trois arbres** au hasard : sapin,
   chêne, bouleau (`v` de la chose `tree`). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident

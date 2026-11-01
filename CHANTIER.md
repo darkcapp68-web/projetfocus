@@ -27,7 +27,9 @@ premier pour reprendre le travail).
   Trois boss au hasard : roi slime (couleur au hasard), squelette géant, chat géant.
   Trois héros (Apparence → Héros) : chevalier, mage, voleur ; par défaut un autre au hasard
   à chaque début de focus. Grottes à traverser de temps en temps (torches, cristaux, chauves-souris)
-  et trois sortes d'arbres au hasard (sapin, chêne, bouleau).
+  et trois sortes d'arbres au hasard (sapin, chêne, bouleau). Dehors une aventure « normale »
+  (slimes, champignons, gobelins, loups, biche qui s'enfuit, aigle qui plane) ; sous terre ce qui
+  fait peur (squelettes, chauves-souris, fantômes, yeux rouges, toiles, obscurité autour du héros).
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

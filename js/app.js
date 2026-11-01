@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h02';
+const APP_VERSION = '01/11/2026 · 17h06';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -934,7 +934,7 @@ const hero = (() => {
   };
 })();
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
-const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190 };
+const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190, wolf: 220 };
 const HERO_RUINS = ['wall', 'columns', 'arch', 'tower'];
 const HERO_BOSSES = ['slime', 'skeleton', 'cat'];
 // Robe du chat géant : couleur, ventre et museau
@@ -1011,8 +1011,9 @@ function heroSpawn() {
   const cv = hero.cave, inCave = cv && x > cv.x0 - 16 && x < cv.x1 + 16;
   if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
   else if (r < 0.52) {
-    const q = Math.random(), k = inCave ? (q < 0.25 ? 'slime' : q < 0.5 ? 'skeleton' : q < 0.8 ? 'bat' : 'ghost')
-      : q < 0.38 ? 'slime' : q < 0.52 ? 'mushroom' : q < 0.66 ? 'goblin' : q < 0.78 ? 'skeleton' : q < 0.9 ? 'bat' : 'ghost';
+    // Dehors, une aventure « normale » ; sous terre, ce qui fait peur.
+    const q = Math.random(), k = inCave ? (q < 0.4 ? 'skeleton' : q < 0.75 ? 'bat' : 'ghost')
+      : q < 0.35 ? 'slime' : q < 0.55 ? 'mushroom' : q < 0.78 ? 'goblin' : 'wolf';
     hero.things.push({ k, foe: true, x, hue: k === 'slime' ? 90 + Math.floor(Math.random() * 200) : HERO_FOE_HUE[k] });
   }
   else if (r < 0.58) hero.things.push({ k: 'chest', x });
@@ -1020,6 +1021,7 @@ function heroSpawn() {
   else if (inCave) hero.things.push({ k: 'coin', x, y: 3 });
   else if (r < 0.8) hero.things.push({ k: 'tree', x, v: Math.floor(Math.random() * 3) }); // sapin, chêne ou bouleau
   else if (r < 0.9) hero.things.push({ k: 'bush', x });
+  else if (Math.random() < 0.3) hero.things.push({ k: 'deer', x }); // biche qui broute, et s'enfuit
   else hero.things.push({ k: 'flower', x, hue: Math.floor(Math.random() * 360) });
   hero.nextX += 16 + Math.random() * 26;
 }
@@ -1144,9 +1146,26 @@ function drawHero(t, beat, pulse) {
     if (h > 80) rect(sx, gy - 1, 1, 1, '#9be37a', 0.8);
   }
 
+  // Aigle : plane de temps en temps dans le ciel du focus (pas dans une grotte), bat des ailes par moments.
+  if (!out && !hero.cave && !hero.eagle && Math.random() < dt / 40000) {
+    hero.eagle = { t0: t, y: 3 + Math.random() * Math.max(2, gy - 26), dir: Math.random() < 0.5 ? 1 : -1, s: 0.012 + Math.random() * 0.008 };
+  }
+  if (hero.eagle) {
+    const g = hero.eagle, age = t - g.t0, d = g.dir, bx = d > 0 ? -8 + age * g.s : LW + 8 - age * g.s;
+    if (out || bx < -10 || bx > LW + 10) hero.eagle = null;
+    else {
+      const by = g.y + Math.round(Math.sin(age / 900) * 1.5), br = '#5b3a1e', wg = '#6b4423';
+      const flap = Math.floor(age / 2500) % 3 === 0 && Math.floor(age / 160) % 2 === 0;
+      rect(bx, by, 3, 1, br); rect(d > 0 ? bx + 3 : bx - 1, by - (d > 0 ? 0 : 0), 1, 1, '#ffffff');
+      rect(d > 0 ? bx + 4 : bx - 2, by, 1, 1, '#ffd23f'); rect(d > 0 ? bx - 1 : bx + 3, by, 1, 1, '#ffffff', 0.8);
+      if (flap) { rect(bx - 2, by + 1, 3, 1, wg); rect(bx + 2, by + 1, 3, 1, wg); }
+      else { rect(bx - 3, by - 1, 3, 1, wg); rect(bx + 3, by - 1, 3, 1, wg); rect(bx - 4, by - 2, 1, 1, wg); rect(bx + 6, by - 2, 1, 1, wg); }
+    }
+  }
+
   // Grotte : un massif rocheux qui cache le ciel, percé d'un souterrain (plafond à stalactites,
   // torches qui vacillent, cristaux qui luisent).
-  const cv = hero.cave;
+  const cv = hero.cave, eyes = [];
   if (cv && cv.x1 + 16 < wx) hero.cave = null;
   else if (cv && !camp) {
     const A = 14, hsh = (n) => Math.imul(n, 2654435761) >>> 0, lights = [];
@@ -1161,6 +1180,11 @@ function drawHero(t, beat, pulse) {
       const cy = gy - Math.min(gy - 3, 19, 12 + Math.round(d * 1.2)) - h % 3;
       rect(x, cy, 1, gy - cy, '#14111a', 0.97);
       if (d > 6 && h % 9 === 0) rect(x, cy, 1, 2 + h % 3, '#3a3542', 0.97); // stalactite
+      if (d > 12 && X % 23 === 5) eyes.push([x, cy + 3 + h % Math.max(1, gy - cy - 10), X]); // yeux dans le noir
+      if (d > 8 && X % 41 === 3) { // toile d'araignée accrochée au plafond
+        for (let i = 0; i < 5; i++) { rect(x + i, cy + i, 1, 1, '#d8d8e8', 0.35); rect(x + 4 - i, cy + i, 1, 1, '#d8d8e8', 0.25); }
+        rect(x + 2, cy, 1, 5, '#d8d8e8', 0.3); rect(x + 2, cy + 6, 1, 1, '#1a1a2e'); rect(x + 1, cy + 7, 3, 1, '#1a1a2e');
+      }
       if (d > 8 && X % 31 === 7) { // cristal
         const c = `hsl(${h % 360} 80% 65%)`;
         rect(x, gy - 2, 1, 2, c); rect(x + 1, gy - 3, 1, 3, c); rect(x + 1, gy - 3, 1, 1, '#fff', 0.8);
@@ -1210,9 +1234,12 @@ function drawHero(t, beat, pulse) {
       // Coup d'épée sur le temps quand il est à portée (ou au contact, si le temps tarde)
       struck = true;
       e.dead = t; hero.atk = t; hero.kills++;
-      heroGain((e.k === 'skeleton' || e.k === 'ghost' ? 4 : 3) + (heroClass() === 'voleur' ? 1 : 0), sx, gy - 10); charge(4);
+      heroGain((e.k === 'skeleton' || e.k === 'ghost' || e.k === 'wolf' ? 4 : 3) + (heroClass() === 'voleur' ? 1 : 0), sx, gy - 10); charge(4);
       hero.atkTo = sx + 4; hero.atkY = e.k === 'bat' ? gy - 9 : gy - 4;
       for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3 - (e.k === 'bat' ? 7 : 0), vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
+    } else if (e.k === 'deer') {
+      if (!e.flee && near < 30) e.flee = t;
+      if (e.flee) { e.x += (speed * 2.2 + 18) * dt / 1000; if (sx > LW + 20) { things.splice(i, 1); continue; } }
     } else if (e.k === 'rock' && !e.jumped && near < 11 && !fight) {
       // Saut par-dessus le rocher : assez long pour qu'il passe dessous
       e.jumped = true; hero.hopT = t;
@@ -1309,6 +1336,29 @@ function drawHero(t, beat, pulse) {
       rect(sx + 3, gy - 7, 1, 5, c); rect(sx + 1, gy - 6, 5, 1, c); rect(sx + 2, gy - 4, 3, 1, c);
       rect(sx + 2 + st, gy - 2, 1, 2, c); rect(sx + 4 - st, gy - 2, 1, 2, c);
       rect(sx - 1, gy - 7, 1, 5, '#b8c0cc'); rect(sx - 1, gy - 8, 1, 1, '#ffffff'); // épée rouillée
+    } else if (e.k === 'wolf') { // loup gris, tourné vers le héros
+      const st = Math.floor(t / 170 + e.x) % 2, c = '#8a8f9c', dk = '#5d6170';
+      rect(sx + 2, gy - 5, 7, 3, c); rect(sx + 3, gy - 3, 5, 1, '#b5bac4');
+      rect(sx, gy - 7, 3, 3, c); rect(sx - 1, gy - 5, 1, 1, c); rect(sx, gy - 8, 1, 1, c); rect(sx + 2, gy - 8, 1, 1, c);
+      rect(sx + 1, gy - 6, 1, 1, '#ffd23f'); rect(sx - 1, gy - 5, 1, 1, '#1a1a2e');
+      rect(sx + 2 + st, gy - 2, 1, 2, dk); rect(sx + 7 - st, gy - 2, 1, 2, dk);
+      rect(sx + 9, gy - 5, 2, 1, c); rect(sx + 10, gy - 6, 1, 1, c);
+    } else if (e.k === 'deer') { // biche : broute, lève la tête, puis s'enfuit en bondissant
+      const c = '#b07a45', lt = '#e8c9a0', dk = '#6b4423';
+      if (e.flee) {
+        const j = Math.round(Math.abs(Math.sin((t - e.flee) / 140)) * 3), st = Math.floor((t - e.flee) / 140) % 2, y = gy - j;
+        rect(sx + 1, y - 7, 8, 3, c); rect(sx + 2, y - 5, 6, 1, lt); rect(sx + 3, y - 7, 1, 1, lt);
+        rect(sx + 9, y - 9, 1, 3, c); rect(sx + 9, y - 11, 3, 2, c); rect(sx + 9, y - 12, 1, 1, c); rect(sx + 11, y - 10, 1, 1, '#1a1a2e');
+        rect(sx, y - 8, 1, 2, '#ffffff');
+        if (st) { rect(sx, y - 4, 1, 3, dk); rect(sx + 9, y - 4, 1, 3, dk); } else { rect(sx + 2, y - 4, 1, 4, dk); rect(sx + 7, y - 4, 1, 4, dk); }
+      } else {
+        const up = Math.floor(t / 1500 + e.x) % 3 === 0;
+        rect(sx + 1, gy - 7, 8, 3, c); rect(sx + 2, gy - 5, 6, 1, lt); rect(sx + 6, gy - 7, 1, 1, lt);
+        for (const lx of [1, 2, 7, 8]) rect(sx + lx, gy - 4, 1, 4, dk);
+        rect(sx + 9, gy - 7, 1, 1, '#ffffff');
+        if (up) { rect(sx, gy - 9, 1, 3, c); rect(sx - 2, gy - 11, 3, 2, c); rect(sx, gy - 12, 1, 1, c); rect(sx - 2, gy - 10, 1, 1, '#1a1a2e'); }
+        else { rect(sx, gy - 6, 1, 2, c); rect(sx - 2, gy - 4, 2, 2, c); rect(sx - 1, gy - 5, 1, 1, c); }
+      }
     } else if (e.k === 'bat') {
       batAt(sx + 2, gy - 9 + Math.sin(t / 200 + e.x) * 1.5, Math.floor(t / 110 + e.x) % 2 === 0, -1);
     } else if (e.k === 'ghost') {
@@ -1464,6 +1514,19 @@ function drawHero(t, beat, pulse) {
     else {
       batAt(bx, b.y + Math.sin(age / 240) * 3, Math.floor(age / 110) % 2 === 0, b.dir);
     }
+  }
+
+  // Sous terre, l'obscurité se resserre autour du héros ; des yeux rouges clignent dans le noir.
+  const hw = wx + hx + 5;
+  if (hero.cave && !camp && hw > hero.cave.x0 && hw < hero.cave.x1) {
+    const deep = clamp(Math.min(hw - hero.cave.x0, hero.cave.x1 - hw) / 30, 0, 1);
+    const g = ctx.createRadialGradient((hx + 5) * px, (gy - 6) * px, 9 * px, (hx + 5) * px, (gy - 6) * px, Math.max(LW * 0.55, 40) * px);
+    g.addColorStop(0, 'rgba(0, 0, 0, 0)'); g.addColorStop(1, `rgba(0, 0, 0, ${0.6 * deep})`);
+    ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, W, gy * px);
+  }
+  for (const [ex, ey, X] of eyes) {
+    if ((t / 1000 + X * 0.37) % 4 < 0.15) continue; // clignement
+    rect(ex, ey, 1, 1, '#ff3b3b', 0.9); rect(ex + 2, ey, 1, 1, '#ff3b3b', 0.9);
   }
 
   // Étincelles et petits textes flottants
