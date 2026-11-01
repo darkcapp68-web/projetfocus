@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h04';
+const APP_VERSION = '01/11/2026 · 13h13';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -914,7 +914,7 @@ function drawHorizon(t, level, pulse) {
 /* ---------- Vue « Petit héros » (mode Rythme, façon jeu idle) ---------- */
 // Un petit chevalier en pixels court sans s'arrêter dans un décor qui défile : deux pas par temps
 // du BPM (80 BPM sans musique). Chaque temps donne un coup d'épée au slime à portée, sinon remplit
-// la jauge de combat ; il ne saute qu'un temps sur quatre. Jauge pleine : un roi slime arrive et
+// la jauge de combat ; il ne saute que par-dessus les rochers. Jauge pleine : un roi slime arrive et
 // se bat à coups d'épée sur le rythme. Il ramasse des pièces, ouvre des coffres ; pièces, niveau
 // et jauge sont gardés sur l'appareil. Pendant le focus il avance vers le drapeau d'arrivée au fil
 // du temps ; en pause il se repose au coin du feu.
@@ -925,7 +925,7 @@ const hero = (() => {
   try { saved = JSON.parse(localStorage.getItem(LS_HERO)) || {}; } catch { /* rien d'enregistré */ }
   return {
     coins: saved.coins | 0, kills: saved.kills | 0, bosses: saved.bosses | 0, charge: Math.min(HERO_BOSS_AT, +saved.charge || 0),
-    dirty: false, lastSave: 0, beats: 0, vbeat: 0, hopT: -1e4, fight: false,
+    dirty: false, lastSave: 0, beats: 0, vbeat: 0, hopT: -1e4, hopD: 350, fight: false, bat: null,
     wx: 0, hx: 0, f: 2.4, step: 0, last: 0, nextX: 40, things: [], parts: [], atk: -1e4, phase: '', level: 0,
   };
 })();
@@ -955,7 +955,8 @@ function heroSpawn() {
   if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
   else if (r < 0.52) hero.things.push({ k: 'slime', x, hue: 90 + Math.floor(Math.random() * 200) });
   else if (r < 0.58) hero.things.push({ k: 'chest', x });
-  else if (r < 0.78) hero.things.push({ k: 'tree', x });
+  else if (r < 0.67) hero.things.push({ k: 'rock', x, w: 5 + Math.floor(Math.random() * 3) });
+  else if (r < 0.8) hero.things.push({ k: 'tree', x });
   else if (r < 0.9) hero.things.push({ k: 'bush', x });
   else hero.things.push({ k: 'flower', x, hue: Math.floor(Math.random() * 360) });
   hero.nextX += 16 + Math.random() * 26;
@@ -965,7 +966,9 @@ function drawHero(t, beat, pulse) {
   const k = devicePixelRatio || 1, W = Math.round(waveCanvas.clientWidth * k), H = Math.round(waveCanvas.clientHeight * k);
   if (!W || !H) return;
   if (waveCanvas.width !== W || waveCanvas.height !== H) { waveCanvas.width = W; waveCanvas.height = H; }
-  const ctx = waveFx, px = Math.max(1, Math.round(H / 40)), LW = Math.ceil(W / px), LH = Math.ceil(H / px);
+  // En pause, zoom ×2 sur le camp : les côtés sortent du cadre.
+  const zoom = T.phase === 'break' ? 2 : 1;
+  const ctx = waveFx, px = Math.max(1, Math.round(H / 40)) * zoom, LW = Math.ceil(W / px), LH = Math.ceil(H / px);
   const gy = LH - 7; // sol
   const dt = hero.last ? clamp(t - hero.last, 0, 60) : 16;
   hero.last = t;
@@ -982,7 +985,7 @@ function drawHero(t, beat, pulse) {
   const fTarget = bpm ? clamp(bpm, 60, 200) / 30 : 2.4;
   hero.f += (fTarget - hero.f) * Math.min(1, dt * 0.004);
   const arrive = phase === 'focus' || phase === 'done';
-  const target = arrive ? LW * 0.14 + p * (LW - 20 - LW * 0.14) : camp ? LW * 0.4 : LW * 0.2;
+  const target = arrive ? LW * 0.14 + p * (LW - 20 - LW * 0.14) : camp ? LW / 2 - 12 : LW * 0.2;
   if (target < hero.hx || (phase !== hero.phase && !camp)) hero.hx = target;
   else hero.hx += arrive ? (target - hero.hx) : Math.min(target - hero.hx, 22 * dt / 1000);
   if (camp && hero.phase !== 'break') hero.things = hero.things.filter((e) => e.k === 'tree' || e.k === 'bush' || e.k === 'flower'); // au camp, plus de pièces ni d'ennemis
@@ -995,10 +998,7 @@ function drawHero(t, beat, pulse) {
   // Temps : ceux de la musique, ou un temps régulier à 80 BPM sans musique.
   let tick = beat;
   if (!audio.musicOn && t - hero.vbeat > 750) { hero.vbeat = t; tick = true; }
-  if (tick && !sitting) {
-    hero.beats++;
-    if (beat && hero.beats % 4 === 0 && !fight) hero.hopT = t; // un saut par mesure seulement
-  }
+  if (tick && !sitting) hero.beats++;
   const out = camp || phase === 'done';
   const charge = (n) => { if (!out && !fight) { hero.charge = Math.min(HERO_BOSS_AT, hero.charge + n); hero.dirty = true; } };
   if (walking) hero.step += hero.f * dt / 1000;
@@ -1066,6 +1066,10 @@ function drawHero(t, beat, pulse) {
       e.dead = t; hero.atk = t; hero.kills++;
       heroGain(3, sx, gy - 10); charge(4);
       for (let j = 0; j < 6; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 3, vx: (Math.random() - 0.3) * 0.008, vy: -0.002 - Math.random() * 0.005, t0: t, hue: e.hue });
+    } else if (e.k === 'rock' && !e.jumped && near < 11 && !fight) {
+      // Saut par-dessus le rocher : assez long pour qu'il passe dessous
+      e.jumped = true; hero.hopT = t;
+      hero.hopD = clamp((near + e.w + 2) / Math.max(speed, 1) * 1000, 400, 1500);
     } else if (e.k === 'chest' && !e.open && near < 10 && near > 0) {
       e.open = t; heroGain(10, sx, gy - 11); charge(6);
       for (let j = 0; j < 8; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 5, vx: (Math.random() - 0.5) * 0.009, vy: -0.003 - Math.random() * 0.005, t0: t, hue: 48 });
@@ -1114,6 +1118,11 @@ function drawHero(t, beat, pulse) {
       rect(sx + 3, gy - 6, 2, 6, '#6b4423');
       rect(sx + 3, gy - 15, 2, 2, '#2f8f4e'); rect(sx + 2, gy - 13, 4, 2, '#2f8f4e'); rect(sx + 1, gy - 11, 6, 2, '#2f8f4e'); rect(sx, gy - 9, 8, 3, '#2f8f4e');
       rect(sx + 3, gy - 14, 1, 1, '#fff', 0.35);
+    } else if (e.k === 'rock') {
+      const w = e.w;
+      rect(sx + 1, gy - 4, w - 2, 1, '#8a8f9c'); rect(sx, gy - 3, w, 3, '#6f7480');
+      rect(sx + 1, gy - 4, 2, 1, '#b5bac4'); rect(sx + 1, gy - 3, 1, 1, '#9aa0ac');
+      rect(sx + w - 2, gy - 2, 2, 2, '#4b4f59');
     } else if (e.k === 'bush') {
       rect(sx, gy - 3, 7, 3, '#3aa35a'); rect(sx + 1, gy - 4, 5, 1, '#3aa35a'); rect(sx + 2, gy - 3, 1, 1, '#7ddc8a');
     } else if (e.k === 'flower') {
@@ -1133,7 +1142,7 @@ function drawHero(t, beat, pulse) {
   }
   // Feu de camp pendant la pause
   if (camp) {
-    const cx = Math.round(LW * 0.4) + 16, fl = Math.sin(t / 90) * 0.5 + Math.sin(t / 37) * 0.5;
+    const cx = Math.round(LW / 2 - 12) + 16, fl = Math.sin(t / 90) * 0.5 + Math.sin(t / 37) * 0.5;
     ctx.globalCompositeOperation = 'lighter';
     const gl = ctx.createRadialGradient((cx + 2) * px, (gy - 3) * px, 0, (cx + 2) * px, (gy - 3) * px, (26 + fl * 2) * px);
     gl.addColorStop(0, 'rgba(255,154,60,0.45)'); gl.addColorStop(1, 'rgba(255,154,60,0)');
@@ -1149,8 +1158,8 @@ function drawHero(t, beat, pulse) {
     H: HERO_HELM[(lvl - 1) % HERO_HELM.length], S: '#f2c9a0', D: '#1a1a2e', B: '#3b6fd4', L: '#3b3f6b', R: HERO_SCARF[(lvl - 1) % HERO_SCARF.length],
   };
   const atk = t - hero.atk < 230;
-  const hopA = (t - hero.hopT) / 350;
-  const hop = phase === 'done' ? Math.abs(Math.sin(t / 130)) * 6 : (!sitting && hopA < 1 ? Math.sin(Math.PI * hopA) * 5 : 0);
+  const hopA = (t - hero.hopT) / hero.hopD;
+  const hop = phase === 'done' ? Math.abs(Math.sin(t / 130)) * 6 : (!sitting && hopA < 1 ? Math.sin(Math.PI * hopA) * (5 + hero.hopD / 400) : 0);
   const air = hop > 0.8;
   const top = gy - 12 - Math.round(hop) + (sitting ? 3 : 0);
   const fr = Math.floor(hero.step) % 2;
@@ -1180,6 +1189,20 @@ function drawHero(t, beat, pulse) {
     const z = (t / 900) % 1;
     ctx.globalAlpha = 1 - z; ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(3.4 * px)}px system-ui, sans-serif`;
     ctx.fillText('z', (hx + 6 + z * 3) * px, (top - 1 - z * 7) * px);
+  }
+
+  // Chauve-souris : de temps en temps, elle traverse le ciel pendant la pause
+  if (camp && !hero.bat && Math.random() < dt / 9000) hero.bat = { t0: t, y: 3 + Math.random() * Math.max(2, gy - 22), dir: Math.random() < 0.5 ? 1 : -1, s: 0.018 + Math.random() * 0.014 };
+  if (hero.bat) {
+    const b = hero.bat, age = t - b.t0, bx = b.dir > 0 ? -6 + age * b.s : LW + 6 - age * b.s;
+    if (!camp || bx < -8 || bx > LW + 8) hero.bat = null;
+    else {
+      const by = b.y + Math.sin(age / 240) * 3, up = Math.floor(age / 110) % 2 === 0;
+      rect(bx, by, 3, 2, '#2a2238'); rect(bx, by - 1, 1, 1, '#2a2238'); rect(bx + 2, by - 1, 1, 1, '#2a2238');
+      rect(bx + (b.dir > 0 ? 2 : 0), by, 1, 1, '#ff5470');
+      if (up) { rect(bx - 2, by - 1, 2, 1, '#2a2238'); rect(bx - 3, by - 2, 1, 1, '#2a2238'); rect(bx + 3, by - 1, 2, 1, '#2a2238'); rect(bx + 5, by - 2, 1, 1, '#2a2238'); }
+      else { rect(bx - 2, by + 1, 2, 1, '#2a2238'); rect(bx - 3, by + 2, 1, 1, '#2a2238'); rect(bx + 3, by + 1, 2, 1, '#2a2238'); rect(bx + 5, by + 2, 1, 1, '#2a2238'); }
+    }
   }
 
   // Étincelles et petits textes flottants

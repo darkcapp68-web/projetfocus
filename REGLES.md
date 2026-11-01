@@ -139,11 +139,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   l'utilisateur : il sautait plus qu'il ne combattait)** : chaque temps donne un **coup d'épée**
   au slime à portée (ou au contact si le temps tarde), sinon il **remplit la jauge de combat**
   (+1 par temps, +4 par slime, +6 par coffre ; barre rouge « boss » sous les pièces) ; il ne
-  **saute qu'un temps sur quatre**. **Jauge pleine (150)** : un **roi slime** (gros, couronné,
+  **saute que par-dessus les rochers** (01/11 : sauter sans raison faisait bizarre ; saut assez
+  long pour que le rocher passe dessous). **Jauge pleine (150)** : un **roi slime** (gros, couronné,
   barre de vie) arrive par la droite, le décor s'arrête et le héros le frappe **un coup par
   temps** (14 points de vie, +2 par roi déjà battu, 30 au plus) ; victoire : +50 pièces,
   « VICTOIRE ! », jauge à zéro, « boss ×n » compté. En pause le roi s'en va et revient après
-  (jauge gardée). Sans musique, un temps régulier à 80 BPM fait tout pareil (sans les sauts). Il
+  (jauge gardée). Sans musique, un temps régulier à 80 BPM fait tout pareil. Il
   **ramasse des pièces** (+1), **bat des slimes** (+3) et **ouvre des coffres**
   (+10) ; les pièces s'additionnent en haut à gauche avec le **niveau** (niveau = 1 + √(pièces / 15),
   barre de progression ; le casque et l'écharpe changent de couleur à chaque niveau, « NIVEAU n ! »
@@ -151,7 +152,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   (`localStorage` `projetfocus.heros`, pas dans les réglages ni sur Drive). **Focus** : il
   avance vers le **drapeau d'arrivée** au fil du temps (l'avancée remplace la barre du temps) ;
   en fin de focus il saute de joie. **Pause** : il s'assoit au **feu de camp** et dort (« z »), le
-  décor s'arrête, le feu bat au rythme. Même sans musique il court. Code : `drawHero()` dans
+  décor s'arrête, le feu bat au rythme ; la scène est **zoomée ×2** et centrée sur le héros et le
+  feu, les côtés sortent du cadre (01/11, essai à juger) ; de temps en temps une **chauve-souris**
+  traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident
   coupait la droite et le bas ; vu en mesurant l'appli à distance par USB) : viewport
