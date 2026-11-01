@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h30';
+const APP_VERSION = '01/11/2026 · 13h37';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1031,7 +1031,7 @@ function drawHero(t, beat, pulse) {
 
   // Décor lointain : étoiles, montagnes, collines
   for (let i = 0, n = gy > 28 ? 34 : 18; i < n; i++) {
-    const sx = (Math.imul(i + 1, 2654435761) >>> 0) % LW, sy = 2 + (i * 13) % Math.max(4, gy - 18);
+    const sx = (Math.imul(i + 1, 2654435761) >>> 0) % LW, sy = 2 + (Math.imul(i + 7, 2246822519) >>> 0) % Math.max(4, gy - 18);
     rect(sx, sy, 1, 1, '#fff', 0.15 + 0.35 * Math.abs(Math.sin(t / 700 + i * 2.1)));
   }
   const ridge = (par, base, amp, f1, f2, a) => {
@@ -1100,6 +1100,7 @@ function drawHero(t, beat, pulse) {
       for (let j = 0; j < 8; j++) hero.parts.push({ k: 'spark', x: sx + 4, y: gy - 5, vx: (Math.random() - 0.5) * 0.009, vy: -0.003 - Math.random() * 0.005, t0: t, hue: 48 });
     } else if (e.k === 'boss' && !e.dead && near < 17) {
       fightNow = true;
+      if (near < 14) e.x = wx + hx + 14; // le héros avance avec le temps : le roi recule, sans se laisser traverser
       if (!struck) { // un coup par temps
         struck = true;
         e.hp--; e.hit = t; hero.atk = t;

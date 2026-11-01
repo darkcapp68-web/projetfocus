@@ -142,7 +142,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   **saute que par-dessus les rochers** (01/11 : sauter sans raison faisait bizarre ; saut assez
   long pour que le rocher passe dessous). **Jauge pleine (150)** : un **roi slime** (gros, couronné,
   barre de vie) arrive par la droite, le décor s'arrête et le héros le frappe **un coup par
-  temps** (14 points de vie, +2 par roi déjà battu, 30 au plus) ; victoire : +50 pièces,
+  temps** (14 points de vie, +2 par roi déjà battu, 30 au plus ; le héros avance avec le temps,
+  le roi recule pour ne pas être traversé) ; victoire : +50 pièces,
   « VICTOIRE ! », jauge à zéro, « boss ×n » compté. En pause le roi s'en va et revient après
   (jauge gardée). Sans musique, un temps régulier à 80 BPM fait tout pareil. Il
   **ramasse des pièces** (+1), **bat des ennemis variés** (01/11 : slimes, champignons, gobelins
@@ -156,8 +157,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   décor s'arrête, le feu bat au rythme ; la scène est **zoomée ×2** et centrée sur le héros et le
   feu, les côtés sortent du cadre (01/11, essai à juger) ; derrière le camp, à chaque pause, une
   **ruine au hasard** (pan de mur, deux colonnes dont une brisée, arche, tour au loin, ou rien une
-  fois sur quatre). **En paysage** (focus et pause), le message s'écrit **dans le ciel** du décor
-  (en haut à droite, sans pastille) et la bande prend toute la hauteur libre : en focus les pixels
+  fois sur quatre). **En paysage** (focus et pause), les **boutons passent sous l'horloge** (01/11 :
+  ils étaient trop bas sur le PC), les idées du coach sous la bande ; le message s'écrit **dans le
+  ciel** du décor (en haut à droite, sans pastille) ; la bande est **aussi haute que l'horloge** : en focus les pixels
   gardent leur taille (on voit plus de ciel), en pause 40 pixels de haut au lieu de 20 dès que la
   bande dépasse 250 px ; lune et grandes montagnes au loin quand le ciel est assez haut ; de temps en temps une **chauve-souris**
   traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans

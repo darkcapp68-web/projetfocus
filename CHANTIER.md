@@ -22,6 +22,7 @@ premier pour reprendre le travail).
   des rochers ; en pause, zoom ×2 sur le camp et chauve-souris au hasard (à juger) ; en paysage,
   la pause prend plus de hauteur (ciel, lune, montagnes). Ensuite : message écrit dans le ciel en
   paysage, ruines au hasard en pause, six sortes d'ennemis (dont chauves-souris et fantômes).
+  Puis : boutons sous l'horloge en paysage, le héros ne traverse plus le roi slime.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

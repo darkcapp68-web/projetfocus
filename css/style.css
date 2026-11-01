@@ -529,18 +529,27 @@ body.land.horizon #side { justify-content: center; align-self: stretch; }
 body.land.horizon #timebar { display: none; }
 body.land.horizon #message { order: 1; }
 body.land.horizon #wave-fx { order: 2; width: calc(100% + var(--gap)); margin-left: calc(-1 * var(--gap)); height: clamp(70px, 34cqh, 170px); }
-/* Petit héros : le message s'écrit dans le ciel du paysage (même case de grille que la bande,
-   en haut à droite, le compteur de pièces restant visible à gauche). La bande prend toute la
-   hauteur libre (plus de ciel et de montagnes, de la place pour les ennemis volants). */
-body.land.hero #side { display: grid; grid-template-columns: 100%; align-content: center; justify-items: start; }
-body.land.hero #wave-fx { grid-area: 1 / 1; }
+/* Petit héros : l'horloge à gauche avec les boutons juste dessous ; à droite la bande, aussi
+   haute que l'horloge (plus de ciel et de montagnes, de la place pour les ennemis volants), le message
+   écrit dans son ciel (en haut à droite, le compteur de pièces restant visible à gauche) et les
+   idées du coach en dessous pendant la pause. */
+body.land.hero #stage {
+  display: grid; grid-template-columns: var(--dial-size) minmax(0, 1fr); grid-template-rows: auto auto auto; align-content: center;
+  column-gap: var(--gap); row-gap: 10px; align-items: center;
+  --dial-size: min(100cqh - 64px, 38cqw, 380px);
+}
+body.land.hero.phase-idle #stage { --dial-size: min(100cqh - 110px, 38cqw, 380px); }
+body.land.hero #side { display: contents; }
+body.land.hero #dial-wrap { grid-area: 1 / 1; justify-self: center; }
+body.land.hero #setup { grid-area: 2 / 1; justify-self: center; }
+body.land.hero #actions, body.land.hero #break-actions { grid-area: 3 / 1; justify-content: center; justify-self: center; }
+body.land.hero #coach-list { grid-area: 3 / 2; justify-self: start; }
+body.land.hero #wave-fx { grid-area: 1 / 2 / 3 / 3; height: var(--dial-size); align-self: center; }
 body.land.hero #message:not(:empty) {
-  grid-area: 1 / 1; z-index: 1; align-self: start; justify-self: end;
+  grid-area: 1 / 2; z-index: 1; align-self: start; justify-self: end;
   max-width: calc(100% - 120px); margin: 8px 10px 0 0; padding: 0; background: none;
   text-align: right; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 }
-body.land.hero #side { grid-template-rows: minmax(70px, 1fr); align-content: stretch; }
-body.land.hero #wave-fx { height: 100%; min-height: 0; max-height: 420px; align-self: center; }
 body.land.horizon #setup, body.land.horizon #actions, body.land.horizon #break-actions, body.land.horizon #coach-list { order: 3; }
 
 /* ---------- Petits écrans ---------- */
