@@ -153,7 +153,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   avance vers le **drapeau d'arrivée** au fil du temps (l'avancée remplace la barre du temps) ;
   en fin de focus il saute de joie. **Pause** : il s'assoit au **feu de camp** et dort (« z »), le
   décor s'arrête, le feu bat au rythme ; la scène est **zoomée ×2** et centrée sur le héros et le
-  feu, les côtés sortent du cadre (01/11, essai à juger) ; de temps en temps une **chauve-souris**
+  feu, les côtés sortent du cadre (01/11, essai à juger) ; **en paysage**, la bande prend toute la
+  hauteur libre entre le message et les boutons, avec deux fois plus de ciel (40 pixels de haut au
+  lieu de 20 dès que la bande dépasse 250 px), une lune et de grandes montagnes au loin ; de temps en temps une **chauve-souris**
   traverse le ciel (en moyenne toutes les 9 s). Même sans musique il court. Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident

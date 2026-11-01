@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 13h13';
+const APP_VERSION = '01/11/2026 · 13h19';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -966,9 +966,10 @@ function drawHero(t, beat, pulse) {
   const k = devicePixelRatio || 1, W = Math.round(waveCanvas.clientWidth * k), H = Math.round(waveCanvas.clientHeight * k);
   if (!W || !H) return;
   if (waveCanvas.width !== W || waveCanvas.height !== H) { waveCanvas.width = W; waveCanvas.height = H; }
-  // En pause, zoom ×2 sur le camp : les côtés sortent du cadre.
-  const zoom = T.phase === 'break' ? 2 : 1;
-  const ctx = waveFx, px = Math.max(1, Math.round(H / 40)) * zoom, LW = Math.ceil(W / px), LH = Math.ceil(H / px);
+  // 40 pixels de haut ; en pause, zoom ×2 sur le camp (20 pixels de haut, les côtés sortent du
+  // cadre), sauf si la bande est grande (pause en paysage, CSS) : on y voit plus de ciel.
+  const rows = T.phase === 'break' && H < 250 * k ? 20 : 40;
+  const ctx = waveFx, px = Math.max(1, Math.round(H / rows)), LW = Math.ceil(W / px), LH = Math.ceil(H / px);
   const gy = LH - 7; // sol
   const dt = hero.last ? clamp(t - hero.last, 0, 60) : 16;
   hero.last = t;
@@ -1013,8 +1014,8 @@ function drawHero(t, beat, pulse) {
   hero.level = lvl;
 
   // Décor lointain : étoiles, montagnes, collines
-  for (let i = 0; i < 18; i++) {
-    const sx = (i * 37 + 11) % LW, sy = 2 + (i * 13) % Math.max(4, gy - 18);
+  for (let i = 0, n = gy > 28 ? 34 : 18; i < n; i++) {
+    const sx = (Math.imul(i + 1, 2654435761) >>> 0) % LW, sy = 2 + (i * 13) % Math.max(4, gy - 18);
     rect(sx, sy, 1, 1, '#fff', 0.15 + 0.35 * Math.abs(Math.sin(t / 700 + i * 2.1)));
   }
   const ridge = (par, base, amp, f1, f2, a) => {
@@ -1024,6 +1025,14 @@ function drawHero(t, beat, pulse) {
       rect(x, gy - h, 1, h, '#000', a);
     }
   };
+  if (gy > 28) { // bande haute (pause en paysage) : lune et grandes montagnes au loin
+    const mx = LW - 16, my = 5;
+    ctx.globalCompositeOperation = 'lighter';
+    rect(mx + 1, my, 4, 1, '#fff6d8', 0.5); rect(mx, my + 1, 6, 4, '#fff6d8', 0.5); rect(mx + 1, my + 5, 4, 1, '#fff6d8', 0.5);
+    ctx.globalCompositeOperation = 'source-over';
+    rect(mx + 1, my + 2, 1, 1, '#000', 0.12); rect(mx + 3, my + 3, 2, 1, '#000', 0.1);
+    ridge(0.05, Math.round(gy * 0.55), 7, 0.09, 0.21, 0.08);
+  }
   ridge(0.12, 15, 6, 0.045, 0.11, 0.13);
   ridge(0.35, 8, 4, 0.08, 0.19, 0.2);
   // Sol

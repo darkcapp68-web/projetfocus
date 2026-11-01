@@ -529,6 +529,8 @@ body.land.horizon #side { justify-content: center; align-self: stretch; }
 body.land.horizon #timebar { display: none; }
 body.land.horizon #message { order: 1; }
 body.land.horizon #wave-fx { order: 2; width: calc(100% + var(--gap)); margin-left: calc(-1 * var(--gap)); height: clamp(70px, 34cqh, 170px); }
+/* Petit héros en pause : la bande prend toute la hauteur libre (plus de ciel et de montagnes). */
+body.land.hero.phase-break #wave-fx { flex: 1 1 0; height: auto; min-height: 70px; max-height: 420px; }
 body.land.horizon #setup, body.land.horizon #actions, body.land.horizon #break-actions, body.land.horizon #coach-list { order: 3; }
 
 /* ---------- Petits écrans ---------- */
