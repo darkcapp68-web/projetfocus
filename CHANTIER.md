@@ -30,6 +30,7 @@ premier pour reprendre le travail).
   et trois sortes d'arbres au hasard (sapin, chêne, bouleau). Dehors une aventure « normale »
   (slimes, champignons, gobelins, loups, biche qui s'enfuit, aigle qui plane) ; sous terre ce qui
   fait peur (squelettes, chauves-souris, fantômes, yeux rouges, toiles, obscurité autour du héros).
+  Boss : roi slime ou chat dehors, squelette géant ou golem de pierre dans la grotte.
 - Menu « Affichage » en haut à gauche (31/10) : style du cadran et forme du mode Rythme
   choisis sans ouvrir les Paramètres ; cases à cocher (Apparence → Affichages du menu) pour
   n'y garder que ceux qu'on aime.

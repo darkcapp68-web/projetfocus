@@ -182,7 +182,10 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   Dehors, des choses « normales » : slimes, champignons, gobelins, **loups** (ennemi, +4), **biche**
   qui broute puis s'enfuit en bondissant quand le héros approche (on ne la combat pas), **aigle**
   qui plane de temps en temps dans le ciel (`hero.eagle`), avec un contour sombre et des plumes
-  plus claires (01/11 : sans contour, il ne se détachait pas du fond). **Trois arbres** au hasard : sapin,
+  plus claires (01/11 : sans contour, il ne se détachait pas du fond). **Boss selon l'endroit**
+  (`HERO_BOSSES.out` / `.cave`) : dehors roi slime ou chat géant, dans la grotte squelette géant ou
+  **golem de pierre** ; pas de grosse araignée (souhait de l'utilisateur ; les petites des toiles
+  restent) ; pas de grotte qui commence sous un boss. **Trois arbres** au hasard : sapin,
   chêne, bouleau (`v` de la chose `tree`). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident

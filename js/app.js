@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h09';
+const APP_VERSION = '01/11/2026 · 17h11';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -936,10 +936,11 @@ const hero = (() => {
 const heroLevel = (c) => 1 + Math.floor(Math.sqrt(c / 15));
 const HERO_FOE_HUE = { mushroom: 0, goblin: 110, skeleton: 50, bat: 280, ghost: 190, wolf: 220 };
 const HERO_RUINS = ['wall', 'columns', 'arch', 'tower'];
-const HERO_BOSSES = ['slime', 'skeleton', 'cat'];
+// Boss du dehors et boss de la grotte
+const HERO_BOSSES = { out: ['slime', 'cat'], cave: ['skeleton', 'golem'] };
 // Robe du chat géant : couleur, ventre et museau
 const HERO_CATS = [['#f0a04b', '#ffe0b8'], ['#9aa0ac', '#e4e7ee'], ['#3a3340', '#e9e4ef'], ['#f4e3c3', '#ffffff']];
-const bossHue = (e) => (e.type === 'skeleton' ? 0 : e.type === 'cat' ? 35 : e.hue ?? 285);
+const bossHue = (e) => (e.type === 'skeleton' ? 0 : e.type === 'cat' ? 35 : e.type === 'golem' ? 190 : e.hue ?? 285);
 const HERO_HELM = ['#c3cbe0', '#5aa9ff', '#ff6b6b', '#ffd23f', '#b57bff', '#4fe3b0'];
 const HERO_SCARF = ['#e63946', '#ff9f1c', '#2ec4b6', '#f72585', '#ffffff', '#ff6b6b'];
 const HERO_BODY = [
@@ -1007,7 +1008,7 @@ function heroSpawn() {
   const r = Math.random();
   const x = hero.nextX;
   // De temps en temps (toutes les deux ou trois minutes de marche), une grotte à traverser.
-  if (!hero.cave && x > 400 && Math.random() < 0.025) hero.cave = { x0: x + 40, x1: x + 180 + Math.random() * 140 };
+  if (!hero.cave && x > 400 && !hero.things.some((e) => e.k === 'boss') && Math.random() < 0.025) hero.cave = { x0: x + 40, x1: x + 180 + Math.random() * 140 };
   const cv = hero.cave, inCave = cv && x > cv.x0 - 16 && x < cv.x1 + 16;
   if (r < 0.34) for (let i = 0, n = 3 + Math.floor(Math.random() * 3); i < n; i++) hero.things.push({ k: 'coin', x: x + i * 6, y: 6 + 3 * Math.sin(i / Math.max(1, n - 1) * Math.PI) });
   else if (r < 0.52) {
@@ -1184,7 +1185,7 @@ function drawHero(t, beat, pulse) {
       if (d > 12 && X % 23 === 5) eyes.push([x, cy + 3 + h % Math.max(1, gy - cy - 10), X]); // yeux dans le noir
       if (d > 8 && X % 41 === 3) { // toile d'araignée accrochée au plafond
         for (let i = 0; i < 5; i++) { rect(x + i, cy + i, 1, 1, '#d8d8e8', 0.35); rect(x + 4 - i, cy + i, 1, 1, '#d8d8e8', 0.25); }
-        rect(x + 2, cy, 1, 5, '#d8d8e8', 0.3); rect(x + 2, cy + 6, 1, 1, '#1a1a2e'); rect(x + 1, cy + 7, 3, 1, '#1a1a2e');
+        rect(x + 2, cy, 1, 5, '#d8d8e8', 0.3); rect(x + 2, cy + 6, 1, 1, '#1a1a2e'); rect(x + 1, cy + 7, 3, 1, '#1a1a2e'); // petite araignée
       }
       if (d > 8 && X % 31 === 7) { // cristal
         const c = `hsl(${h % 360} 80% 65%)`;
@@ -1214,11 +1215,12 @@ function drawHero(t, beat, pulse) {
       // Jauge pleine : le boss arrive par la droite, on lui fait de la place.
       const bx = wx + LW + 8, hp = 14 + Math.min(16, hero.bosses * 2);
       hero.things = hero.things.filter((e) => e.x < bx - 30 || e.x > bx + 40 || e.k === 'tree' || e.k === 'bush' || e.k === 'flower');
-      const type = HERO_BOSSES[Math.floor(Math.random() * HERO_BOSSES.length)];
+      const cv0 = hero.cave, list = HERO_BOSSES[cv0 && bx > cv0.x0 - 30 && bx < cv0.x1 + 16 ? 'cave' : 'out'];
+      const type = list[Math.floor(Math.random() * list.length)];
       const pal = type === 'cat' ? HERO_CATS[Math.floor(Math.random() * HERO_CATS.length)] : null;
       hero.things.push({ k: 'boss', type, pal, hue: Math.floor(Math.random() * 360), x: bx, hp, max: hp, hit: -1e4 });
       hero.nextX = Math.max(hero.nextX, bx + 40);
-      hero.parts.push({ k: 'txt', x: LW / 2 - 14, y: gy - 24, vy: -0.004, t0: t, txt: { slime: 'UN ROI SLIME !', skeleton: 'UN SQUELETTE GÉANT !', cat: 'UN CHAT GÉANT !' }[type], big: true });
+      hero.parts.push({ k: 'txt', x: LW / 2 - 14, y: gy - 24, vy: -0.004, t0: t, txt: { slime: 'UN ROI SLIME !', skeleton: 'UN SQUELETTE GÉANT !', cat: 'UN CHAT GÉANT !', golem: 'UN GOLEM DE PIERRE !' }[type], big: true });
     }
   }
   const things = hero.things;
@@ -1284,6 +1286,17 @@ function drawHero(t, beat, pulse) {
         rect(sx + 6 + st, gy - 1, 3, 1, sh); rect(sx + 11 - st, gy - 1, 3, 1, sh);
         rect(sx + 1, gy - 8 + dy, 4, 1, '#8a5a2b'); rect(sx + 2, gy - 9 + dy, 1, 3, '#c9a227'); // grande épée
         rect(sx + 2, gy - 20 + dy, 1, 11, '#c9d1dc'); rect(sx + 3, gy - 19 + dy, 1, 10, '#8f98a6'); rect(sx + 2, gy - 21 + dy, 1, 1, '#ffffff');
+      } else if (e.type === 'golem') { // golem de pierre : yeux et cœur qui luisent, mousse, cristal à l'épaule
+        const c = flash ? '#ffffff' : '#7d7889', sh = '#4e4a58', dy = Math.round(Math.sin(t / 400)), gl = '#7fe0ff', ms = '#5aa04a';
+        rect(sx + 4, gy - 7, 4, 7, c); rect(sx + 10, gy - 7, 4, 7, c); rect(sx + 4, gy - 1, 4, 1, sh); rect(sx + 10, gy - 1, 4, 1, sh);
+        rect(sx + 3, gy - 15 + dy, 12, 8, c); rect(sx + 6, gy - 13 + dy, 1, 3, sh); rect(sx + 11, gy - 12 + dy, 2, 1, sh);
+        rect(sx + 8, gy - 12 + dy, 2, 2, gl);
+        rect(sx, gy - 15 + dy, 3, 9, c); rect(sx + 15, gy - 15 + dy, 3, 9, c);
+        rect(sx - 1, gy - 7 + dy, 4, 3, c); rect(sx + 15, gy - 7 + dy, 4, 3, c); rect(sx - 1, gy - 5 + dy, 4, 1, sh); rect(sx + 15, gy - 5 + dy, 4, 1, sh);
+        rect(sx + 5, gy - 21 + dy, 8, 6, c); rect(sx + 5, gy - 20 + dy, 8, 1, sh);
+        rect(sx + 6, gy - 19 + dy, 2, 1, gl); rect(sx + 10, gy - 19 + dy, 2, 1, gl); rect(sx + 7, gy - 16 + dy, 4, 1, sh);
+        rect(sx + 5, gy - 22 + dy, 3, 1, ms); rect(sx + 15, gy - 16 + dy, 2, 1, ms); rect(sx + 3, gy - 8 + dy, 2, 1, ms);
+        rect(sx + 1, gy - 17 + dy, 1, 2, '#c77dff'); rect(sx + 2, gy - 18 + dy, 1, 3, '#c77dff'); rect(sx + 2, gy - 18 + dy, 1, 1, '#ffffff', 0.8);
       } else if (e.type === 'cat') {
         const [c0, l0] = e.pal, c = flash ? '#ffffff' : c0, l = flash ? '#ffffff' : l0, w = Math.round(Math.sin(t / 250) * 1.5);
         const blink = Math.floor(t / 2600) % 5 === 0 && t % 2600 < 160;
@@ -1527,6 +1540,7 @@ function drawHero(t, beat, pulse) {
   }
   for (const [ex, ey, X] of eyes) {
     if ((t / 1000 + X * 0.37) % 4 < 0.15) continue; // clignement
+    if (things.some((e) => e.k === 'boss' && !e.dead && ex > e.x - wx - 4 && ex < e.x - wx + 21)) continue; // derrière le boss
     rect(ex, ey, 1, 1, '#ff3b3b', 0.9); rect(ex + 2, ey, 1, 1, '#ff3b3b', 0.9);
   }
 
