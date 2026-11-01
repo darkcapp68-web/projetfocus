@@ -181,7 +181,8 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   qui se resserre autour du héros (souterrain « flippant », souhait de l'utilisateur), pas d'arbres.
   Dehors, des choses « normales » : slimes, champignons, gobelins, **loups** (ennemi, +4), **biche**
   qui broute puis s'enfuit en bondissant quand le héros approche (on ne la combat pas), **aigle**
-  qui plane de temps en temps dans le ciel (`hero.eagle`). **Trois arbres** au hasard : sapin,
+  qui plane de temps en temps dans le ciel (`hero.eagle`), avec un contour sombre et des plumes
+  plus claires (01/11 : sans contour, il ne se détachait pas du fond). **Trois arbres** au hasard : sapin,
   chêne, bouleau (`v` de la chose `tree`). Code : `drawHero()` dans
   `js/app.js`.
 - **Pas de zoom** de la page (31/10 : sur le téléphone, une page zoomée à 104,6 % par accident

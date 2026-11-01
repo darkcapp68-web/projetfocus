@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h06';
+const APP_VERSION = '01/11/2026 · 17h09';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -1154,12 +1154,13 @@ function drawHero(t, beat, pulse) {
     const g = hero.eagle, age = t - g.t0, d = g.dir, bx = d > 0 ? -8 + age * g.s : LW + 8 - age * g.s;
     if (out || bx < -10 || bx > LW + 10) hero.eagle = null;
     else {
-      const by = g.y + Math.round(Math.sin(age / 900) * 1.5), br = '#5b3a1e', wg = '#6b4423';
+      const by = g.y + Math.round(Math.sin(age / 900) * 1.5), br = '#7a4a22', wg = '#a8692e';
       const flap = Math.floor(age / 2500) % 3 === 0 && Math.floor(age / 160) % 2 === 0;
-      rect(bx, by, 3, 1, br); rect(d > 0 ? bx + 3 : bx - 1, by - (d > 0 ? 0 : 0), 1, 1, '#ffffff');
-      rect(d > 0 ? bx + 4 : bx - 2, by, 1, 1, '#ffd23f'); rect(d > 0 ? bx - 1 : bx + 3, by, 1, 1, '#ffffff', 0.8);
-      if (flap) { rect(bx - 2, by + 1, 3, 1, wg); rect(bx + 2, by + 1, 3, 1, wg); }
-      else { rect(bx - 3, by - 1, 3, 1, wg); rect(bx + 3, by - 1, 3, 1, wg); rect(bx - 4, by - 2, 1, 1, wg); rect(bx + 6, by - 2, 1, 1, wg); }
+      const ps = [[bx, by, 3, 1, br], [d > 0 ? bx + 3 : bx - 1, by, 1, 1, '#ffffff'], [d > 0 ? bx + 4 : bx - 2, by, 1, 1, '#ffd23f'], [d > 0 ? bx - 1 : bx + 3, by, 1, 1, '#ffffff']];
+      if (flap) ps.push([bx - 2, by + 1, 3, 1, wg], [bx + 2, by + 1, 3, 1, wg]);
+      else ps.push([bx - 3, by - 1, 3, 1, wg], [bx + 3, by - 1, 3, 1, wg], [bx - 4, by - 2, 1, 1, wg], [bx + 6, by - 2, 1, 1, wg]);
+      for (const [x, y, w, h] of ps) rect(x - 1, y - 1, w + 2, h + 2, '#1a1a2e', 0.85); // contour sombre : il se détache du ciel
+      for (const [x, y, w, h, c] of ps) rect(x, y, w, h, c);
     }
   }
 
