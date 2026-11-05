@@ -272,6 +272,12 @@ body.phase-idle #message { display: none; }
 #btn-skip, #btn-stop { display: none; }
 body.phase-focus #btn-skip, body.phase-focus #btn-stop { display: inline-block; }
 body.phase-break #actions { display: none; }
+/* Fin du focus : la question « On active la pause ? » ; ses deux réponses restent visibles
+   même contrôles effacés, à la place des boutons du focus. */
+#btn-ask-yes, #btn-ask-no { display: none; }
+body.asking #btn-ask-yes, body.asking #btn-ask-no { display: inline-block; }
+body.asking #btn-start, body.asking #btn-skip, body.asking #btn-stop { display: none; }
+html body.asking #actions { opacity: 1; pointer-events: auto; }
 
 #break-actions { display: none; }
 body.phase-break #break-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }

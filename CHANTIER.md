@@ -83,7 +83,8 @@ exige aussi le plein écran).
 
 ## En cours
 
-- Rien.
+- 05/11 (envoyé, à juger) : question « On active la pause ? » en fin de focus (10 s, sinon
+  pause) ; musique de pause adoucie pour le casque Bluetooth (à confirmer à l'écoute).
 
 ## Ce dont j'ai besoin de toi
 

@@ -262,12 +262,14 @@ async function renderLift(rate) {
     o.stop(at + dur + release + 0.1);
   };
   const piano = (freq, at, level, pan) => {
-    for (const [mult, lv, dec] of [[1, 1, 1.8], [2, 0.25, 0.6], [3, 0.08, 0.3]]) {
+    // Attaque de 25 ms et pas de 3e harmonique : au casque Bluetooth, des attaques plus
+    // sèches et une basse plus forte faisaient craquer le son (enceintes : rien).
+    for (const [mult, lv, dec] of [[1, 1, 1.8], [2, 0.2, 0.6]]) {
       const o = oc.createOscillator();
       const g = oc.createGain();
       o.frequency.value = freq * mult;
       g.gain.setValueAtTime(0, at);
-      g.gain.linearRampToValueAtTime(level * lv, at + 0.01);
+      g.gain.linearRampToValueAtTime(level * lv, at + 0.025);
       g.gain.exponentialRampToValueAtTime(0.0001, at + dec * 2);
       o.connect(g);
       out(g, pan);
@@ -282,7 +284,7 @@ async function renderLift(rate) {
       voice(midi(n), 'triangle', at, LIFT_BAR - 1, 0.035, 1.5, 2, pan);
       voice(midi(n) * 1.004, 'sine', at, LIFT_BAR - 1, 0.03, 1.8, 2, -pan);
     });
-    voice(midi(ch.bass), 'sine', at, LIFT_BAR - 1.5, 0.12, 0.08, 1.5, 0);
+    voice(midi(ch.bass), 'sine', at, LIFT_BAR - 1.5, 0.07, 0.3, 1.5, 0);
     for (let s = 0; s < LIFT_BAR * 2; s++) {
       if (Math.random() < 0.4) {
         const n = ch.notes[Math.floor(Math.random() * ch.notes.length)] + 12;

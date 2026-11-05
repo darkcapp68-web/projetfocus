@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '01/11/2026 · 17h31';
+const APP_VERSION = '05/11/2026 · 08h24';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -189,6 +189,7 @@ const T = {
   pausedRemaining: null, // secondes restantes si le focus est mis en pause
   breakEnded: false,
   resumeAt: 0, // reprise automatique du focus (ms), 0 = on attend « Fait, je reprends »
+  askAt: 0, // fin du focus : « On active la pause ? », pause toute seule à cette heure (ms) ; 0 = pas de question
   breakColor: '', // couleur tirée pour cette pause
   isLong: false,
   afterBreak: false,
@@ -2195,6 +2196,7 @@ function startFocus(afterBreak) {
   T.afterBreak = afterBreak;
   T.breakEnded = false;
   T.resumeAt = 0;
+  T.askAt = 0;
   T.isLong = false;
   T.total = S.focusMin * 60;
   T.endAt = Date.now() + T.total * 1000;
@@ -2211,6 +2213,7 @@ function startFocus(afterBreak) {
 function startBreak(fromTimer) {
   T.phase = 'break';
   T.breakEnded = false;
+  T.askAt = 0;
   T.isLong = S.longBreakOn && T.cycle % S.longBreakEvery === 0;
   T.total = (T.isLong ? S.longBreakMin : S.breakMin) * 60;
   T.endAt = Date.now() + T.total * 1000;
@@ -2226,6 +2229,26 @@ function startBreak(fromTimer) {
     notify(T.isLong ? 'Pause longue' : 'C’est l’heure de la pause', T.coach[0] || 'Lève-toi un moment.');
   }
   renderCoach(); showCoach();
+  render(true);
+}
+
+// Fin du focus : on demande avant de passer en pause. Sans réponse en 10 s, la pause commence.
+const ASK_SECONDS = 10;
+
+function askBreak() {
+  T.askAt = Date.now() + ASK_SECONDS * 1000;
+  chime();
+  notify('On active la pause ?', `Sans réponse, la pause commence dans ${ASK_SECONDS} s.`);
+  showText('On active la pause ?');
+  render(true);
+}
+
+// « Non » : on repart pour le même temps de focus, dans le même cycle.
+function declineBreak() {
+  if (T.phase !== 'focus' || !T.askAt) return;
+  T.askAt = 0;
+  T.endAt = Date.now() + T.total * 1000;
+  startMessages();
   render(true);
 }
 
@@ -2268,6 +2291,7 @@ function resetAll() {
   T.pausedRemaining = null;
   T.breakEnded = false;
   T.resumeAt = 0;
+  T.askAt = 0;
   T.afterBreak = false;
   leaveFullscreen();
   keepAwake(false);
@@ -2278,7 +2302,7 @@ function resetAll() {
 }
 
 function togglePauseFocus() {
-  if (T.phase !== 'focus') return;
+  if (T.phase !== 'focus' || T.askAt) return; // pendant la question, on répond oui ou non
   if (T.pausedRemaining == null) {
     T.pausedRemaining = remaining();
   } else {
@@ -2307,6 +2331,8 @@ $('#btn-start').addEventListener('click', () => {
 
 $('#btn-skip').addEventListener('click', () => { if (T.phase === 'focus') startBreak(false); });
 $('#btn-stop').addEventListener('click', resetAll);
+$('#btn-ask-yes').addEventListener('click', () => { if (T.phase === 'focus' && T.askAt) startBreak(false); });
+$('#btn-ask-no').addEventListener('click', declineBreak);
 $('#btn-stop-break').addEventListener('click', resetAll);
 $('#btn-done').addEventListener('click', resumeFromBreak);
 
@@ -2709,6 +2735,7 @@ const els = {
   time: $('#time'), sub: $('#sub'), info: $('#info'), start: $('#btn-start'),
   vFocus: $('#v-focus'), vBreak: $('#v-break'), cyc: $('#cyc-val'),
 };
+const askMin = $('#ask-min');
 let lastBg = '', lastTitle = '';
 
 function fmt(sec) {
@@ -2817,7 +2844,7 @@ function render(force) {
 
   const classes = {
     'phase-idle': p === 'idle', 'phase-focus': p === 'focus', 'phase-break': p === 'break', 'phase-done': p === 'done',
-    paused: T.pausedRemaining != null, 'break-ended': T.breakEnded,
+    paused: T.pausedRemaining != null, 'break-ended': T.breakEnded, asking: p === 'focus' && !!T.askAt,
     'edit-break': T.editing === 'break', 'fmt-min': S.timeFormat === 'min', 'no-info': !S.showInfo,
   };
   for (const [c, on] of Object.entries(classes)) body.classList.toggle(c, on);
@@ -2841,6 +2868,7 @@ function render(force) {
 
   let sub = '';
   if (p === 'idle') sub = T.editing === 'focus' ? 'focus' : 'pause';
+  else if (p === 'focus' && T.askAt) sub = `pause dans ${Math.max(0, Math.ceil((T.askAt - Date.now()) / 1000))} s`;
   else if (p === 'focus') sub = T.pausedRemaining != null ? 'en pause' : 'focus';
   else if (p === 'break' && T.resumeAt) sub = `reprise dans ${Math.max(0, Math.ceil((T.resumeAt - Date.now()) / 1000))} s`;
   else if (p === 'break') sub = T.isLong ? 'pause longue' : 'pause';
@@ -2855,6 +2883,7 @@ function render(force) {
   if (force || p === 'idle') {
     setText(els.vFocus, String(S.focusMin));
     setText(els.vBreak, String(S.breakMin));
+    setText(askMin, String(Math.round(T.total / 60)));
     setText(els.cyc, S.cycles === 0 ? 'sans fin' : `${S.cycles} cycle${S.cycles > 1 ? 's' : ''}`);
     $('#edit-focus').classList.toggle('on', T.editing === 'focus');
     $('#edit-break').classList.toggle('on', T.editing === 'break');
@@ -2907,8 +2936,10 @@ function countdownTick() {
 
 function tick() {
   countdownTick();
-  if (T.phase === 'focus' && T.pausedRemaining == null && remaining() <= 0) startBreak(true);
-  else if (T.phase === 'break' && !T.breakEnded && remaining() <= 0) breakTimeUp();
+  if (T.phase === 'focus' && T.pausedRemaining == null && remaining() <= 0) {
+    if (!T.askAt) askBreak();
+    else if (Date.now() >= T.askAt) startBreak(false);
+  } else if (T.phase === 'break' && !T.breakEnded && remaining() <= 0) breakTimeUp();
   else if (T.phase === 'break' && T.resumeAt && Date.now() >= T.resumeAt) resumeFromBreak();
   messagesTick();
   render(false);

@@ -207,6 +207,12 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   Reprendre. « Passer à la pause » existe en focus.
 - **Arrêter** (en focus, et en pause au toucher) remet tout à zéro et **coupe tous les sons**
   (musique, musique de pause, bruit), en gardant les choix pour le prochain Démarrer.
+- **Fin du focus : « On active la pause ? »** (05/11, demande de l'utilisateur) : la clochette
+  sonne, la question s'écrit à la place du message, « pause dans 10 s » sous le temps, et deux
+  boutons toujours visibles : « Oui, pause » et « Non, encore N min » (le même temps de focus
+  recommence, même cycle). Sans réponse en 10 s, la pause commence. Pendant la question, le
+  bouton Pause ne sert pas. « Passer à la pause » ne pose pas la question. D'autres sons pour
+  la question : à chercher plus tard (pas prioritaire). Code : `askBreak()`, `T.askAt`.
 - Pause longue après N cycles (par défaut après 4, 15 min).
 - **Recharger ou rouvrir la page repart de zéro** comme une première ouverture : minuteur
   arrêté, aucun son ; seuls les réglages et les choix (musique, bruit, volumes…) sont relus.
@@ -289,7 +295,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
     `js/defaults.js`, après les tests habituels (lecture depuis un autre site, publicité).
 - **Musique de la pause** (choix retenu) : musique douce générée par l'appli (par défaut,
   façon « ascenseur », jouée même si rien ne jouait avant), même musique que le focus plus
-  bas, silence, ou n'importe quelle playlist / radio cochée. En pause, le lecteur affiche la
+  bas, silence, ou n'importe quelle playlist / radio cochée. 05/11 : elle craquait au casque
+  Bluetooth du téléphone (pas aux enceintes) ; basse baissée et adoucie, notes de piano moins
+  sèches (attaque 25 ms, sans 3e harmonique), à confirmer à l'écoute. En pause, le lecteur affiche la
   musique de pause et **son propre menu** ; le menu et le ▶ du focus sont masqués. Un seul
   curseur de volume (celui du lecteur), qui règle la musique de la phase en cours.
 - La musique du focus est **notée au début de la pause** et **reprend après** : la playlist
