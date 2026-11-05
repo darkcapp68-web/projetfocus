@@ -85,6 +85,7 @@ exige aussi le plein écran).
 
 - 05/11 (envoyé, à juger) : question « On active la pause ? » en fin de focus (10 s, sinon
   pause) ; musique de pause adoucie pour le casque Bluetooth (à confirmer à l'écoute).
+- 05/11 (envoyé) : bouton « Pause maintenant » en haut à gauche pendant le focus.
 
 ## Ce dont j'ai besoin de toi
 

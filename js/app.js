@@ -10,7 +10,7 @@ const body = document.body;
 
 // Version affichée en bas des Paramètres : à changer à chaque envoi sur GitHub, pour voir
 // d'un coup d'œil si un appareil a la dernière.
-const APP_VERSION = '05/11/2026 · 08h24';
+const APP_VERSION = '05/11/2026 · 18h57';
 const LS_SETTINGS = 'projetfocus.settings';
 const LS_BEFORE_SYNC = 'projetfocus.settings.avant-drive'; // copie gardée avant chaque récupération
 
@@ -2330,6 +2330,7 @@ $('#btn-start').addEventListener('click', () => {
 });
 
 $('#btn-skip').addEventListener('click', () => { if (T.phase === 'focus') startBreak(false); });
+$('#btn-break-now').addEventListener('click', () => { if (T.phase === 'focus') startBreak(false); });
 $('#btn-stop').addEventListener('click', resetAll);
 $('#btn-ask-yes').addEventListener('click', () => { if (T.phase === 'focus' && T.askAt) startBreak(false); });
 $('#btn-ask-no').addEventListener('click', declineBreak);

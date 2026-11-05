@@ -105,7 +105,13 @@ body.breath-word #breath.on { opacity: 1; }
 .cycles { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; margin-left: 4px; }
 .cycles .round { width: 1.9em; height: 1.9em; }
 #cyc-val { min-width: 5.2em; text-align: center; opacity: 0.85; }
-body:not(.phase-idle) #quick { visibility: hidden; }
+body:not(.phase-idle):not(.phase-focus) #quick { visibility: hidden; }
+/* Pendant le focus, la ligne des préréglages laisse la place à « Pause maintenant » (masqué,
+   sans changer la mise en page, pendant la question « On active la pause ? »). */
+#btn-break-now { display: none; }
+body.phase-focus #quick > :not(#btn-break-now) { display: none; }
+body.phase-focus #btn-break-now { display: inline-block; }
+body.asking #btn-break-now { visibility: hidden; }
 
 /* ---------- Centre ---------- */
 #stage {

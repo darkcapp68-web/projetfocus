@@ -213,6 +213,9 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
   recommence, même cycle). Sans réponse en 10 s, la pause commence. Pendant la question, le
   bouton Pause ne sert pas. « Passer à la pause » ne pose pas la question. D'autres sons pour
   la question : à chercher plus tard (pas prioritaire). Code : `askBreak()`, `T.askAt`.
+- **« Pause maintenant »** (05/11, demande de l'utilisateur : il répondait trop souvent « Non ») :
+  pendant le focus, en haut à gauche à la place des préréglages et des cycles, visible avec les
+  autres contrôles ; il lance la pause tout de suite, comme « Passer à la pause ».
 - Pause longue après N cycles (par défaut après 4, 15 min).
 - **Recharger ou rouvrir la page repart de zéro** comme une première ouverture : minuteur
   arrêté, aucun son ; seuls les réglages et les choix (musique, bruit, volumes…) sont relus.
