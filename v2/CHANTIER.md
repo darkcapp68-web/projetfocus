@@ -75,6 +75,11 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   - `app.js` est maintenant un module (`stations.js`, `noise.js`, `sync.js`) ; service worker
     en `projetfocus2-v2`.
 
+- 07/11 : **choix de la radio dans la fenêtre principale** : le nom de la radio du lecteur est
+  un menu en dragée (comme la 1.0) avec les radios cochées dans « Musiques du menu » ; choisir
+  une radio la lance tout de suite ; même liste et même choix que « Musique par défaut » des
+  Paramètres.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

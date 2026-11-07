@@ -3,7 +3,7 @@ import { STATIONS, SHOWN_STATIONS, CLIENT_ID } from './stations.js';
 import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 
-const APP_VERSION = '07/11/2026 · 07h40';
+const APP_VERSION = '07/11/2026 · 07h43';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -106,7 +106,6 @@ player.addEventListener('error', () => {
 player.addEventListener('pause', () => { if (wantOn && player.src) { wantOn = false; setState(RADIO.desc); renderRadio(); } });
 
 function updateMeta() {
-  $('#radio-name').textContent = RADIO.name;
   if ('mediaSession' in navigator && window.MediaMetadata) {
     navigator.mediaSession.metadata = new MediaMetadata({ title: RADIO.name, artist: RADIO.desc, album: 'projetfocus 2' });
   }
@@ -123,6 +122,7 @@ function setRadio(id) {
   RADIO = stationOf(id);
   saveS();
   updateMeta();
+  syncRadioSelects();
   if (wantOn) radioOn(); else setState(RADIO.desc);
 }
 updateMeta();
@@ -547,8 +547,18 @@ function groupedOptions(list, select, value) {
   select.value = value;
 }
 
+// Les radios cochées dans « Musiques du menu » : même liste dans les Paramètres et dans le lecteur.
+function fillRadioSelects() {
+  const shown = STATIONS.filter((x) => S.radios.includes(x.id));
+  groupedOptions(shown, $('#sel-radio'), S.radio);
+  groupedOptions(shown, $('#sel-player-radio'), S.radio);
+}
+function syncRadioSelects() {
+  for (const sel of [$('#sel-radio'), $('#sel-player-radio')]) if (sel.value !== S.radio) sel.value = S.radio;
+}
+
 function buildSounds() {
-  groupedOptions(STATIONS.filter((x) => S.radios.includes(x.id)), $('#sel-radio'), S.radio);
+  fillRadioSelects();
   const sn = $('#sel-noise');
   sn.replaceChildren(...NOISES.map((n) => new Option(n.name, n.id)));
   sn.value = S.noise;
@@ -575,7 +585,7 @@ function buildSounds() {
       if (!c.checked && x.id === S.radio) { c.checked = true; return; }
       S.radios = STATIONS.filter((y) => (y.id === x.id ? c.checked : S.radios.includes(y.id))).map((y) => y.id);
       saveS();
-      groupedOptions(STATIONS.filter((y) => S.radios.includes(y.id)), $('#sel-radio'), S.radio);
+      fillRadioSelects();
     });
     l.append(c, document.createTextNode(x.name));
     picks.appendChild(l);
@@ -583,6 +593,11 @@ function buildSounds() {
 }
 
 $('#sel-radio').addEventListener('change', (e) => setRadio(e.target.value));
+// Dans le lecteur, choisir une radio la lance tout de suite (comme la 1.0).
+$('#sel-player-radio').addEventListener('change', (e) => {
+  setRadio(e.target.value);
+  if (!wantOn) radioOn();
+});
 $('#sel-noise').addEventListener('change', (e) => {
   S.noise = e.target.value;
   saveS();
