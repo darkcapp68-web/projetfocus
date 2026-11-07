@@ -87,6 +87,21 @@ exige aussi le plein écran).
   pause) ; musique de pause adoucie pour le casque Bluetooth (à confirmer à l'écoute).
 - 05/11 (envoyé) : bouton « Pause maintenant » en haut à gauche pendant le focus.
 
+## Chantier ouvert le 07/11 (demande de l'utilisateur)
+
+1. **Son qui craque** : toujours là, au casque Bluetooth du téléphone. Cause trouvée par
+   l'utilisateur : l'activité du téléphone. Piste : tous les sons générés (musique de pause,
+   bruits, dings) et la radio en mode Rythme passent par le moteur audio de la page, créé
+   avec la plus petite mémoire tampon (réglage par défaut « interactive ») ; dès que le
+   téléphone est occupé (animations, autre appli), il manque des morceaux de son et ça
+   craque. À faire : moteur audio en mode « playback » (tampon plus grand), voire musique
+   de pause et bruits joués comme un fichier par le lecteur du téléphone.
+2. **Ergonomie sur le téléphone** : à refaire depuis zéro (pas pratique). À définir avec
+   l'utilisateur avant de toucher au code.
+3. **Paramètres qui ne passent pas** : impression que certains réglages ne sont pas pris en
+   compte. À préciser (lesquels, où : PC, téléphone, après une reprise du Drive ?).
+4. **Pauses avec exercice** : trop compliquées. À simplifier, à définir avec l'utilisateur.
+
 ## Ce dont j'ai besoin de toi
 
 1. **Publication** : fait. Site en ligne sur https://darkcapp68-web.github.io/projetfocus/
