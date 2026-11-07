@@ -37,6 +37,8 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   // Seulement les fichiers du site ; la radio et le reste passent sans s'arrêter ici.
   if (req.method !== 'GET' || url.origin !== location.origin) return;
+  // Les sons (musique de pause, sons de respiration) sont lus par le navigateur par morceaux : on les laisse passer.
+  if (url.pathname.includes('/audio/')) return;
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     try {

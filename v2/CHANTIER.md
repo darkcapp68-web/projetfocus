@@ -95,6 +95,34 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   Pas encore : cloche de début / fin de pause, signal des 10 dernières secondes, question de
   fin de focus.
 
+## Chantier du 07/11 (demande de l'utilisateur)
+
+1. **Musique calme pour la pause, via Suno** : à créer par l'utilisateur, prompts prêts dans
+   `SUNO.md`. Le support est en place : fichier `audio/pause/calme.mp3`, choix « Musique de
+   la pause » (la radio continue / silence / musique calme). **En attente du fichier.**
+2. **Sons pour inspire / retiens / expire selon les modes** : à trouver ou fabriquer par
+   l'utilisateur (Suno ne fait pas de sons courts : voir `SUNO.md`), à donner à Claude. Le
+   support est en place : `audio/respiration/` + `manifest.json`, un jeu par rythme ou
+   `default`, sinon notes de cloche. **En attente des fichiers.**
+3. **Réglages de pause de la 1.0, sans les messages** : repris (Paramètres → Pause, voir
+   ci-dessous). Les messages bienveillants du focus ne sont **pas** repris.
+
+- 07/11 : **Paramètres → Pause** repris de la 1.0 : respiration guidée (rythmes cohérence
+  cardiaque, apaisante, carrée, 4-7-8, simple pulsation avec « une respiration toutes les N s »),
+  **sons de respiration** (réglage de la 2.0 : aigu / moyen / grave), « la respiration se voit
+  par » (rien par défaut, le mot qui grandit, les couleurs, les deux, un voile sombre ;
+  couleurs d'inspire / retenue / expire ; « écrire inspire / retiens / expire » ; voile réglable),
+  **coach** (une action à la fois + deux autres au toucher, liste modifiable, copiée de la 1.0),
+  **reprise du focus** tout seul à la fin de la pause avec un délai réglable (0 par défaut) ou
+  avec le bouton, **« maintenir pour reprendre »** (0 = un toucher ; réglable jusqu'à 10 s),
+  plein écran au début de la pause (non par défaut), notification si la fenêtre est cachée
+  (la permission est demandée à Démarrer), musique de la pause. Le son et l'écran suivent la
+  même horloge. Fin de pause sans reprise automatique : « pause terminée » et le bouton attend.
+  **Pas encore repris** de la 1.0 : pause longue après N cycles, nombre de cycles, « ding » de
+  fin de pause, compte à rebours sonore (le son reste à décider avec l'oreille de l'utilisateur).
+  Testé sur 127.0.0.1 (réglages, mot / couleurs / voile, coach, maintenir, reprise auto ou à la
+  main, radio coupée pendant la pause et rendue) ; plein écran et notifications non testés.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

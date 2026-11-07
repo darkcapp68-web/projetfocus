@@ -2,9 +2,9 @@
 import { STATIONS, SHOWN_STATIONS, CLIENT_ID } from './stations.js';
 import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
-import { RHYTHMS, createBreath } from './breath.js';
+import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 07h51';
+const APP_VERSION = '07/11/2026 · 08h02';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -26,21 +26,80 @@ const DEFAULTS = {
   radios: [...SHOWN_STATIONS], // radios proposées dans « Musiques du menu »
   noise: 'none', // bruit de fond lancé avec Démarrer
   noiseVol: 30,
-  rhythm: 'coherence', // respiration par le son pendant la pause
-  breathVol: 60, // volume des trois dings de respiration (%)
+  // Pause : réglages repris de la 1.0 (sans les messages).
+  pulseOn: true, // respiration guidée
+  breathPattern: 'coherence', // rythme (voir breath.js)
+  pulseSeconds: 6, // simple pulsation : une respiration toutes les N secondes
+  breathSound: true, // trois sons : aigu = inspire, moyen = retiens, grave = expire
+  breathVol: 60, // volume de ces sons (%)
+  breathShow: 'none', // la respiration se voit par : none | word | colors | both | veil
+  breathLabels: true, // écrire « inspire / retiens / expire » sous le temps
+  breathInspireColor: '#8fd3ff', // bleu ciel
+  breathHoldColor: '#ffd36e', // doré
+  breathExpireColor: '#000000', // noir
+  pulseIntensity: 30, // assombrissement du voile (%)
+  coachMode: 'one', // une action à la fois : one | none
+  coachActions: [
+    'Lève-toi et marche un peu.',
+    'Bois un grand verre d’eau.',
+    'Regarde au loin pendant 20 secondes.',
+    'Étire le dos et les épaules.',
+    'Ouvre la fenêtre et respire l’air frais.',
+    'Fais rouler tes épaules, cinq fois dans chaque sens.',
+    'Ferme les yeux et respire lentement une minute.',
+    'Détends tes mains : ouvre, ferme, secoue.',
+    'Range une seule chose autour de toi.',
+    'Va jusqu’à la fenêtre et regarde le ciel.',
+  ],
+  autoChain: true, // le focus reprend tout seul à la fin de la pause
+  autoChainDelay: 0, // … après N secondes
+  breakMusic: 'radio', // musique de la pause : radio | silence | calme
+  fullscreenOnBreak: false, // plein écran au début de la pause
+  holdSeconds: 0, // « Reprendre le focus » : 0 = un toucher ; sinon, toucher maintenu N secondes
+  notifyOn: true, // notification si la fenêtre est cachée
   syncClientId: CLIENT_ID,
 };
 
-function sanitize(raw) {
-  const r = { ...DEFAULTS, ...(raw && typeof raw === 'object' ? raw : {}) };
+function sanitize(raw0) {
+  const raw = raw0 && typeof raw0 === 'object' ? { ...raw0 } : {};
+  // Ancien réglage « rythme » (premier essai du 07/11) : repris sous le nom de la 1.0.
+  if (raw.rhythm && !raw.breathPattern) {
+    raw.breathPattern = raw.rhythm === 'aucune' ? 'coherence' : raw.rhythm;
+    if (raw.rhythm === 'aucune') raw.breathSound = false;
+  }
+  delete raw.rhythm;
+  const r = { ...DEFAULTS, ...raw };
   const known = new Set(STATIONS.map((x) => x.id));
   r.radios = (Array.isArray(r.radios) ? r.radios : DEFAULTS.radios).filter((id) => known.has(id));
   if (!known.has(r.radio)) r.radio = DEFAULTS.radio;
   if (!r.radios.includes(r.radio)) r.radios.push(r.radio); // la radio en cours reste dans le menu
   if (!NOISES.some((n) => n.id === r.noise)) r.noise = DEFAULTS.noise;
   r.noiseVol = Math.min(100, Math.max(0, Math.round(Number(r.noiseVol)) || 0));
-  if (!RHYTHMS.some((x) => x.id === r.rhythm)) r.rhythm = DEFAULTS.rhythm;
-  r.breathVol = Math.min(100, Math.max(0, Math.round(Number(r.breathVol)) || 0));
+  const num = (v, min, max, def, step = 1) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n / step) * step)) : def;
+  };
+  const pick = (v, list, def) => (list.includes(v) ? v : def);
+  const color = (v, def) => (/^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : def);
+  r.pulseOn = !!r.pulseOn;
+  r.breathSound = !!r.breathSound;
+  r.breathLabels = !!r.breathLabels;
+  r.autoChain = !!r.autoChain;
+  r.fullscreenOnBreak = !!r.fullscreenOnBreak;
+  r.notifyOn = !!r.notifyOn;
+  r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
+  r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
+  r.coachMode = pick(r.coachMode, ['one', 'none'], DEFAULTS.coachMode);
+  r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
+  r.pulseSeconds = num(r.pulseSeconds, 1, 12, DEFAULTS.pulseSeconds, 0.5);
+  r.breathVol = num(r.breathVol, 0, 100, DEFAULTS.breathVol);
+  r.pulseIntensity = num(r.pulseIntensity, 5, 70, DEFAULTS.pulseIntensity, 5);
+  r.autoChainDelay = num(r.autoChainDelay, 0, 60, DEFAULTS.autoChainDelay);
+  r.holdSeconds = num(r.holdSeconds, 0, 10, DEFAULTS.holdSeconds);
+  r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
+  r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
+  r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);
+  r.coachActions = Array.isArray(r.coachActions) ? r.coachActions.map((x) => String(x).trim()).filter(Boolean) : [...DEFAULTS.coachActions];
   r.syncClientId = typeof r.syncClientId === 'string' && r.syncClientId.trim() ? r.syncClientId.trim() : DEFAULTS.syncClientId;
   return r;
 }
@@ -74,6 +133,7 @@ function renderRadio() {
 // Démarrer ne la lance que si elle était lancée la dernière fois (comme la 1.0).
 function radioOn() {
   wantOn = true;
+  radioHeld = false;
   store.set('radioWanted', true);
   // Une radio repart toujours en direct : on recharge le flux.
   player.crossOrigin = 'anonymous'; // permet d'analyser le son pour l'onde (la radio l'autorise)
@@ -84,9 +144,10 @@ function radioOn() {
   renderRadio();
 }
 
-function radioOff() {
+// `remember` faux : arrêt le temps de la pause (la radio reviendra), sans changer le souvenir.
+function radioStop(remember = true) {
   wantOn = false;
-  store.set('radioWanted', false);
+  if (remember) store.set('radioWanted', false);
   player.pause();
   player.removeAttribute('src');
   player.load(); // coupe vraiment la connexion au flux
@@ -94,6 +155,7 @@ function radioOff() {
   renderRadio();
   wave.settle();
 }
+const radioOff = () => radioStop(true);
 
 btnRadio.addEventListener('click', () => (wantOn ? radioOff() : radioOn()));
 player.addEventListener('playing', () => {
@@ -232,6 +294,7 @@ wave.draw(false);
 volume.value = store.get('volume', 70);
 volume.addEventListener('input', () => {
   player.volume = volume.value / 100;
+  calm.volume = volume.value / 100;
   store.set('volume', Number(volume.value));
 });
 
@@ -417,44 +480,210 @@ const clock = (() => {
 const noise = createNoise();
 noise.setLevel(S.noiseVol / 100);
 
-/* ---------- Respiration par le son (pause) ---------- */
-// Pendant la pause, trois dings guident la respiration sans qu'on regarde l'écran :
-// aigu = inspire, moyen = retiens, grave = expire. Le rythme se règle dans Paramètres → Pause.
+/* ---------- Pause : respiration (son et écran), coach, musique ---------- */
+// Pendant la pause, trois sons guident la respiration sans qu'on regarde l'écran :
+// aigu = inspire, moyen = retiens, grave = expire (breath.js). Comme la 1.0, la respiration
+// peut aussi se voir (le mot qui grandit, les couleurs, un voile sombre), au choix dans
+// Paramètres → Pause. Le son et l'écran suivent la même horloge (`guide`).
 const breath = createBreath();
+const pulseEl = $('#pulse'), subEl = $('#sub');
+let guide = null; // { steps, t0 } : la respiration en cours (t0 = heure du premier son, en ms)
+
+function startGuide() {
+  stopGuide();
+  if (!S.pulseOn) return;
+  const g = { steps: stepsFor(S.breathPattern, S.pulseSeconds), t0: Date.now() + 150 };
+  guide = g;
+  if (S.breathSound) {
+    breath.start(S.breathPattern, S.breathVol / 100, S.pulseSeconds).then((t0) => { if (guide === g && t0) g.t0 = t0; });
+  }
+}
+function stopGuide() {
+  guide = null;
+  breath.stop();
+  resetVisual();
+}
+
+const hexToRgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const mixRgb = (a, b, p) => a.map((v, i) => Math.round(v + (b[i] - v) * p));
+const lerp = (a, b, p) => a + (b - a) * p;
+const colorOf = (kind) => hexToRgb(kind === 'inspire' ? S.breathInspireColor : kind === 'retiens' ? S.breathHoldColor : S.breathExpireColor);
+
+function resetVisual() {
+  pulseEl.style.opacity = 0;
+  subEl.style.transform = '';
+  document.body.classList.remove('ink-dark');
+}
+
+// Le mot de l'étape en cours, s'il doit s'afficher (pas pour la simple pulsation).
+function guideWord() {
+  if (!guide || S.breathPattern === 'simple') return '';
+  if (!(S.breathLabels || S.breathShow === 'word')) return '';
+  const e = (Date.now() - guide.t0) / 1000;
+  return e < 0 ? '' : stepAt(guide.steps, e).kind;
+}
+
+// Respiration à l'écran, calculée à chaque image : inspire = le mot grandit / l'écran
+// s'éclaircit ; retiens = rien ne bouge ; expire = le mot rétrécit / l'écran s'assombrit.
+function applyGuide() {
+  if (!guide) return resetVisual();
+  const e = (Date.now() - guide.t0) / 1000;
+  if (e < 0) return;
+  const show = S.breathShow, simple = S.breathPattern === 'simple';
+  const st = stepAt(guide.steps, e);
+  const prev = guide.steps[(st.i - 1 + guide.steps.length) % guide.steps.length][0] || 'expire';
+  const dark = S.pulseIntensity / 100;
+  const endOf = (kind) => (kind === 'inspire' ? 1 : 0); // 1 = poumons pleins
+  // Poumons pleins (1) ou vides (0) à l'instant : sert au mot qui grandit et au voile.
+  const fill = st.kind === 'inspire' ? st.p : st.kind === 'expire' ? 1 - st.p : endOf(prev);
+  if ((show === 'word' || show === 'both') && !simple) {
+    subEl.style.transform = `scale(${lerp(1, show === 'word' ? 3 : 2.4, fill).toFixed(3)})`;
+  } else subEl.style.transform = '';
+  if ((show === 'colors' || show === 'both') && !simple) {
+    const glide = st.kind === 'retiens' ? Math.min(1.5, st.secs) : st.secs;
+    const c = mixRgb(colorOf(prev), colorOf(st.kind), Math.min(1, (st.p * st.secs) / glide)); // la couleur glisse d'une étape à l'autre
+    pulseEl.style.backgroundColor = `rgb(${c})`;
+    pulseEl.style.opacity = st.cycle === 0 && st.i === 0 ? st.p : 1; // la première inspiration s'allume doucement
+    document.body.classList.toggle('ink-dark', (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 > 0.6);
+  } else if (show === 'veil' || simple) {
+    pulseEl.style.backgroundColor = '#000';
+    pulseEl.style.opacity = (dark * (1 - fill)).toFixed(3); // inspire : s'éclaircit ; expire : s'assombrit
+    document.body.classList.remove('ink-dark');
+  } else {
+    pulseEl.style.opacity = 0;
+    document.body.classList.remove('ink-dark');
+  }
+}
+
+/* ---------- Pause : coach ---------- */
+// Une action à la fois pendant la pause ; deux autres proposées au toucher (liste modifiable).
+const coachEl = $('#coach'), coachList = $('#coach-list');
+let coach = [], coachKey = '';
+
+function pickCoach() {
+  const a = [...S.coachActions];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  coach = a.slice(0, 3);
+  coachKey = '';
+}
+
+function renderCoach(phase, ended) {
+  const key = `${phase}|${ended}|${S.coachMode}|${coach.join('|')}`;
+  if (key === coachKey) return;
+  coachKey = key;
+  coachEl.textContent = '';
+  coachList.replaceChildren();
+  if (phase !== 'break') return;
+  if (ended) { coachEl.textContent = 'Pause terminée.'; return; }
+  if (S.coachMode !== 'one' || !coach.length) return;
+  coachEl.textContent = coach[0];
+  coach.forEach((txt, i) => {
+    if (i === 0) return;
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = txt;
+    b.title = 'Plutôt ça';
+    b.addEventListener('click', () => { coach.splice(i, 1); coach.unshift(txt); coachKey = ''; });
+    li.appendChild(b);
+    coachList.appendChild(li);
+  });
+}
+
+/* ---------- Pause : plein écran, notifications ---------- */
+let weWentFullscreen = false;
+function enterFullscreen() {
+  if (!S.fullscreenOnBreak || document.fullscreenElement || !document.documentElement.requestFullscreen) return;
+  document.documentElement.requestFullscreen().then(() => { weWentFullscreen = true; }).catch(() => { /* sans geste, refusé */ });
+}
+function leaveFullscreen() {
+  if (weWentFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  weWentFullscreen = false;
+}
+function askNotifyPermission() {
+  if (S.notifyOn && 'Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {});
+}
+async function notify(title, text) {
+  if (!S.notifyOn || !document.hidden || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body: text, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'projetfocus2', renotify: true };
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (reg) await reg.showNotification(title, opts); else new Notification(title, opts);
+  } catch { /* notifications indisponibles */ }
+}
+
+/* ---------- Pause : musique ---------- */
+// « radio » : la radio continue ; « silence » : elle se coupe le temps de la pause et revient
+// après ; « calme » : une musique calme fournie en fichier (audio/pause/calme.mp3, voir
+// SUNO.md) joue à la place, en boucle. Sans fichier, « calme » se comporte comme « silence ».
+const CALM_URL = 'audio/pause/calme.mp3';
+const calm = new Audio();
+calm.loop = true;
+calm.preload = 'none';
+let calmAvailable = false;
+let radioHeld = false; // la radio était lancée : on la rend à la fin de la pause
+fetch(CALM_URL, { method: 'HEAD' }).then((r) => { calmAvailable = r.ok; refreshPauseUi(); }).catch(() => {});
+
+function pauseMusicOn() {
+  if (S.breakMusic === 'radio') return;
+  if (wantOn) { radioHeld = true; radioStop(false); }
+  if (S.breakMusic === 'calme' && calmAvailable) {
+    calm.src = CALM_URL;
+    calm.volume = volume.value / 100;
+    calm.play().catch(() => {});
+  }
+}
+function pauseMusicOff() {
+  calm.pause();
+  calm.removeAttribute('src');
+  if (radioHeld) { radioHeld = false; radioOn(); }
+}
 
 /* ---------- Démarrer / Pause maintenant / Arrêter ---------- */
 // Démarrer lance le focus, et la radio seulement si elle était lancée la dernière fois
 // (07/11, demande de l'utilisateur ; souvenir `radioWanted`, coupée par défaut).
 // « Pause maintenant » (pendant le focus) lance tout de suite le décompte de la pause.
-// Arrêter ramène au réglage. Le temps est calculé sur l'heure de fin (pas de dérive), et
-// gardé sur l'appareil : si Android ferme ou recharge la page, le décompte reprend là où il
-// en était (leçon de la 1.0). À 0, retour au réglage pour l'instant (la suite viendra :
-// signal, question de la pause, fin de pause).
+// À la fin de la pause, le focus reprend tout seul (réglable) ou avec « Reprendre le focus »
+// (qu'on peut faire « maintenir »). Arrêter ramène au réglage. Le temps est calculé sur
+// l'heure de fin (pas de dérive), et gardé sur l'appareil : si Android ferme ou recharge la
+// page, le décompte reprend là où il en était (leçon de la 1.0). À la fin du focus : retour
+// au réglage pour l'instant (la question « On fait une pause ? » reste à faire).
 const timer = (() => {
   const btn = $('#btn-start'), btnBreak = $('#btn-break'), btnResume = $('#btn-resume');
-  let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total } en cours, sinon null
+  let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total, ended?, resumeAt? } en cours, sinon null
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
   if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
+  if (run?.phase === 'break') pickCoach();
 
+  let resumeLabel = '';
   function render() {
     const b = document.body;
+    const ph = run?.phase;
     b.classList.toggle('running', !!run);
-    b.classList.toggle('phase-focus', run?.phase === 'focus');
-    b.classList.toggle('phase-break', run?.phase === 'break');
+    b.classList.toggle('phase-focus', ph === 'focus');
+    b.classList.toggle('phase-break', ph === 'break');
+    b.classList.toggle('break-ended', !!run?.ended);
     btn.textContent = run ? 'Arrêter' : 'Démarrer';
     btn.classList.toggle('primary', !run);
+    const rl = S.holdSeconds > 0 ? `Maintenir pour reprendre (${S.holdSeconds} s)` : 'Reprendre le focus';
+    if (rl !== resumeLabel) { resumeLabel = rl; btnResume.textContent = rl; }
     if (run) {
-      const left = Math.max(0, (run.endAt - Date.now()) / 1000);
-      clock.label(run.phase, run.phase === 'break' ? breath.word() : ''); // l'action en cours
+      const left = run.ended ? 0 : Math.max(0, (run.endAt - Date.now()) / 1000);
+      // Sous le temps : « focus », « pause », ou l'action de respiration en cours.
+      clock.label(ph, run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
       clock.draw(left, run.total);
       // Fond (07/11, demande de l'utilisateur) : pendant le focus, il glisse de la couleur
       // d'origine au noir sur toute la durée ; pendant la pause, il revient du noir à la
       // couleur d'origine.
       const done = 1 - left / run.total;
-      paintBg(run.phase === 'focus' ? done : 1 - done);
+      paintBg(ph === 'focus' ? done : 1 - done);
+      if (ph === 'break') applyGuide(); else resetVisual();
+      renderCoach(ph, !!run.ended);
     } else {
       clock.reset();
       paintBg(0);
+      resetVisual();
+      renderCoach(null, false);
     }
   }
 
@@ -472,54 +701,125 @@ const timer = (() => {
   }
 
   function begin(phase) {
+    holdEnd();
     const total = clock.minutes(phase) * 60;
     run = { phase, endAt: Date.now() + total * 1000, total };
     store.set('run', run);
-    // Pause : les dings de respiration partent avec elle ; focus : ils s'arrêtent.
-    if (phase === 'break') breath.start(S.rhythm, S.breathVol / 100);
-    else breath.stop();
+    if (phase === 'break') {
+      pickCoach();
+      startGuide(); // respiration : son et écran
+      pauseMusicOn();
+      enterFullscreen();
+    } else {
+      stopGuide();
+      pauseMusicOff();
+      leaveFullscreen();
+    }
     render();
     loop();
   }
 
   function start() {
+    askNotifyPermission();
     if (!wantOn && store.get('radioWanted', false)) radioOn();
     noise.set(S.noise); // bruit de fond choisi dans les Paramètres (rien si « Aucun bruit »)
     begin('focus');
   }
 
   function stop() {
+    holdEnd();
     run = null;
     store.set('run', null);
     noise.set('none');
-    breath.stop();
+    stopGuide();
+    pauseMusicOff();
+    leaveFullscreen();
     render();
   }
 
-  // Fin d'un décompte : la pause finie, le focus reprend tout seul (07/11, demande de
-  // l'utilisateur) ; le focus fini, retour au réglage pour l'instant.
+  // Un décompte est-il arrivé au bout ? (la pause finie attend ensuite l'heure de reprise)
+  function due() {
+    if (!run) return false;
+    const now = Date.now();
+    if (run.ended) return run.resumeAt > 0 && now >= run.resumeAt;
+    return now >= run.endAt;
+  }
+
+  // Fin d'un décompte. Pause finie : le focus reprend tout seul après le délai réglé
+  // (Paramètres → Pause), ou on attend « Reprendre le focus ». Focus fini : retour au réglage.
   function finish() {
-    if (run?.phase === 'break') begin('focus');
-    else stop();
+    if (!run) return;
+    if (run.phase === 'break') {
+      if (!run.ended) {
+        run.ended = true;
+        run.resumeAt = S.autoChain ? Date.now() + S.autoChainDelay * 1000 : 0;
+        store.set('run', run);
+        stopGuide(); // plus de sons de respiration
+        notify(S.autoChain ? 'On reprend' : 'La pause est finie', S.autoChain ? 'Le focus repart.' : 'Reviens quand tu veux.');
+      }
+      if (run.resumeAt && Date.now() >= run.resumeAt) begin('focus');
+      return;
+    }
+    notify('Focus terminé', 'Prends une vraie pause.');
+    stop();
   }
 
   // Arc fluide tant que l'écran est visible ; le contrôle de fin tourne aussi en arrière-plan.
   function loop() {
     if (!run) return;
-    if (Date.now() >= run.endAt) { finish(); return; }
+    if (due()) finish();
+    if (!run) return;
     render();
     if (!document.hidden) requestAnimationFrame(loop);
   }
-  setInterval(() => { if (run && Date.now() >= run.endAt) finish(); }, 1000);
+  // Une fois par seconde : fin de décompte, et affichage à jour même quand le navigateur ne dessine plus
+  // d'images (onglet en arrière-plan).
+  setInterval(() => { if (due()) finish(); else if (run) render(); }, 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
 
   btn.addEventListener('click', () => (run ? stop() : start()));
   btnBreak.addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
-  // « Reprendre le focus » (pendant la pause) : on n'attend pas la fin de la pause.
-  btnResume.addEventListener('click', () => { if (run?.phase === 'break') begin('focus'); });
+
+  // « Reprendre le focus » : un simple toucher ou, si réglé, un toucher MAINTENU (geste
+  // volontaire pour ne pas écourter la pause sans y penser, comme la 1.0).
+  let holdTimer = 0, holdRaf = 0, holdT0 = 0;
+  function holdEnd() {
+    clearTimeout(holdTimer);
+    cancelAnimationFrame(holdRaf);
+    btnResume.classList.remove('holding');
+    btnResume.style.setProperty('--p', 0);
+  }
+  function holdBegin() {
+    if (S.holdSeconds <= 0 || run?.phase !== 'break') return;
+    holdEnd();
+    holdT0 = performance.now();
+    btnResume.classList.add('holding');
+    holdTimer = setTimeout(() => { holdEnd(); begin('focus'); }, S.holdSeconds * 1000);
+    const tick = () => {
+      btnResume.style.setProperty('--p', Math.min(1, (performance.now() - holdT0) / (S.holdSeconds * 1000)));
+      holdRaf = requestAnimationFrame(tick);
+    };
+    tick();
+  }
+  btnResume.addEventListener('pointerdown', (e) => {
+    if (S.holdSeconds <= 0) return;
+    try { btnResume.setPointerCapture(e.pointerId); } catch { /* pointeur déjà relâché */ }
+    holdBegin();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) btnResume.addEventListener(ev, holdEnd);
+  btnResume.addEventListener('contextmenu', (e) => e.preventDefault());
+  btnResume.addEventListener('click', (e) => {
+    if (S.holdSeconds > 0) { e.preventDefault(); return; } // en mode « maintenir », un simple toucher ne fait rien
+    if (run?.phase === 'break') begin('focus');
+  });
+
   render();
   loop();
-  return { get running() { return !!run; } };
+  return {
+    get running() { return !!run; },
+    get onBreak() { return run?.phase === 'break' && !run.ended; },
+    render,
+  };
 })();
 
 /* ---------- Heure bien visible au toucher ---------- */
@@ -609,25 +909,73 @@ function buildSounds() {
 $('#sel-radio').addEventListener('change', (e) => setRadio(e.target.value));
 
 /* ---------- Paramètres : Pause ---------- */
-function buildPause() {
-  $('#sel-rhythm').replaceChildren(...RHYTHMS.map((x) => new Option(x.name, x.id)));
-  $('#sel-rhythm').value = S.rhythm;
-  $('#rng-breath').value = S.breathVol;
-  $('#out-breath').textContent = S.breathVol;
+// Les réglages de pause de la 1.0 (sans les messages). Chaque champ porte `data-k` (le nom du
+// réglage) ; `data-if` cache un réglage qui ne sert pas (« k », « k=a|k=b », « k!=v », tous
+// à satisfaire quand ils sont séparés par un espace).
+const pauseFields = [...dlg.querySelectorAll('[data-k]')];
+
+function readField(el) {
+  if (el.type === 'checkbox') return el.checked;
+  if (el.type === 'range' || el.type === 'number') return Number(el.value);
+  if ('list' in el.dataset) return el.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  return el.value;
 }
-$('#sel-rhythm').addEventListener('change', (e) => {
-  S.rhythm = e.target.value;
-  saveS();
-  if (timer.running && document.body.classList.contains('phase-break')) breath.start(S.rhythm, S.breathVol / 100);
-});
-$('#rng-breath').addEventListener('input', (e) => {
-  S.breathVol = Number(e.target.value);
-  $('#out-breath').textContent = S.breathVol;
-  breath.setLevel(S.breathVol / 100);
-  saveS();
-});
-$('#btn-test-breath').addEventListener('click', () => breath.preview(S.breathVol / 100));
-buildPause();
+function writeField(el, v) {
+  if (el.type === 'checkbox') el.checked = !!v;
+  else if ('list' in el.dataset) el.value = v.join('\n');
+  else el.value = v;
+  const out = el.closest('.rng')?.querySelector('output');
+  if (out) out.textContent = v;
+}
+function condOk(c) {
+  return c.split('|').some((part) => {
+    const m = part.match(/^(\w+)(!?=)?(.*)$/);
+    const val = S[m[1]];
+    if (!m[2]) return !!val;
+    return m[2] === '=' ? String(val) === m[3] : String(val) !== m[3];
+  });
+}
+function refreshVisibility() {
+  for (const el of dlg.querySelectorAll('[data-if]')) el.hidden = !el.dataset.if.split(/\s+/).every(condOk);
+}
+// La musique « calme » n'est proposée que si son fichier existe (audio/pause/calme.mp3).
+function refreshPauseUi() {
+  const sel = $('#sel-break-music');
+  sel.replaceChildren(
+    new Option('La radio continue', 'radio'),
+    new Option('Silence (la radio revient après)', 'silence'),
+    new Option(calmAvailable ? 'Musique calme (fichier de la pause)' : 'Musique calme (pas encore de fichier)', 'calme'),
+  );
+  sel.value = S.breakMusic;
+}
+function syncFields() {
+  for (const el of pauseFields) writeField(el, S[el.dataset.k]);
+  refreshVisibility();
+}
+function onSettingChanged(k) {
+  if (['pulseOn', 'breathPattern', 'pulseSeconds', 'breathSound'].includes(k) && timer.onBreak) startGuide();
+  if (k === 'breathVol') breath.setLevel(S.breathVol / 100);
+  if (k === 'coachMode' || k === 'coachActions') pickCoach();
+  if (k === 'breakMusic' && timer.onBreak) { pauseMusicOff(); pauseMusicOn(); }
+  if (k === 'notifyOn') askNotifyPermission();
+  refreshVisibility();
+  timer.render();
+}
+
+$('#sel-breath').replaceChildren(...RHYTHMS.map((x) => new Option(x.name, x.id)));
+refreshPauseUi();
+for (const el of pauseFields) {
+  el.addEventListener(el.type === 'range' || el.tagName === 'TEXTAREA' ? 'input' : el.type === 'color' ? 'input' : 'change', () => {
+    const k = el.dataset.k;
+    S = sanitize({ ...S, [k]: readField(el) });
+    saveS();
+    if (el.tagName !== 'TEXTAREA') writeField(el, S[k]); // montre la valeur corrigée (limites)
+    else if (!S.coachActions.length) { /* liste vide : pas de coach */ }
+    onSettingChanged(k);
+  });
+}
+$('#btn-test-breath').addEventListener('click', () => breath.preview(S.breathVol / 100, S.breathPattern));
+syncFields();
 
 // Dans le lecteur, choisir une radio la lance tout de suite (comme la 1.0).
 $('#sel-player-radio').addEventListener('change', (e) => {
@@ -670,7 +1018,10 @@ function applyAll(data) {
   if (wantOn) radioOn(); else setState(RADIO.desc);
   if (timer.running) noise.set(S.noise);
   buildSounds();
-  buildPause();
+  refreshPauseUi();
+  syncFields();
+  if (timer.onBreak) startGuide();
+  timer.render();
   $('#inp-client').value = S.syncClientId;
 }
 
