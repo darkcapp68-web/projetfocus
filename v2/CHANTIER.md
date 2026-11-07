@@ -31,7 +31,7 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   réglage pour l'instant (signal et question de la pause : à venir).
 
 - 07/11 : après Démarrer, **l'heure s'efface** (temps et « focus ») : fondu jusqu'à
-  l'invisible en 4 s, invisible 10 s, retour en 4 s, puis ça repart (demande de
+  l'invisible en 10 s, invisible 10 s, retour en 10 s, puis ça repart (fondus ralentis de 4 à 10 s) (demande de
   l'utilisateur, d'abord essayé comme le fondu lent de la 1.0 : 12 %, 16 s aller-retour) ; le **cercle et l'arc
   restent toujours visibles** pour le décompte ; un toucher rend l'heure visible 5 s.
 
