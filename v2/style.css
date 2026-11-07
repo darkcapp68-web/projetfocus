@@ -55,6 +55,8 @@ header {
 main {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  gap: 20px;
   align-items: center;
   justify-content: center;
   padding: 0 16px;
@@ -65,6 +67,8 @@ main {
    graduations seulement pendant le réglage). */
 #dial-wrap { --dial-size: min(78vw, 42vh, 420px); position: relative; width: var(--dial-size); height: var(--dial-size); flex: none; }
 #dial { width: 100%; height: 100%; display: block; touch-action: none; overflow: visible; cursor: grab; }
+body.running #dial { cursor: default; }
+body.running #ticks { opacity: 0; } /* les graduations valent pour le réglage, pas le décompte */
 #dial:focus { outline: none; }
 #dial:focus-visible .track { stroke: rgba(255, 255, 255, 0.6); }
 body.adjusting #dial { cursor: grabbing; }
@@ -182,3 +186,17 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
   background: var(--glass);
 }
 .wide.hot { background: var(--accent); color: #10143a; font-weight: 600; }
+
+/* Démarrer / Arrêter : gros bouton sous l'horloge. */
+#btn-start {
+  min-width: 200px;
+  min-height: 56px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--glass);
+  font-size: 18px;
+  font-weight: 600;
+}
+#btn-start.primary { background: var(--fg); color: var(--bg); }
+#btn-start:active { transform: scale(0.97); }

@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h09';
+const APP_VERSION = '07/11/2026 · 07h13';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -188,7 +188,9 @@ volume.addEventListener('input', () => {
 // Cadran de la 1.0 (style « Normal ») : on le tourne pour régler le temps du focus, de 1 à
 // 90 min (07/11, demande de l'utilisateur ; 60 dans la 1.0), comme un minuteur de cuisine. L'arc part de la position du temps et finit à midi ;
 // le point est en tête. Graduations visibles pendant le réglage. Le temps choisi est gardé.
-// Pour l'instant l'horloge ne fait que régler : son comportement viendra ensuite.
+// Démarrer (07/11, demande de l'utilisateur) : le cercle devient COMPLET, quel que soit le
+// temps choisi, puis se vide jusqu'à 0 pendant le focus (le point recule jusqu'à midi).
+// Pendant le décompte, on ne règle plus l'horloge (bouton Arrêter pour revenir au réglage).
 const clock = (() => {
   const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), time = $('#time');
   const R = 128, CIRC = 2 * Math.PI * R;
@@ -218,17 +220,18 @@ const clock = (() => {
     }
   })();
 
-  // Arc et point pour un temps donné (en secondes).
-  function draw(sec) {
-    const min = clamp(sec / 60, 0, MAX);
-    const len = (min / MAX) * CIRC;
+  // Arc et point pour un temps donné (en secondes). `total` : durée du décompte en cours ;
+  // le cercle complet vaut alors ce total. Sans total (réglage), un tour vaut 90 min.
+  function draw(sec, total = 0) {
+    const f = clamp(total ? sec / total : sec / 60 / MAX, 0, 1);
+    const len = f * CIRC;
     arc.style.strokeDasharray = `${len} ${CIRC}`;
     arc.style.strokeDashoffset = `${len - CIRC}`;
     arc.style.opacity = len < 0.5 ? 0 : 1;
-    const a = (360 - min * DEG) * Math.PI / 180;
+    const a = (360 - f * 360) * Math.PI / 180;
     knob.setAttribute('cx', 150 + R * Math.sin(a));
     knob.setAttribute('cy', 150 - R * Math.cos(a));
-    knob.style.opacity = min <= 0 ? 0 : 1;
+    knob.style.opacity = f <= 0 ? 0 : 1;
     const s = Math.max(0, Math.round(sec));
     time.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   }
@@ -256,7 +259,10 @@ const clock = (() => {
 
   const save = () => store.set('focusMin', minutes);
 
+  const locked = () => document.body.classList.contains('running');
+
   dial.addEventListener('pointerdown', (e) => {
+    if (locked()) return;
     showTicks();
     const { m, dist } = fromPointer(e);
     if (dist < 0.35) return; // le centre ne règle rien
@@ -284,18 +290,69 @@ const clock = (() => {
   dial.addEventListener('pointerup', end);
   dial.addEventListener('pointercancel', end);
   dial.addEventListener('keydown', (e) => {
+    if (locked()) return;
     const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 5, PageDown: -5 }[e.key];
     if (!step) return;
     e.preventDefault();
     showTicks(); set(minutes + step); save();
   });
   dial.addEventListener('wheel', (e) => {
+    if (locked()) return;
     e.preventDefault();
     showTicks(); set(minutes + (e.deltaY < 0 ? 1 : -1)); save();
   }, { passive: false });
 
   set(minutes);
-  return { get minutes() { return minutes; }, draw };
+  return { get minutes() { return minutes; }, draw, reset: () => set(minutes) };
+})();
+
+/* ---------- Démarrer / Arrêter ---------- */
+// Démarrer lance le décompte et la radio (si elle ne joue pas). Le temps est calculé sur
+// l'heure de fin (pas de dérive), et gardé sur l'appareil : si Android ferme ou recharge la
+// page, le décompte reprend là où il en était (leçon de la 1.0). À 0, retour au réglage
+// pour l'instant (la suite viendra : signal, question de la pause).
+const timer = (() => {
+  const btn = $('#btn-start');
+  let run = store.get('run', null); // { endAt, total } en cours, sinon null
+  if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
+
+  function render() {
+    document.body.classList.toggle('running', !!run);
+    btn.textContent = run ? 'Arrêter' : 'Démarrer';
+    btn.classList.toggle('primary', !run);
+    if (run) clock.draw(Math.max(0, (run.endAt - Date.now()) / 1000), run.total);
+    else clock.reset();
+  }
+
+  function start() {
+    const total = clock.minutes * 60;
+    run = { endAt: Date.now() + total * 1000, total };
+    store.set('run', run);
+    if (!wantOn) radioOn();
+    render();
+    loop();
+  }
+
+  function stop() {
+    run = null;
+    store.set('run', null);
+    render();
+  }
+
+  // Arc fluide tant que l'écran est visible ; le contrôle de fin tourne aussi en arrière-plan.
+  function loop() {
+    if (!run) return;
+    if (Date.now() >= run.endAt) { stop(); return; }
+    render();
+    if (!document.hidden) requestAnimationFrame(loop);
+  }
+  setInterval(() => { if (run && Date.now() >= run.endAt) stop(); }, 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
+
+  btn.addEventListener('click', () => (run ? stop() : start()));
+  render();
+  loop();
+  return { get running() { return !!run; } };
 })();
 
 /* ---------- Paramètres ---------- */
