@@ -4,7 +4,7 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h45';
+const APP_VERSION = '07/11/2026 · 08h47';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -259,15 +259,20 @@ const wave = (() => {
     }
     // Barres en gélule (bouts ronds), avec un halo rond autour.
     const pill = (x, y, w, hh) => { g.beginPath(); g.roundRect(x, y, w, hh, w / 2); g.fill(); };
+    // Plus de couleur (07/11, demande de l'utilisateur) : tout l'arc-en-ciel froid et chaud,
+    // du vert-cyan (basses, à gauche) au magenta-rose (aigus, à droite), qui glisse lentement
+    // avec le temps ; les barres les plus hautes s'éclaircissent et virent un peu au chaud.
+    const drift = Math.sin(performance.now() / 5000) * 35;
     g.globalCompositeOperation = 'lighter';
     for (let i = 0; i < n; i++) {
-      const f = i / Math.max(1, n - 1), a = h[i];
-      const x = i * step + (step - bw) / 2, hue = 188 + f * 87;
-      g.globalAlpha = 0.16;
-      g.fillStyle = `hsl(${hue} 100% 60%)`;
+      const f = i / Math.max(1, n - 1), a = h[i], loud = Math.min(1, a / (mid * 0.6));
+      const x = i * step + (step - bw) / 2;
+      const hue = (150 + f * 210 + drift - loud * 25 + 360) % 360;
+      g.globalAlpha = 0.18;
+      g.fillStyle = `hsl(${hue} 100% 58%)`;
       pill(x - bw * 0.8, mid - a - k, bw * 2.6, 2 * a + 2 * k); // halo
-      g.globalAlpha = 0.9;
-      g.fillStyle = `hsl(${hue} 100% 72%)`;
+      g.globalAlpha = 0.92;
+      g.fillStyle = `hsl(${hue} 100% ${66 + loud * 14}%)`;
       pill(x, mid - a, bw, 2 * a);
     }
     // Ligne du milieu

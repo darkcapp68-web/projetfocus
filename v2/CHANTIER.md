@@ -128,6 +128,10 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   un peu plus épaisses, halo rond) et silhouette lissée entre barres voisines (3 passes), donc
   une courbe douce au lieu de dents.
 
+- 07/11 : **onde plus colorée** (demande de l'utilisateur) : de 87° de teinte (cyan → violet)
+  à 210° (vert-cyan → bleu → violet → rose), qui glisse lentement avec le temps (± 35°, cycle
+  de 31 s) ; les barres les plus hautes s'éclaircissent et virent un peu au chaud.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC
