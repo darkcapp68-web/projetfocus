@@ -87,6 +87,17 @@ exige aussi le plein écran).
   pause) ; musique de pause adoucie pour le casque Bluetooth (à confirmer à l'écoute).
 - 05/11 (envoyé) : bouton « Pause maintenant » en haut à gauche pendant le focus.
 
+## Version 2.0 (décision de l'utilisateur, 07/11)
+
+- La version actuelle (**1.0**) reste en ligne **telle quelle**, sans correction pour le
+  moment ; son état est marqué par l'étiquette git `v1`, pour comparer plus tard.
+- La **2.0** repart d'**une page blanche** dans le dossier `v2/` du dépôt, publiée à
+  https://darkcapp68-web.github.io/projetfocus/v2/ (réglages séparés de la 1.0 : clés
+  `projetfocus2.*`, service worker limité à `v2/`). Rien de la 1.0 n'est copié d'office.
+- Le chantier ci-dessous vaut pour la 1.0 : ce sont les leçons à ne pas reproduire dans la 2.0.
+- Une correction du point 5 (la série reprend après une fermeture par Android) avait été
+  écrite pour la 1.0 puis mise de côté : `perso/point5-reprise-serie.patch` (hors dépôt).
+
 ## Chantier ouvert le 07/11 (demande de l'utilisateur)
 
 1. **Son qui craque** : toujours là, au casque Bluetooth du téléphone. Cause trouvée par
