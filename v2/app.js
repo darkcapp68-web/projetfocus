@@ -4,7 +4,7 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h08';
+const APP_VERSION = '07/11/2026 · 08h45';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -238,9 +238,11 @@ const wave = (() => {
       peak = Math.max(top, peak - 0.04); // redescend doucement : une musique calme bouge aussi
       level = (i) => Math.min(1, Math.max(0, (freq[i] - (peak - 42)) / 42));
     }
-    const mid = H / 2, step = 7 * k, bw = 2.6 * k, n = Math.floor(W / step);
+    const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
-    g.globalCompositeOperation = 'lighter';
+    // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
+    // devient une courbe douce au lieu de dents (07/11, demande de l'utilisateur : plus arrondie).
+    let h = new Float32Array(n);
     for (let i = 0; i < n; i++) {
       const f = i / Math.max(1, n - 1);
       // Chaque barre a sa propre sensibilité (son maximum récent) : les aigus bougent aussi.
@@ -248,14 +250,25 @@ const wave = (() => {
       const top = hzMax[i] = Math.max(raw, (hzMax[i] || 0.2) * 0.997, 0.1);
       const s = hz[i] = Math.max(raw / top, (hz[i] || 0) * 0.9);
       const env = 0.6 + 0.4 * Math.sin(Math.PI * Math.min(1, f * 1.15)); // plus haut vers le milieu
-      const a = Math.max(1.5 * k, (0.03 + 0.97 * s ** 1.3) * mid * 0.94 * env);
+      h[i] = Math.max(bw / 2, (0.03 + 0.97 * s ** 1.3) * mid * 0.94 * env);
+    }
+    for (let pass = 0; pass < 3; pass++) {
+      const o = new Float32Array(n);
+      for (let i = 0; i < n; i++) o[i] = 0.25 * h[Math.max(0, i - 1)] + 0.5 * h[i] + 0.25 * h[Math.min(n - 1, i + 1)];
+      h = o;
+    }
+    // Barres en gélule (bouts ronds), avec un halo rond autour.
+    const pill = (x, y, w, hh) => { g.beginPath(); g.roundRect(x, y, w, hh, w / 2); g.fill(); };
+    g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < n; i++) {
+      const f = i / Math.max(1, n - 1), a = h[i];
       const x = i * step + (step - bw) / 2, hue = 188 + f * 87;
       g.globalAlpha = 0.16;
       g.fillStyle = `hsl(${hue} 100% 60%)`;
-      g.fillRect(x - bw * 0.8, mid - a - k, bw * 2.6, 2 * a + 2 * k); // halo
+      pill(x - bw * 0.8, mid - a - k, bw * 2.6, 2 * a + 2 * k); // halo
       g.globalAlpha = 0.9;
       g.fillStyle = `hsl(${hue} 100% 72%)`;
-      g.fillRect(x, mid - a, bw, 2 * a);
+      pill(x, mid - a, bw, 2 * a);
     }
     // Ligne du milieu
     g.globalCompositeOperation = 'source-over';

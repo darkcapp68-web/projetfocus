@@ -124,6 +124,10 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   Testé sur 127.0.0.1 (réglages, mot / couleurs / voile, maintenir, reprise auto ou à la
   main, radio coupée pendant la pause et rendue) ; plein écran et notifications non testés.
 
+- 07/11 : **onde plus arrondie** (demande de l'utilisateur) : barres en gélule (bouts ronds,
+  un peu plus épaisses, halo rond) et silhouette lissée entre barres voisines (3 passes), donc
+  une courbe douce au lieu de dents.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC
