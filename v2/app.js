@@ -2,8 +2,9 @@
 import { STATIONS, SHOWN_STATIONS, CLIENT_ID } from './stations.js';
 import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
+import { RHYTHMS, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 07h43';
+const APP_VERSION = '07/11/2026 · 07h51';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -25,6 +26,8 @@ const DEFAULTS = {
   radios: [...SHOWN_STATIONS], // radios proposées dans « Musiques du menu »
   noise: 'none', // bruit de fond lancé avec Démarrer
   noiseVol: 30,
+  rhythm: 'coherence', // respiration par le son pendant la pause
+  breathVol: 60, // volume des trois dings de respiration (%)
   syncClientId: CLIENT_ID,
 };
 
@@ -36,6 +39,8 @@ function sanitize(raw) {
   if (!r.radios.includes(r.radio)) r.radios.push(r.radio); // la radio en cours reste dans le menu
   if (!NOISES.some((n) => n.id === r.noise)) r.noise = DEFAULTS.noise;
   r.noiseVol = Math.min(100, Math.max(0, Math.round(Number(r.noiseVol)) || 0));
+  if (!RHYTHMS.some((x) => x.id === r.rhythm)) r.rhythm = DEFAULTS.rhythm;
+  r.breathVol = Math.min(100, Math.max(0, Math.round(Number(r.breathVol)) || 0));
   r.syncClientId = typeof r.syncClientId === 'string' && r.syncClientId.trim() ? r.syncClientId.trim() : DEFAULTS.syncClientId;
   return r;
 }
@@ -295,7 +300,7 @@ const clock = (() => {
     if (time.textContent !== txt) time.textContent = txt;
   }
 
-  function label(phase) { sub.textContent = phase === 'break' ? 'pause' : 'focus'; }
+  function label(phase, text) { sub.textContent = text || (phase === 'break' ? 'pause' : 'focus'); }
 
   // Au repos : l'horloge montre ce qu'on règle, et les deux boutons leurs temps.
   function showSetup() {
@@ -412,6 +417,11 @@ const clock = (() => {
 const noise = createNoise();
 noise.setLevel(S.noiseVol / 100);
 
+/* ---------- Respiration par le son (pause) ---------- */
+// Pendant la pause, trois dings guident la respiration sans qu'on regarde l'écran :
+// aigu = inspire, moyen = retiens, grave = expire. Le rythme se règle dans Paramètres → Pause.
+const breath = createBreath();
+
 /* ---------- Démarrer / Pause maintenant / Arrêter ---------- */
 // Démarrer lance le focus, et la radio seulement si elle était lancée la dernière fois
 // (07/11, demande de l'utilisateur ; souvenir `radioWanted`, coupée par défaut).
@@ -435,7 +445,7 @@ const timer = (() => {
     btn.classList.toggle('primary', !run);
     if (run) {
       const left = Math.max(0, (run.endAt - Date.now()) / 1000);
-      clock.label(run.phase);
+      clock.label(run.phase, run.phase === 'break' ? breath.word() : ''); // l'action en cours
       clock.draw(left, run.total);
       // Fond (07/11, demande de l'utilisateur) : pendant le focus, il glisse de la couleur
       // d'origine au noir sur toute la durée ; pendant la pause, il revient du noir à la
@@ -465,6 +475,9 @@ const timer = (() => {
     const total = clock.minutes(phase) * 60;
     run = { phase, endAt: Date.now() + total * 1000, total };
     store.set('run', run);
+    // Pause : les dings de respiration partent avec elle ; focus : ils s'arrêtent.
+    if (phase === 'break') breath.start(S.rhythm, S.breathVol / 100);
+    else breath.stop();
     render();
     loop();
   }
@@ -479,6 +492,7 @@ const timer = (() => {
     run = null;
     store.set('run', null);
     noise.set('none');
+    breath.stop();
     render();
   }
 
@@ -593,6 +607,28 @@ function buildSounds() {
 }
 
 $('#sel-radio').addEventListener('change', (e) => setRadio(e.target.value));
+
+/* ---------- Paramètres : Pause ---------- */
+function buildPause() {
+  $('#sel-rhythm').replaceChildren(...RHYTHMS.map((x) => new Option(x.name, x.id)));
+  $('#sel-rhythm').value = S.rhythm;
+  $('#rng-breath').value = S.breathVol;
+  $('#out-breath').textContent = S.breathVol;
+}
+$('#sel-rhythm').addEventListener('change', (e) => {
+  S.rhythm = e.target.value;
+  saveS();
+  if (timer.running && document.body.classList.contains('phase-break')) breath.start(S.rhythm, S.breathVol / 100);
+});
+$('#rng-breath').addEventListener('input', (e) => {
+  S.breathVol = Number(e.target.value);
+  $('#out-breath').textContent = S.breathVol;
+  breath.setLevel(S.breathVol / 100);
+  saveS();
+});
+$('#btn-test-breath').addEventListener('click', () => breath.preview(S.breathVol / 100));
+buildPause();
+
 // Dans le lecteur, choisir une radio la lance tout de suite (comme la 1.0).
 $('#sel-player-radio').addEventListener('change', (e) => {
   setRadio(e.target.value);
@@ -634,6 +670,7 @@ function applyAll(data) {
   if (wantOn) radioOn(); else setState(RADIO.desc);
   if (timer.running) noise.set(S.noise);
   buildSounds();
+  buildPause();
   $('#inp-client').value = S.syncClientId;
 }
 
@@ -713,7 +750,7 @@ sync.start();
 /* ---------- Mise à jour ---------- */
 // L'appli relit la version publiée ; si elle a changé, un point bleu s'allume sur
 // « Paramètres ». Jamais de rechargement tout seul.
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'stations.js', 'noise.js', 'sync.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'stations.js', 'noise.js', 'breath.js', 'sync.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 let lastCheck = 0;
 
 async function checkUpdate() {

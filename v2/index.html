@@ -84,6 +84,14 @@
       </details>
 
       <details class="sec">
+        <summary>Pause <small>respiration par le son</small></summary>
+        <label>Respiration<select id="sel-rhythm"></select></label>
+        <label>Volume des sons (%)<span class="rng"><input type="range" id="rng-breath" min="0" max="100" step="5"><output id="out-breath"></output></span></label>
+        <p class="note">Trois sons, pour ne pas avoir à regarder l'écran : <b>aigu = inspire</b>, <b>moyen = retiens</b>, <b>grave = expire</b>. Ils jouent pendant la pause, au rythme choisi.</p>
+        <div class="buttons"><button type="button" id="btn-test-breath">Écouter les trois sons</button></div>
+      </details>
+
+      <details class="sec">
         <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
         <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus2-parametres.json », à part de celui de la 1.0) ; « Reprendre » les ramène sur un autre appareil.</p>
         <div class="buttons">

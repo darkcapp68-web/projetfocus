@@ -80,6 +80,21 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   une radio la lance tout de suite ; même liste et même choix que « Musique par défaut » des
   Paramètres.
 
+- 07/11 : **pause guidée par le son** (idée de l'utilisateur : le but est de ne pas regarder
+  l'écran ; la 1.0 avait de beaux modes visuels mais trop compliqués). **Trois dings**, un par
+  action, faciles à retenir : **aigu = inspire, moyen = retiens, grave = expire** (do aigu,
+  mi, sol grave, même volume ; « intensité » comprise comme hauteur du son). Un tour de
+  respiration est fabriqué en mémoire (`breath.js`) puis **joué en boucle** par le moteur
+  audio (contexte « playback ») : le rythme est tenu par l'horloge audio, pas par des
+  minuteurs de la page, donc ça ne dérive pas et ça doit continuer écran éteint (à vérifier
+  sur le téléphone). Démarre avec la pause (« Pause maintenant »), s'arrête à la reprise du
+  focus ou à Arrêter ; l'action en cours s'écrit sous le temps (« inspire »…) à titre
+  d'indication. Paramètres → **Pause** : rythme (cohérence cardiaque 5/5 par défaut,
+  apaisante 4/6, carrée 4-4-4-4, 4-7-8, aucun), volume des sons, bouton « Écouter les trois
+  sons ». **Je ne peux pas écouter : à juger par l'utilisateur** (hauteurs, durée, volume).
+  Pas encore : cloche de début / fin de pause, signal des 10 dernières secondes, question de
+  fin de focus.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC
