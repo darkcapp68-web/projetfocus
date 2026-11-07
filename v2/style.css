@@ -214,3 +214,28 @@ body.running:not(.awake) #center { animation: time-fade 31s ease-in-out infinite
   96.77% { opacity: 1; } /* 10 s pour revenir */
   100% { opacity: 1; } /* 1 s visible, puis on repart */
 }
+
+/* Au repos : deux boutons pour choisir ce que règle l'horloge (focus ou pause). */
+#setup { display: flex; gap: 10px; }
+.seg {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--glass);
+  color: var(--soft);
+}
+.seg b { color: var(--fg); font-weight: 600; }
+.seg.on { border-color: var(--fg); color: var(--fg); }
+body.running #setup { display: none; }
+
+/* Pendant le focus : lancer la pause tout de suite. */
+#btn-break {
+  display: none;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--glass-strong);
+}
+body.phase-focus #btn-break { display: block; }

@@ -35,6 +35,13 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   l'utilisateur, d'abord essayé comme le fondu lent de la 1.0 : 12 %, 16 s aller-retour) ; le **cercle et l'arc
   restent toujours visibles** pour le décompte ; un toucher rend l'heure visible 5 s.
 
+- 07/11 : comme la 1.0, **choix du temps du focus et de la pause** avant Démarrer : deux
+  boutons sous l'horloge (« focus 25 min » / « pause 5 min ») choisissent ce que règle
+  l'horloge ; les deux temps sont gardés (`projetfocus2.focusMin`, `projetfocus2.breakMin`).
+- 07/11 : bouton **« Pause maintenant »** pendant le focus : lance tout de suite le décompte
+  de la pause (cercle complet qui se vide, « pause » sous le temps). À la fin de la pause :
+  retour au réglage pour l'instant.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

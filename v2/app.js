@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h19';
+const APP_VERSION = '07/11/2026 · 07h23';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -189,18 +189,21 @@ volume.addEventListener('input', () => {
 });
 
 /* ---------- Horloge ---------- */
-// Cadran de la 1.0 (style « Normal ») : on le tourne pour régler le temps du focus, de 1 à
-// 90 min (07/11, demande de l'utilisateur ; 60 dans la 1.0), comme un minuteur de cuisine. L'arc part de la position du temps et finit à midi ;
-// le point est en tête. Graduations visibles pendant le réglage. Le temps choisi est gardé.
-// Démarrer (07/11, demande de l'utilisateur) : le cercle devient COMPLET, quel que soit le
-// temps choisi, puis se vide jusqu'à 0 pendant le focus (le point recule jusqu'à midi).
-// Pendant le décompte, on ne règle plus l'horloge (bouton Arrêter pour revenir au réglage).
+// Cadran de la 1.0 (style « Normal ») : on le tourne pour régler, de 1 à 90 min (07/11,
+// demande de l'utilisateur ; 60 dans la 1.0), comme un minuteur de cuisine. L'arc part de la
+// position du temps et finit à midi ; le point est en tête. Graduations pendant le réglage.
+// Comme la 1.0, deux boutons sous l'horloge choisissent ce qu'on règle : le temps du focus
+// ou celui de la pause (07/11). Les deux temps sont gardés.
+// Pendant un décompte, le cercle est COMPLET au départ, quel que soit le temps choisi, puis
+// se vide jusqu'à 0 (le point recule jusqu'à midi) ; on ne règle plus l'horloge.
 const clock = (() => {
-  const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), time = $('#time');
+  const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), time = $('#time'), sub = $('#sub');
   const R = 128, CIRC = 2 * Math.PI * R;
   const MAX = 90, DEG = 360 / MAX; // un tour complet = 90 min, 4° par minute
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  let minutes = clamp(Math.round(store.get('focusMin', 25)) || 25, 1, MAX);
+  const read = (key, def) => clamp(Math.round(store.get(key, def)) || def, 1, MAX);
+  const mins = { focus: read('focusMin', 25), break: read('breakMin', 5) };
+  let editing = 'focus'; // ce que règle l'horloge au repos
   let dragging = false, prev = 0, ticksTimer = 0;
 
   (function buildTicks() {
@@ -237,14 +240,32 @@ const clock = (() => {
     knob.setAttribute('cy', 150 - R * Math.cos(a));
     knob.style.opacity = f <= 0 ? 0 : 1;
     const s = Math.max(0, Math.round(sec));
-    time.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    const txt = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    if (time.textContent !== txt) time.textContent = txt;
+  }
+
+  function label(phase) { sub.textContent = phase === 'break' ? 'pause' : 'focus'; }
+
+  // Au repos : l'horloge montre ce qu'on règle, et les deux boutons leurs temps.
+  function showSetup() {
+    label(editing);
+    dial.setAttribute('aria-valuenow', String(mins[editing]));
+    dial.setAttribute('aria-label', editing === 'focus' ? 'Durée du focus en minutes' : 'Durée de la pause en minutes');
+    $('#v-focus').textContent = mins.focus;
+    $('#v-break').textContent = mins.break;
+    $('#edit-focus').classList.toggle('on', editing === 'focus');
+    $('#edit-break').classList.toggle('on', editing === 'break');
+    draw(mins[editing] * 60);
   }
 
   function set(m) {
-    minutes = clamp(Math.round(m), 1, MAX);
-    dial.setAttribute('aria-valuenow', String(minutes));
-    draw(minutes * 60);
+    mins[editing] = clamp(Math.round(m), 1, MAX);
+    showSetup();
   }
+
+  function edit(what) { editing = what; showSetup(); showTicks(); }
+  $('#edit-focus').addEventListener('click', () => edit('focus'));
+  $('#edit-break').addEventListener('click', () => edit('break'));
 
   // Graduations : affichées au toucher, effacées quelques secondes après.
   function showTicks() {
@@ -261,8 +282,7 @@ const clock = (() => {
     return { m: Math.round((360 - a) / DEG), dist: Math.hypot(dx, dy) / (r.width / 2) };
   }
 
-  const save = () => store.set('focusMin', minutes);
-
+  const save = () => { store.set('focusMin', mins.focus); store.set('breakMin', mins.break); };
   const locked = () => document.body.classList.contains('running');
 
   dial.addEventListener('pointerdown', (e) => {
@@ -298,44 +318,56 @@ const clock = (() => {
     const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 5, PageDown: -5 }[e.key];
     if (!step) return;
     e.preventDefault();
-    showTicks(); set(minutes + step); save();
+    showTicks(); set(mins[editing] + step); save();
   });
   dial.addEventListener('wheel', (e) => {
     if (locked()) return;
     e.preventDefault();
-    showTicks(); set(minutes + (e.deltaY < 0 ? 1 : -1)); save();
+    showTicks(); set(mins[editing] + (e.deltaY < 0 ? 1 : -1)); save();
   }, { passive: false });
 
-  set(minutes);
-  return { get minutes() { return minutes; }, draw, reset: () => set(minutes) };
+  showSetup();
+  return { minutes: (phase) => mins[phase], draw, label, reset: showSetup };
 })();
 
-/* ---------- Démarrer / Arrêter ---------- */
-// Démarrer lance le décompte, et la radio seulement si elle était lancée la dernière fois
-// (07/11, demande de l'utilisateur ; souvenir `radioWanted`, coupée par défaut). Le temps est calculé sur
-// l'heure de fin (pas de dérive), et gardé sur l'appareil : si Android ferme ou recharge la
-// page, le décompte reprend là où il en était (leçon de la 1.0). À 0, retour au réglage
-// pour l'instant (la suite viendra : signal, question de la pause).
+/* ---------- Démarrer / Pause maintenant / Arrêter ---------- */
+// Démarrer lance le focus, et la radio seulement si elle était lancée la dernière fois
+// (07/11, demande de l'utilisateur ; souvenir `radioWanted`, coupée par défaut).
+// « Pause maintenant » (pendant le focus) lance tout de suite le décompte de la pause.
+// Arrêter ramène au réglage. Le temps est calculé sur l'heure de fin (pas de dérive), et
+// gardé sur l'appareil : si Android ferme ou recharge la page, le décompte reprend là où il
+// en était (leçon de la 1.0). À 0, retour au réglage pour l'instant (la suite viendra :
+// signal, question de la pause, fin de pause).
 const timer = (() => {
-  const btn = $('#btn-start');
-  let run = store.get('run', null); // { endAt, total } en cours, sinon null
+  const btn = $('#btn-start'), btnBreak = $('#btn-break');
+  let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total } en cours, sinon null
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
+  if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
 
   function render() {
-    document.body.classList.toggle('running', !!run);
+    const b = document.body;
+    b.classList.toggle('running', !!run);
+    b.classList.toggle('phase-focus', run?.phase === 'focus');
+    b.classList.toggle('phase-break', run?.phase === 'break');
     btn.textContent = run ? 'Arrêter' : 'Démarrer';
     btn.classList.toggle('primary', !run);
-    if (run) clock.draw(Math.max(0, (run.endAt - Date.now()) / 1000), run.total);
-    else clock.reset();
+    if (run) {
+      clock.label(run.phase);
+      clock.draw(Math.max(0, (run.endAt - Date.now()) / 1000), run.total);
+    } else clock.reset();
+  }
+
+  function begin(phase) {
+    const total = clock.minutes(phase) * 60;
+    run = { phase, endAt: Date.now() + total * 1000, total };
+    store.set('run', run);
+    render();
+    loop();
   }
 
   function start() {
-    const total = clock.minutes * 60;
-    run = { endAt: Date.now() + total * 1000, total };
-    store.set('run', run);
     if (!wantOn && store.get('radioWanted', false)) radioOn();
-    render();
-    loop();
+    begin('focus');
   }
 
   function stop() {
@@ -355,6 +387,7 @@ const timer = (() => {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
 
   btn.addEventListener('click', () => (run ? stop() : start()));
+  btnBreak.addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
   render();
   loop();
   return { get running() { return !!run; } };
