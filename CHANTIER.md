@@ -101,6 +101,11 @@ exige aussi le plein écran).
 3. **Paramètres qui ne passent pas** : impression que certains réglages ne sont pas pris en
    compte. À préciser (lesquels, où : PC, téléphone, après une reprise du Drive ?).
 4. **Pauses avec exercice** : trop compliquées. À simplifier, à définir avec l'utilisateur.
+5. **Fins inattendues du programme en cours** : la série s'arrête sans qu'on l'ait voulu.
+   Piste : Android ferme ou recharge la page quand elle est en arrière-plan ou que le
+   téléphone manque de mémoire ; or recharger repart de zéro (règle actuelle, REGLES §3).
+   À préciser : quand ça arrive (écran éteint, autre appli, en pleine utilisation ?) et ce
+   qu'on voit (retour au cadran de réglage, appli rouverte, page blanche ?).
 
 ## Ce dont j'ai besoin de toi
 
