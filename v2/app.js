@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h30';
+const APP_VERSION = '07/11/2026 · 07h33';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -366,7 +366,7 @@ const clock = (() => {
 // en était (leçon de la 1.0). À 0, retour au réglage pour l'instant (la suite viendra :
 // signal, question de la pause, fin de pause).
 const timer = (() => {
-  const btn = $('#btn-start'), btnBreak = $('#btn-break');
+  const btn = $('#btn-start'), btnBreak = $('#btn-break'), btnResume = $('#btn-resume');
   let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total } en cours, sinon null
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
   if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
@@ -425,18 +425,27 @@ const timer = (() => {
     render();
   }
 
+  // Fin d'un décompte : la pause finie, le focus reprend tout seul (07/11, demande de
+  // l'utilisateur) ; le focus fini, retour au réglage pour l'instant.
+  function finish() {
+    if (run?.phase === 'break') begin('focus');
+    else stop();
+  }
+
   // Arc fluide tant que l'écran est visible ; le contrôle de fin tourne aussi en arrière-plan.
   function loop() {
     if (!run) return;
-    if (Date.now() >= run.endAt) { stop(); return; }
+    if (Date.now() >= run.endAt) { finish(); return; }
     render();
     if (!document.hidden) requestAnimationFrame(loop);
   }
-  setInterval(() => { if (run && Date.now() >= run.endAt) stop(); }, 1000);
+  setInterval(() => { if (run && Date.now() >= run.endAt) finish(); }, 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
 
   btn.addEventListener('click', () => (run ? stop() : start()));
   btnBreak.addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
+  // « Reprendre le focus » (pendant la pause) : on n'attend pas la fin de la pause.
+  btnResume.addEventListener('click', () => { if (run?.phase === 'break') begin('focus'); });
   render();
   loop();
   return { get running() { return !!run; } };

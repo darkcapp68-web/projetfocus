@@ -53,6 +53,11 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   couleur d'origine. La barre du téléphone suit (`theme-color`). Transition de 2 s pour adoucir
   les sauts (« Pause maintenant » en plein focus, Arrêter).
 
+- 07/11 : **reprise du focus après la pause** : à la fin de la pause, le focus reprend tout
+  seul (même temps de focus) ; pendant la pause, un bouton « Reprendre le focus » le relance
+  tout de suite. À la fin du focus : retour au réglage pour l'instant. Si la page était
+  fermée quand la pause s'est terminée, retour au réglage (pas de focus lancé dans le dos).
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

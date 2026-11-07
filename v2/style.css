@@ -275,3 +275,14 @@ body.running #presets { width: 0; margin-right: 0; opacity: 0; pointer-events: n
 /* Le fond suit le décompte (couleur d'origine → noir pendant le focus, retour en pause) ;
    la transition adoucit les sauts (« Pause maintenant », Arrêter). */
 body { transition: background-color 2s linear; }
+
+/* Pendant la pause : reprendre le focus tout de suite (sinon il reprend à la fin de la pause). */
+#btn-resume {
+  display: none;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--glass-strong);
+}
+body.phase-break #btn-resume { display: block; }
