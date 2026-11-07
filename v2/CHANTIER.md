@@ -38,6 +38,7 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
 - 07/11 : comme la 1.0, **choix du temps du focus et de la pause** avant Démarrer : deux
   boutons sous l'horloge (« focus 25 min » / « pause 5 min ») choisissent ce que règle
   l'horloge ; les deux temps sont gardés (`projetfocus2.focusMin`, `projetfocus2.breakMin`).
+  La **pause est limitée à 20 min** (07/11) : l'horloge y bute (le focus va jusqu'à 90).
 - 07/11 : bouton **« Pause maintenant »** pendant le focus : lance tout de suite le décompte
   de la pause (cercle complet qui se vide, « pause » sous le temps). À la fin de la pause :
   retour au réglage pour l'instant.

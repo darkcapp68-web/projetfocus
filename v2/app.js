@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h23';
+const APP_VERSION = '07/11/2026 · 07h25';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -201,8 +201,10 @@ const clock = (() => {
   const R = 128, CIRC = 2 * Math.PI * R;
   const MAX = 90, DEG = 360 / MAX; // un tour complet = 90 min, 4° par minute
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const read = (key, def) => clamp(Math.round(store.get(key, def)) || def, 1, MAX);
-  const mins = { focus: read('focusMin', 25), break: read('breakMin', 5) };
+  // La pause est limitée à 20 min (07/11, demande de l'utilisateur) : l'horloge y bute.
+  const TOP = { focus: MAX, break: 20 };
+  const read = (key, def, top) => clamp(Math.round(store.get(key, def)) || def, 1, top);
+  const mins = { focus: read('focusMin', 25, TOP.focus), break: read('breakMin', 5, TOP.break) };
   let editing = 'focus'; // ce que règle l'horloge au repos
   let dragging = false, prev = 0, ticksTimer = 0;
 
@@ -259,7 +261,7 @@ const clock = (() => {
   }
 
   function set(m) {
-    mins[editing] = clamp(Math.round(m), 1, MAX);
+    mins[editing] = clamp(Math.round(m), 1, TOP[editing]);
     showSetup();
   }
 
@@ -293,7 +295,7 @@ const clock = (() => {
     dragging = true;
     dial.setPointerCapture(e.pointerId);
     document.body.classList.add('adjusting');
-    prev = clamp(m, 1, MAX);
+    prev = clamp(m, 1, MAX); // position du doigt (sur 90), avant la limite de la pause
     set(prev);
   });
   dial.addEventListener('pointermove', (e) => {
@@ -302,7 +304,7 @@ const clock = (() => {
     // Pas de saut de 90 à 0 en passant par midi : on bute comme un vrai minuteur.
     if (Math.abs(m - prev) > MAX / 2) m = prev > MAX / 2 ? MAX : 1;
     m = clamp(m, 1, MAX);
-    if (m !== prev) { prev = m; set(m); }
+    if (m !== prev) { prev = m; set(m); } // set() applique la limite (20 min pour la pause)
   });
   const end = () => {
     if (!dragging) return;
