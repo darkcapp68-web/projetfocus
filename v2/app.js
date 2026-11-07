@@ -1,7 +1,9 @@
-// projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
-'use strict';
+// projetfocus 2.0 : horloge, radio, onde, Paramètres (Musiques et sons, Sauvegarde).
+import { STATIONS, SHOWN_STATIONS, CLIENT_ID } from './stations.js';
+import { NOISES, createNoise } from './noise.js';
+import { createSync } from './sync.js';
 
-const APP_VERSION = '07/11/2026 · 07h33';
+const APP_VERSION = '07/11/2026 · 07h40';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -15,14 +17,38 @@ const store = {
 
 const $ = (s) => document.querySelector(s);
 
+/* ---------- Réglages ---------- */
+// Réglages de la section « Musiques et sons » (le reste est gardé à part : temps du focus et
+// de la pause, volume). Tout part dans la sauvegarde Drive et l'export.
+const DEFAULTS = {
+  radio: 'tlminimal', // musique par défaut
+  radios: [...SHOWN_STATIONS], // radios proposées dans « Musiques du menu »
+  noise: 'none', // bruit de fond lancé avec Démarrer
+  noiseVol: 30,
+  syncClientId: CLIENT_ID,
+};
+
+function sanitize(raw) {
+  const r = { ...DEFAULTS, ...(raw && typeof raw === 'object' ? raw : {}) };
+  const known = new Set(STATIONS.map((x) => x.id));
+  r.radios = (Array.isArray(r.radios) ? r.radios : DEFAULTS.radios).filter((id) => known.has(id));
+  if (!known.has(r.radio)) r.radio = DEFAULTS.radio;
+  if (!r.radios.includes(r.radio)) r.radios.push(r.radio); // la radio en cours reste dans le menu
+  if (!NOISES.some((n) => n.id === r.noise)) r.noise = DEFAULTS.noise;
+  r.noiseVol = Math.min(100, Math.max(0, Math.round(Number(r.noiseVol)) || 0));
+  r.syncClientId = typeof r.syncClientId === 'string' && r.syncClientId.trim() ? r.syncClientId.trim() : DEFAULTS.syncClientId;
+  return r;
+}
+
+let S = sanitize(store.get('settings', {}));
+const saveS = () => store.set('settings', S);
+
 /* ---------- Radio ---------- */
 // Jouée par le lecteur du téléphone (balise audio), sans passer par le moteur audio de la
 // page : c'est ce qui faisait craquer le son de la 1.0 quand le téléphone était occupé.
-const RADIO = {
-  name: 'Radio Technolovers Minimal',
-  desc: 'minimal techno',
-  url: 'https://stream.technolovers.fm/minimal',
-};
+// La radio vient des Paramètres (Musiques et sons) ; Technolovers Minimal au départ.
+const stationOf = (id) => STATIONS.find((x) => x.id === id) || STATIONS.find((x) => x.id === DEFAULTS.radio);
+let RADIO = stationOf(S.radio);
 
 const player = new Audio();
 player.preload = 'none';
@@ -79,12 +105,28 @@ player.addEventListener('error', () => {
 // Coupée par le téléphone (appel, autre appli qui prend le son…) : le bouton le montre.
 player.addEventListener('pause', () => { if (wantOn && player.src) { wantOn = false; setState(RADIO.desc); renderRadio(); } });
 
-if ('mediaSession' in navigator && window.MediaMetadata) {
-  navigator.mediaSession.metadata = new MediaMetadata({ title: RADIO.name, artist: RADIO.desc, album: 'projetfocus 2' });
+function updateMeta() {
+  $('#radio-name').textContent = RADIO.name;
+  if ('mediaSession' in navigator && window.MediaMetadata) {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: RADIO.name, artist: RADIO.desc, album: 'projetfocus 2' });
+  }
+}
+if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('play', radioOn);
   navigator.mediaSession.setActionHandler('pause', radioOff);
   navigator.mediaSession.setActionHandler('stop', radioOff);
 }
+
+// Changer de radio (Paramètres) : si elle joue, la nouvelle prend sa place tout de suite.
+function setRadio(id) {
+  S.radio = id;
+  RADIO = stationOf(id);
+  saveS();
+  updateMeta();
+  if (wantOn) radioOn(); else setState(RADIO.desc);
+}
+updateMeta();
+if (!wantOn) setState(RADIO.desc);
 
 /* ---------- Onde en ligne ---------- */
 // Reprise de la vue « Rythme · Onde horizontale » de la 1.0 : des barres néon symétriques,
@@ -354,8 +396,21 @@ const clock = (() => {
   }, { passive: false });
 
   showSetup();
-  return { minutes: (phase) => mins[phase], draw, label, reset: showSetup };
+  // Temps repris d'une sauvegarde, d'un import ou des valeurs par défaut.
+  function setTimes(f, b) {
+    mins.focus = clamp(Math.round(Number(f)) || 25, 1, TOP.focus);
+    mins.break = clamp(Math.round(Number(b)) || 5, 1, TOP.break);
+    save();
+    showSetup();
+  }
+  return { minutes: (phase) => mins[phase], draw, label, reset: showSetup, setTimes };
 })();
+
+/* ---------- Bruit de fond ---------- */
+// Généré par la page (Web Audio), repris de la 1.0 ; à revoir plus tard. Il démarre avec
+// « Démarrer » et s'arrête avec « Arrêter » (ou à la fin du focus).
+const noise = createNoise();
+noise.setLevel(S.noiseVol / 100);
 
 /* ---------- Démarrer / Pause maintenant / Arrêter ---------- */
 // Démarrer lance le focus, et la radio seulement si elle était lancée la dernière fois
@@ -416,12 +471,14 @@ const timer = (() => {
 
   function start() {
     if (!wantOn && store.get('radioWanted', false)) radioOn();
+    noise.set(S.noise); // bruit de fond choisi dans les Paramètres (rien si « Aucun bruit »)
     begin('focus');
   }
 
   function stop() {
     run = null;
     store.set('run', null);
+    noise.set('none');
     render();
   }
 
@@ -468,10 +525,180 @@ $('#btn-settings').addEventListener('click', () => { dlg.showModal(); checkUpdat
 $('#btn-close').addEventListener('click', () => dlg.close());
 dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); }); // toucher à côté ferme
 
+// Une seule section ouverte à la fois, comme la 1.0.
+const secs = [...dlg.querySelectorAll('details.sec')];
+for (const d of secs) d.addEventListener('toggle', () => { if (d.open) for (const o of secs) if (o !== d) o.open = false; });
+
+const note = (text) => { $('#save-note').textContent = text; };
+
+/* ---------- Paramètres : Musiques et sons ---------- */
+function groupedOptions(list, select, value) {
+  select.replaceChildren();
+  const groups = new Map();
+  for (const x of list) {
+    if (!groups.has(x.group)) {
+      const g = document.createElement('optgroup');
+      g.label = x.group;
+      groups.set(x.group, g);
+      select.appendChild(g);
+    }
+    groups.get(x.group).appendChild(new Option(x.name, x.id));
+  }
+  select.value = value;
+}
+
+function buildSounds() {
+  groupedOptions(STATIONS.filter((x) => S.radios.includes(x.id)), $('#sel-radio'), S.radio);
+  const sn = $('#sel-noise');
+  sn.replaceChildren(...NOISES.map((n) => new Option(n.name, n.id)));
+  sn.value = S.noise;
+  $('#rng-noise').value = S.noiseVol;
+  $('#out-noise').textContent = S.noiseVol;
+  // « Musiques du menu » : une case par radio ; la radio en cours reste toujours cochée.
+  const picks = $('#station-picks');
+  picks.replaceChildren();
+  let group = null;
+  for (const x of STATIONS) {
+    if (x.group !== group) {
+      group = x.group;
+      const h = document.createElement('p');
+      h.className = 'pick-group';
+      h.textContent = group;
+      picks.appendChild(h);
+    }
+    const l = document.createElement('label');
+    l.className = 'pick';
+    const c = document.createElement('input');
+    c.type = 'checkbox';
+    c.checked = S.radios.includes(x.id);
+    c.addEventListener('change', () => {
+      if (!c.checked && x.id === S.radio) { c.checked = true; return; }
+      S.radios = STATIONS.filter((y) => (y.id === x.id ? c.checked : S.radios.includes(y.id))).map((y) => y.id);
+      saveS();
+      groupedOptions(STATIONS.filter((y) => S.radios.includes(y.id)), $('#sel-radio'), S.radio);
+    });
+    l.append(c, document.createTextNode(x.name));
+    picks.appendChild(l);
+  }
+}
+
+$('#sel-radio').addEventListener('change', (e) => setRadio(e.target.value));
+$('#sel-noise').addEventListener('change', (e) => {
+  S.noise = e.target.value;
+  saveS();
+  if (timer.running) noise.set(S.noise); // pendant un décompte, le changement s'entend tout de suite
+});
+$('#rng-noise').addEventListener('input', (e) => {
+  S.noiseVol = Number(e.target.value);
+  $('#out-noise').textContent = S.noiseVol;
+  noise.setLevel(S.noiseVol / 100);
+  saveS();
+});
+buildSounds();
+
+/* ---------- Paramètres : Sauvegarde ---------- */
+// Tout ce qui se sauvegarde : les réglages, les temps du focus et de la pause, le volume.
+function collect() {
+  return { version: 2, settings: S, focusMin: clock.minutes('focus'), breakMin: clock.minutes('break'), volume: Number(volume.value) };
+}
+
+// Remplace les réglages de cet appareil (reprise du Drive, import, valeurs par défaut).
+function applyAll(data) {
+  const keepId = S.syncClientId;
+  S = sanitize(data?.settings);
+  if (!data?.settings?.syncClientId) S.syncClientId = keepId;
+  saveS();
+  clock.setTimes(data?.focusMin, data?.breakMin);
+  const v = Number(data?.volume);
+  volume.value = Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 70;
+  player.volume = volume.value / 100;
+  store.set('volume', Number(volume.value));
+  noise.setLevel(S.noiseVol / 100);
+  RADIO = stationOf(S.radio);
+  updateMeta();
+  if (wantOn) radioOn(); else setState(RADIO.desc);
+  if (timer.running) noise.set(S.noise);
+  buildSounds();
+  $('#inp-client').value = S.syncClientId;
+}
+
+const undoBtn = $('#btn-undo-sync');
+undoBtn.hidden = !store.get('beforeDrive', null);
+
+const sync = createSync({
+  getSettings: collect,
+  getClientId: () => S.syncClientId,
+  // « Reprendre » : les paramètres du Drive remplacent ceux de cet appareil (copie gardée).
+  applyRemote: (remote) => {
+    store.set('beforeDrive', collect());
+    undoBtn.hidden = false;
+    applyAll(remote);
+    note('Paramètres repris depuis Google Drive.');
+  },
+  onStatus: ({ text, kind, connected }) => {
+    $('#sync-status').textContent = text;
+    $('#sync-status').dataset.kind = kind;
+    $('#btn-sync-out').hidden = !connected;
+  },
+});
+
+$('#btn-sync-save').addEventListener('click', () => sync.save());
+$('#btn-sync-load').addEventListener('click', () => {
+  if (confirm('Reprendre les paramètres sauvegardés sur Google Drive ? Ceux de cet appareil seront remplacés (tu pourras revenir en arrière).')) sync.load();
+});
+$('#btn-sync-out').addEventListener('click', () => sync.disconnect());
+undoBtn.addEventListener('click', () => {
+  const before = store.get('beforeDrive', null);
+  if (!before) return;
+  if (!confirm('Remettre les réglages de cet appareil d’avant la dernière reprise depuis Google Drive ?')) return;
+  applyAll(before);
+  store.set('beforeDrive', null);
+  undoBtn.hidden = true;
+  note('Réglages d’avant remis sur cet appareil.');
+});
+
+// Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
+$('#btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ ...collect(), savedAt: Date.now() }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'projetfocus2-parametres.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  note('Réglages exportés.');
+});
+$('#btn-import').addEventListener('click', () => $('#file-import').click());
+$('#file-import').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || typeof data !== 'object' || !(data.settings || data.focusMin)) throw new Error('fichier inconnu');
+    if (!confirm('Importer ce fichier ? Les réglages de cet appareil seront remplacés.')) return;
+    applyAll(data);
+    note('Réglages importés.');
+  } catch {
+    note('Ce fichier n’est pas un export de projetfocus 2.');
+  }
+});
+$('#btn-reset').addEventListener('click', () => {
+  if (!confirm('Revenir aux valeurs par défaut ? (L’ID client Google est gardé.)')) return;
+  applyAll({ focusMin: 25, breakMin: 5, volume: 70 });
+  note('Valeurs par défaut remises.');
+});
+$('#inp-client').value = S.syncClientId;
+$('#inp-client').addEventListener('change', (e) => {
+  S.syncClientId = e.target.value.trim() || DEFAULTS.syncClientId;
+  e.target.value = S.syncClientId;
+  saveS();
+});
+sync.start();
+
 /* ---------- Mise à jour ---------- */
 // L'appli relit la version publiée ; si elle a changé, un point bleu s'allume sur
 // « Paramètres ». Jamais de rechargement tout seul.
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'stations.js', 'noise.js', 'sync.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 let lastCheck = 0;
 
 async function checkUpdate() {

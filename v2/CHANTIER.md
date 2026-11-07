@@ -58,6 +58,23 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   tout de suite. À la fin du focus : retour au réglage pour l'instant. Si la page était
   fermée quand la pause s'est terminée, retour au réglage (pas de focus lancé dans le dos).
 
+- 07/11 : **Paramètres** repris de la 1.0 (demande de l'utilisateur) : deux sections
+  repliables, une seule ouverte à la fois, **bruits de fond gardés** (« on verra plus tard
+  ce qu'on en fait »).
+  - **Musiques et sons** : musique par défaut (31 radios de la 1.0 en direct, `stations.js` ;
+    pas encore les playlists MP3 embarquées ni les liens SomaFM), bruit de fond (pluie,
+    orage, vent, neige, café, `noise.js` copié de la 1.0) avec son volume, « Musiques du menu »
+    (cases à cocher, la radio en cours reste cochée). Le bruit démarre avec Démarrer et
+    s'arrête avec Arrêter ; contexte audio en mode `playback` (moins de craquements). Reste
+    à juger : ce bruit est généré par la page, donc sensible comme dans la 1.0.
+  - **Sauvegarde** : Google Drive à la main (Sauvegarder / Reprendre / Remettre mes réglages
+    d'avant / Se déconnecter, `sync.js` copié de la 1.0 mais **fichier à part**
+    `projetfocus2-parametres.json`), Exporter / Importer (JSON), valeurs par défaut, ID client
+    Google (celui de la 1.0 ; origines autorisées : localhost:8417 et github.io, donc le
+    Drive ne marchera pas sur localhost:8418). **Drive non testé** (connexion Google).
+  - `app.js` est maintenant un module (`stations.js`, `noise.js`, `sync.js`) ; service worker
+    en `projetfocus2-v2`.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

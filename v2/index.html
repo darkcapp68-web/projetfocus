@@ -71,12 +71,47 @@
         <h2>Paramètres</h2>
         <button id="btn-close" type="button" aria-label="Fermer">✕</button>
       </div>
+      <details class="sec">
+        <summary>Musiques et sons <small>radio, bruit de fond</small></summary>
+        <label>Musique par défaut<select id="sel-radio"></select></label>
+        <label>Bruit de fond<select id="sel-noise"></select></label>
+        <label>Volume du bruit de fond (%)<span class="rng"><input type="range" id="rng-noise" min="0" max="100" step="5"><output id="out-noise"></output></span></label>
+        <p class="note">Le bruit de fond démarre avec « Démarrer » et s'arrête avec « Arrêter ». Le volume de la radio se règle avec le curseur du lecteur.</p>
+        <details class="more">
+          <summary>Musiques du menu <small>décoche ce qui ne te plaît pas</small></summary>
+          <div id="station-picks"></div>
+        </details>
+      </details>
+
+      <details class="sec">
+        <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
+        <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus2-parametres.json », à part de celui de la 1.0) ; « Reprendre » les ramène sur un autre appareil.</p>
+        <div class="buttons">
+          <button type="button" id="btn-sync-save">Sauvegarder mes paramètres</button>
+          <button type="button" id="btn-sync-load">Reprendre mes paramètres</button>
+          <button type="button" id="btn-undo-sync" class="link" hidden>Remettre mes réglages d’avant</button>
+          <button type="button" id="btn-sync-out" class="link" hidden>Se déconnecter de Google</button>
+        </div>
+        <p id="sync-status" class="note" aria-live="polite"></p>
+        <details class="more">
+          <summary>Réglages avancés <small>fichier, valeurs par défaut, ID Google</small></summary>
+          <div class="buttons">
+            <button type="button" id="btn-export">Exporter (JSON)</button>
+            <button type="button" id="btn-import">Importer</button>
+            <input type="file" id="file-import" accept="application/json,.json" hidden>
+            <button type="button" id="btn-reset">Revenir aux valeurs par défaut</button>
+          </div>
+          <label>ID client Google <small>déjà réglé ; à changer seulement pour un autre projet Google</small><input type="text" id="inp-client" spellcheck="false" autocomplete="off"></label>
+        </details>
+        <p id="save-note" class="note" aria-live="polite">Tout est enregistré sur cet appareil.</p>
+      </details>
+
       <p class="version">Version <span id="version"></span></p>
       <p id="update-info" class="hint"></p>
       <button id="btn-update" type="button" class="wide">Mettre à jour l'appli</button>
     </div>
   </dialog>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

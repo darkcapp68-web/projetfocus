@@ -2,12 +2,15 @@
 // « Réseau d'abord, cache en secours » : une nouvelle version arrive au chargement suivant.
 // Changer CACHE quand la liste des fichiers change.
 
-const CACHE = 'projetfocus2-v1';
+const CACHE = 'projetfocus2-v2';
 const ASSETS = [
   './',
   'index.html',
   'style.css',
   'app.js',
+  'stations.js',
+  'noise.js',
+  'sync.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',

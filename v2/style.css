@@ -162,6 +162,7 @@ body.adjusting #ticks, body.show-ticks #ticks { opacity: 1; }
 
 /* Paramètres : un panneau qui monte du bas. */
 dialog {
+  max-height: 90dvh;
   margin: auto auto 0;
   width: 100%;
   max-width: 560px;
@@ -286,3 +287,48 @@ body { transition: background-color 2s linear; }
   background: var(--glass-strong);
 }
 body.phase-break #btn-resume { display: block; }
+
+/* Paramètres : sections repliables (une seule ouverte à la fois). */
+details.sec { border-top: 1px solid var(--glass-strong); }
+details.sec > summary, details.more > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 52px;
+  align-content: center;
+  flex-wrap: wrap;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+details > summary::-webkit-details-marker { display: none; }
+details.sec > summary { align-items: center; }
+details > summary small { color: var(--soft); font-weight: 400; font-size: 13px; }
+details.sec[open] > summary { color: var(--accent); }
+details.sec[open] > :not(summary) { margin-left: 8px; padding-left: 12px; border-left: 2px solid var(--accent); }
+details.more > summary { font-weight: 500; color: var(--soft); min-height: 44px; }
+.sheet label { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; font-size: 15px; }
+.sheet label small { color: var(--soft); }
+.sheet select, .sheet input[type="text"] {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--glass);
+  color: var(--fg);
+  font: inherit;
+}
+.sheet select option, .sheet select optgroup { color: #111; }
+.rng { display: flex; align-items: center; gap: 10px; }
+.rng input { flex: 1; min-height: 44px; accent-color: var(--accent); }
+.rng output { min-width: 2.5em; text-align: right; color: var(--soft); }
+.pick-group { margin: 14px 0 2px; font-weight: 600; font-size: 14px; color: var(--soft); }
+.sheet label.pick { flex-direction: row; align-items: center; gap: 10px; min-height: 44px; margin: 0; }
+.pick input { width: 22px; height: 22px; accent-color: var(--accent); }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.buttons button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--glass); }
+.buttons button.link { background: none; text-decoration: underline; color: var(--soft); padding: 0 4px; }
+.buttons button[hidden] { display: none; }
+.note { margin: 8px 0; color: var(--soft); font-size: 14px; }
+#sync-status[data-kind="warn"] { color: #ffb4a8; }
+#sync-status[data-kind="ok"] { color: #a8f0c0; }
