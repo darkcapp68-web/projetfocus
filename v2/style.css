@@ -52,7 +52,54 @@ header {
   background: var(--accent);
 }
 
-main { flex: 1; }
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  min-height: 0;
+}
+
+/* Horloge : cadran de la 1.0 (arc blanc de 5 px sur cercle translucide, point en tête,
+   graduations seulement pendant le réglage). */
+#dial-wrap { --dial-size: min(78vw, 42vh, 420px); position: relative; width: var(--dial-size); height: var(--dial-size); flex: none; }
+#dial { width: 100%; height: 100%; display: block; touch-action: none; overflow: visible; cursor: grab; }
+#dial:focus { outline: none; }
+#dial:focus-visible .track { stroke: rgba(255, 255, 255, 0.6); }
+body.adjusting #dial { cursor: grabbing; }
+#dial .track { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.22); stroke-width: 5; }
+#arc { fill: none; stroke: var(--fg); stroke-width: 5; stroke-linecap: round; transition: opacity 0.4s; }
+#knob { fill: var(--fg); transition: opacity 0.4s; }
+#ticks { opacity: 0; transition: opacity 0.5s ease; }
+#ticks line { stroke: rgba(255, 255, 255, 0.35); stroke-width: 1; }
+#ticks line.major { stroke: rgba(255, 255, 255, 0.6); }
+#ticks text { fill: rgba(255, 255, 255, 0.55); font-size: 10px; text-anchor: middle; dominant-baseline: central; }
+body.adjusting #ticks, body.show-ticks #ticks { opacity: 1; }
+#center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+#time {
+  font-size: calc(var(--dial-size) * 0.22);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+#sub {
+  margin-top: 0.6em;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
 
 /* Lecteur : la radio et son volume, en bas, à portée du pouce. */
 #player {
