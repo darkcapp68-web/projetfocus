@@ -44,6 +44,10 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   de la pause (cercle complet qui se vide, « pause » sous le temps). À la fin de la pause :
   retour au réglage pour l'instant.
 
+- 07/11 : **préréglages** à gauche de l'horloge avant Démarrer : 25/5, 50/10, 90/20 (focus en
+  gros, pause dessous) ; celui qui correspond aux temps réglés est entouré. Au démarrage, ils
+  se replient et l'horloge glisse au centre ; ils reviennent à l'arrêt.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

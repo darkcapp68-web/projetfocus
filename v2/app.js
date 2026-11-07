@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h26';
+const APP_VERSION = '07/11/2026 · 07h28';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -266,6 +266,7 @@ const clock = (() => {
     $('#edit-focus').classList.toggle('on', editing === 'focus');
     $('#edit-break').classList.toggle('on', editing === 'break');
     draw(mins[editing] * 60);
+    markPreset();
   }
 
   function set(m) {
@@ -274,6 +275,21 @@ const clock = (() => {
   }
 
   function edit(what) { editing = what; showSetup(); showTicks(); }
+
+  // Préréglages (07/11, demande de l'utilisateur) : 25/5, 50/10, 90/20 d'un toucher.
+  // Celui qui correspond aux temps réglés est entouré.
+  const presets = [...document.querySelectorAll('.preset')];
+  function markPreset() {
+    for (const b of presets) b.classList.toggle('on', +b.dataset.f === mins.focus && +b.dataset.b === mins.break);
+  }
+  for (const b of presets) {
+    b.addEventListener('click', () => {
+      mins.focus = +b.dataset.f;
+      mins.break = +b.dataset.b;
+      save();
+      showSetup();
+    });
+  }
   $('#edit-focus').addEventListener('click', () => edit('focus'));
   $('#edit-break').addEventListener('click', () => edit('break'));
 

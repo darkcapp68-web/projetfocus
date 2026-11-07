@@ -17,6 +17,13 @@
   </header>
 
   <main>
+    <div id="dial-row">
+    <!-- Préréglages focus / pause, à gauche de l'horloge, seulement avant Démarrer. -->
+    <div id="presets" aria-label="Préréglages">
+      <button type="button" class="preset" data-f="25" data-b="5">25<span>5</span></button>
+      <button type="button" class="preset" data-f="50" data-b="10">50<span>10</span></button>
+      <button type="button" class="preset" data-f="90" data-b="20">90<span>20</span></button>
+    </div>
     <!-- Horloge (cadran de la 1.0, style « Normal ») : on la tourne pour régler 1 à 90 min. -->
     <div id="dial-wrap">
       <svg id="dial" viewBox="0 0 300 300" role="slider" tabindex="0" aria-label="Durée du focus en minutes"
@@ -30,6 +37,7 @@
         <div id="time">25:00</div>
         <div id="sub">focus</div>
       </div>
+    </div>
     </div>
     <!-- Au repos : ce que règle l'horloge (comme la 1.0). Pendant le focus : « Pause maintenant ». -->
     <div id="setup">

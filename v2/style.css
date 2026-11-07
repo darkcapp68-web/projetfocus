@@ -65,7 +65,7 @@ main {
 
 /* Horloge : cadran de la 1.0 (arc blanc de 5 px sur cercle translucide, point en tête,
    graduations seulement pendant le réglage). */
-#dial-wrap { --dial-size: min(78vw, 42vh, 420px); position: relative; width: var(--dial-size); height: var(--dial-size); flex: none; }
+#dial-wrap { --dial-size: min(calc(100vw - 32px - 76px), 42vh, 420px); position: relative; width: var(--dial-size); height: var(--dial-size); flex: none; }
 #dial { width: 100%; height: 100%; display: block; touch-action: none; overflow: visible; cursor: grab; }
 body.running #dial { cursor: default; }
 body.running #ticks { opacity: 0; } /* les graduations valent pour le réglage, pas le décompte */
@@ -239,3 +239,35 @@ body.running #setup { display: none; }
   background: var(--glass-strong);
 }
 body.phase-focus #btn-break { display: block; }
+
+/* Préréglages à gauche de l'horloge (avant Démarrer) : focus en gros, pause dessous.
+   Au démarrage, ils se replient et l'horloge glisse au centre. */
+#dial-row { display: flex; align-items: center; justify-content: center; }
+#presets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 64px;
+  margin-right: 12px;
+  overflow: hidden;
+  transition: width 0.5s ease, margin 0.5s ease, opacity 0.4s ease;
+}
+.preset {
+  width: 64px;
+  min-height: 56px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--glass);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.preset span { font-size: 12px; font-weight: 400; color: var(--soft); }
+.preset span::before { content: "pause "; }
+.preset.on { border-color: var(--fg); }
+.preset:active { transform: scale(0.96); }
+body.running #presets { width: 0; margin-right: 0; opacity: 0; pointer-events: none; }
