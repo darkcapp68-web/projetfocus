@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h15';
+const APP_VERSION = '07/11/2026 · 07h17';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -359,6 +359,16 @@ const timer = (() => {
   loop();
   return { get running() { return !!run; } };
 })();
+
+/* ---------- Heure bien visible au toucher ---------- */
+// Pendant le décompte, l'heure s'efface lentement (voir style.css) ; un toucher la rend
+// entièrement visible pendant 5 s.
+let awakeTimer = 0;
+addEventListener('pointerdown', () => {
+  document.body.classList.add('awake');
+  clearTimeout(awakeTimer);
+  awakeTimer = setTimeout(() => document.body.classList.remove('awake'), 5000);
+}, true);
 
 /* ---------- Paramètres ---------- */
 const dlg = $('#settings');

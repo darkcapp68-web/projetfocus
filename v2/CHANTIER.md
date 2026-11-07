@@ -30,6 +30,10 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   Android, la page reprend le décompte (le son revient au bouton radio). À 0 : retour au
   réglage pour l'instant (signal et question de la pause : à venir).
 
+- 07/11 : après Démarrer, **l'heure s'efface lentement** comme le « fondu lent » de la 1.0
+  (temps et « focus » jusqu'à 12 % puis retour, 16 s aller-retour) ; le **cercle et l'arc
+  restent toujours visibles** pour le décompte ; un toucher rend l'heure visible 5 s.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC
