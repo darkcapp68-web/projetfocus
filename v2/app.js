@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h25';
+const APP_VERSION = '07/11/2026 · 07h26';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -199,20 +199,26 @@ volume.addEventListener('input', () => {
 const clock = (() => {
   const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), time = $('#time'), sub = $('#sub');
   const R = 128, CIRC = 2 * Math.PI * R;
-  const MAX = 90, DEG = 360 / MAX; // un tour complet = 90 min, 4° par minute
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  // La pause est limitée à 20 min (07/11, demande de l'utilisateur) : l'horloge y bute.
-  const TOP = { focus: MAX, break: 20 };
+  // Un tour d'horloge vaut 90 min pour le focus, 20 min pour la pause (07/11, demande de
+  // l'utilisateur : pause limitée à 20 min, et plus facile à régler au doigt sur un tour entier).
+  const TOP = { focus: 90, break: 20 };
+  const top = () => TOP[editing];
   const read = (key, def, top) => clamp(Math.round(store.get(key, def)) || def, 1, top);
   const mins = { focus: read('focusMin', 25, TOP.focus), break: read('breakMin', 5, TOP.break) };
   let editing = 'focus'; // ce que règle l'horloge au repos
-  let dragging = false, prev = 0, ticksTimer = 0;
+  let dragging = false, prev = 0, ticksTimer = 0, ticksFor = 0;
 
-  (function buildTicks() {
-    const g = $('#ticks'), ns = 'http://www.w3.org/2000/svg';
-    for (let m = 0; m < MAX; m++) {
+  // Graduations pour l'échelle en cours : un trait par minute, plus marqué toutes les 5 min ;
+  // chiffres toutes les 10 min sur 90, toutes les 5 min sur 20.
+  function buildTicks(max) {
+    if (ticksFor === max) return;
+    ticksFor = max;
+    const g = $('#ticks'), ns = 'http://www.w3.org/2000/svg', deg = 360 / max, every = max > 30 ? 10 : 5;
+    g.replaceChildren();
+    for (let m = 0; m < max; m++) {
       // Comme un minuteur de cuisine : les minutes se lisent dans le sens inverse des aiguilles.
-      const a = ((360 - m * DEG) % 360) * Math.PI / 180;
+      const a = ((360 - m * deg) % 360) * Math.PI / 180;
       const major = m % 5 === 0;
       const r1 = major ? 112 : 117, r2 = 122;
       const l = document.createElementNS(ns, 'line');
@@ -220,19 +226,20 @@ const clock = (() => {
       l.setAttribute('x2', 150 + r2 * Math.sin(a)); l.setAttribute('y2', 150 - r2 * Math.cos(a));
       if (major) l.classList.add('major');
       g.appendChild(l);
-      if (m % 10 === 0) { // chiffres toutes les 10 min
+      if (m % every === 0) {
         const t = document.createElementNS(ns, 'text');
         t.setAttribute('x', 150 + 99 * Math.sin(a)); t.setAttribute('y', 150 - 99 * Math.cos(a));
         t.textContent = m;
         g.appendChild(t);
       }
     }
-  })();
+  }
 
   // Arc et point pour un temps donné (en secondes). `total` : durée du décompte en cours ;
-  // le cercle complet vaut alors ce total. Sans total (réglage), un tour vaut 90 min.
+  // le cercle complet vaut alors ce total. Sans total (réglage), un tour vaut 90 min (focus)
+  // ou 20 min (pause).
   function draw(sec, total = 0) {
-    const f = clamp(total ? sec / total : sec / 60 / MAX, 0, 1);
+    const f = clamp(total ? sec / total : sec / 60 / top(), 0, 1);
     const len = f * CIRC;
     arc.style.strokeDasharray = `${len} ${CIRC}`;
     arc.style.strokeDashoffset = `${len - CIRC}`;
@@ -250,6 +257,7 @@ const clock = (() => {
 
   // Au repos : l'horloge montre ce qu'on règle, et les deux boutons leurs temps.
   function showSetup() {
+    buildTicks(top());
     label(editing);
     dial.setAttribute('aria-valuenow', String(mins[editing]));
     dial.setAttribute('aria-label', editing === 'focus' ? 'Durée du focus en minutes' : 'Durée de la pause en minutes');
@@ -261,7 +269,7 @@ const clock = (() => {
   }
 
   function set(m) {
-    mins[editing] = clamp(Math.round(m), 1, TOP[editing]);
+    mins[editing] = clamp(Math.round(m), 1, top());
     showSetup();
   }
 
@@ -281,7 +289,7 @@ const clock = (() => {
     const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
     let a = Math.atan2(dx, -dy) * 180 / Math.PI;
     if (a < 0) a += 360;
-    return { m: Math.round((360 - a) / DEG), dist: Math.hypot(dx, dy) / (r.width / 2) };
+    return { m: Math.round((360 - a) / (360 / top())), dist: Math.hypot(dx, dy) / (r.width / 2) };
   }
 
   const save = () => { store.set('focusMin', mins.focus); store.set('breakMin', mins.break); };
@@ -295,16 +303,17 @@ const clock = (() => {
     dragging = true;
     dial.setPointerCapture(e.pointerId);
     document.body.classList.add('adjusting');
-    prev = clamp(m, 1, MAX); // position du doigt (sur 90), avant la limite de la pause
+    prev = clamp(m, 1, top());
     set(prev);
   });
   dial.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     let { m } = fromPointer(e);
-    // Pas de saut de 90 à 0 en passant par midi : on bute comme un vrai minuteur.
-    if (Math.abs(m - prev) > MAX / 2) m = prev > MAX / 2 ? MAX : 1;
-    m = clamp(m, 1, MAX);
-    if (m !== prev) { prev = m; set(m); } // set() applique la limite (20 min pour la pause)
+    // Pas de saut du maximum à 0 en passant par midi : on bute comme un vrai minuteur.
+    const max = top();
+    if (Math.abs(m - prev) > max / 2) m = prev > max / 2 ? max : 1;
+    m = clamp(m, 1, max);
+    if (m !== prev) { prev = m; set(m); }
   });
   const end = () => {
     if (!dragging) return;
