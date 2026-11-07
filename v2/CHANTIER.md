@@ -14,7 +14,8 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   téléphone (dans la 1.0, le son entier passait par le moteur audio de la page). Pas encore
   de trait d'avancée du temps (pas de minuteur pour l'instant).
 - 07/11 : **horloge** comme la 1.0 (cadran « Normal ») : arc blanc sur cercle translucide,
-  point en tête, temps au centre, « focus » dessous ; on la tourne pour régler 1 à 60 min
+  point en tête, temps au centre, « focus » dessous ; on la tourne pour régler de 1 à
+  **90 min** (07/11 : un tour = 90 min au lieu de 60, chiffres toutes les 10 min)
   (graduations pendant le réglage, effacées 4 s après) ; temps gardé
   (`projetfocus2.focusMin`, 25 par défaut). Elle ne fait que régler pour l'instant : son
   comportement changera ensuite (demande de l'utilisateur).

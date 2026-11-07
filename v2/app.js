@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h08';
+const APP_VERSION = '07/11/2026 · 07h09';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -186,21 +186,22 @@ volume.addEventListener('input', () => {
 
 /* ---------- Horloge ---------- */
 // Cadran de la 1.0 (style « Normal ») : on le tourne pour régler le temps du focus, de 1 à
-// 60 min, comme un minuteur de cuisine. L'arc part de la position du temps et finit à midi ;
+// 90 min (07/11, demande de l'utilisateur ; 60 dans la 1.0), comme un minuteur de cuisine. L'arc part de la position du temps et finit à midi ;
 // le point est en tête. Graduations visibles pendant le réglage. Le temps choisi est gardé.
 // Pour l'instant l'horloge ne fait que régler : son comportement viendra ensuite.
 const clock = (() => {
   const dial = $('#dial'), arc = $('#arc'), knob = $('#knob'), time = $('#time');
   const R = 128, CIRC = 2 * Math.PI * R;
+  const MAX = 90, DEG = 360 / MAX; // un tour complet = 90 min, 4° par minute
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  let minutes = clamp(Math.round(store.get('focusMin', 25)) || 25, 1, 60);
+  let minutes = clamp(Math.round(store.get('focusMin', 25)) || 25, 1, MAX);
   let dragging = false, prev = 0, ticksTimer = 0;
 
   (function buildTicks() {
     const g = $('#ticks'), ns = 'http://www.w3.org/2000/svg';
-    for (let m = 0; m < 60; m++) {
+    for (let m = 0; m < MAX; m++) {
       // Comme un minuteur de cuisine : les minutes se lisent dans le sens inverse des aiguilles.
-      const a = ((360 - m * 6) % 360) * Math.PI / 180;
+      const a = ((360 - m * DEG) % 360) * Math.PI / 180;
       const major = m % 5 === 0;
       const r1 = major ? 112 : 117, r2 = 122;
       const l = document.createElementNS(ns, 'line');
@@ -208,7 +209,7 @@ const clock = (() => {
       l.setAttribute('x2', 150 + r2 * Math.sin(a)); l.setAttribute('y2', 150 - r2 * Math.cos(a));
       if (major) l.classList.add('major');
       g.appendChild(l);
-      if (major) {
+      if (m % 10 === 0) { // chiffres toutes les 10 min
         const t = document.createElementNS(ns, 'text');
         t.setAttribute('x', 150 + 99 * Math.sin(a)); t.setAttribute('y', 150 - 99 * Math.cos(a));
         t.textContent = m;
@@ -219,12 +220,12 @@ const clock = (() => {
 
   // Arc et point pour un temps donné (en secondes).
   function draw(sec) {
-    const min = clamp(sec / 60, 0, 60);
-    const len = (min / 60) * CIRC;
+    const min = clamp(sec / 60, 0, MAX);
+    const len = (min / MAX) * CIRC;
     arc.style.strokeDasharray = `${len} ${CIRC}`;
     arc.style.strokeDashoffset = `${len - CIRC}`;
     arc.style.opacity = len < 0.5 ? 0 : 1;
-    const a = (360 - min * 6) * Math.PI / 180;
+    const a = (360 - min * DEG) * Math.PI / 180;
     knob.setAttribute('cx', 150 + R * Math.sin(a));
     knob.setAttribute('cy', 150 - R * Math.cos(a));
     knob.style.opacity = min <= 0 ? 0 : 1;
@@ -233,7 +234,7 @@ const clock = (() => {
   }
 
   function set(m) {
-    minutes = clamp(Math.round(m), 1, 60);
+    minutes = clamp(Math.round(m), 1, MAX);
     dial.setAttribute('aria-valuenow', String(minutes));
     draw(minutes * 60);
   }
@@ -250,7 +251,7 @@ const clock = (() => {
     const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
     let a = Math.atan2(dx, -dy) * 180 / Math.PI;
     if (a < 0) a += 360;
-    return { m: Math.round((360 - a) / 6), dist: Math.hypot(dx, dy) / (r.width / 2) };
+    return { m: Math.round((360 - a) / DEG), dist: Math.hypot(dx, dy) / (r.width / 2) };
   }
 
   const save = () => store.set('focusMin', minutes);
@@ -262,15 +263,15 @@ const clock = (() => {
     dragging = true;
     dial.setPointerCapture(e.pointerId);
     document.body.classList.add('adjusting');
-    prev = clamp(m, 1, 60);
+    prev = clamp(m, 1, MAX);
     set(prev);
   });
   dial.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     let { m } = fromPointer(e);
-    // Pas de saut de 60 à 0 en passant par midi : on bute comme un vrai minuteur.
-    if (Math.abs(m - prev) > 30) m = prev > 30 ? 60 : 1;
-    m = clamp(m, 1, 60);
+    // Pas de saut de 90 à 0 en passant par midi : on bute comme un vrai minuteur.
+    if (Math.abs(m - prev) > MAX / 2) m = prev > MAX / 2 ? MAX : 1;
+    m = clamp(m, 1, MAX);
     if (m !== prev) { prev = m; set(m); }
   });
   const end = () => {
