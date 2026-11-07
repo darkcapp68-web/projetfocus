@@ -13,15 +13,12 @@ export const RHYTHMS = [
   { id: 'apaisante', name: 'Apaisante (4 s / 6 s)', steps: [['inspire', 4], ['expire', 6]] },
   { id: 'carree', name: 'Carrée (4-4-4-4)', steps: [['inspire', 4], ['retiens', 4], ['expire', 4], ['retiens', 4]] },
   { id: '478', name: '4-7-8 (pour se détendre)', steps: [['inspire', 4], ['retiens', 7], ['expire', 8]] },
-  { id: 'simple', name: 'Simple pulsation (sans consignes)', steps: null }, // durée réglée à part
+  { id: 'aucun', name: 'Aucun (pas de respiration guidée)', steps: null },
 ];
 
-// Les étapes d'un rythme ; la simple pulsation se règle par « une respiration toutes les N s ».
-export function stepsFor(id, pulseSeconds = 6) {
-  const r = RHYTHMS.find((x) => x.id === id) || RHYTHMS[0];
-  if (r.steps) return r.steps;
-  const half = Math.max(0.5, pulseSeconds / 2);
-  return [['inspire', half], ['expire', half]];
+// Les étapes d'un rythme (« aucun » n'en a pas : rien n'est guidé).
+export function stepsFor(id) {
+  return RHYTHMS.find((x) => x.id === id)?.steps || null;
 }
 
 // Où en est-on, `elapsed` secondes après le début ? { i, kind, secs, p (0 à 1), cycle }.
@@ -141,13 +138,14 @@ export function createBreath() {
 
   // Lance la respiration (à appeler depuis un geste : toucher, clic). Rend l'heure (ms) du
   // premier son, ou null si rien ne peut jouer.
-  async function start(id, volume, pulseSeconds) {
+  async function start(id, volume) {
     stop();
     const my = seq;
     const c = ensure();
     if (!c) return null;
-    const steps = stepsFor(id, pulseSeconds);
-    const key = `${id}:${id === 'simple' ? pulseSeconds : ''}`;
+    const steps = stepsFor(id);
+    if (!steps) return null; // « aucun »
+    const key = id;
     if (!cache[key]) {
       const samples = await loadSamples(c, id);
       cache[key] = makeBuffer(c, renderCycle(steps, c.sampleRate, samples));

@@ -138,6 +138,12 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   Arrêter pendant une pause coupe aussi la radio. À la fin du focus (retour au réglage), la
   radio s'arrête de la même façon.
 
+- 07/11 : dans **Rythme** (Paramètres → Pause), **la simple pulsation est retirée** et un mode
+  **« Aucun »** est ajouté (pas de respiration guidée : ni sons, ni mot, ni couleurs). Il
+  remplace la case « Respiration guidée », supprimée. Anciens réglages migrés : « simple » →
+  cohérence cardiaque, « respiration guidée » décochée → Aucun. Avec « Aucun », les réglages de
+  sons et d'affichage de la respiration se cachent.
+
 ## Test sur le téléphone
 
 - À la fin seulement (décision de l'utilisateur, 07/11) : d'ici là, tests sur le PC

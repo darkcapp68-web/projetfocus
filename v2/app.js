@@ -4,7 +4,7 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h51';
+const APP_VERSION = '07/11/2026 · 08h56';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -27,9 +27,7 @@ const DEFAULTS = {
   noise: 'none', // bruit de fond lancé avec Démarrer
   noiseVol: 30,
   // Pause : réglages repris de la 1.0 (sans les messages).
-  pulseOn: true, // respiration guidée
-  breathPattern: 'coherence', // rythme (voir breath.js)
-  pulseSeconds: 6, // simple pulsation : une respiration toutes les N secondes
+  breathPattern: 'coherence', // rythme (voir breath.js) ; « aucun » = pas de respiration guidée
   breathSound: true, // trois sons : aigu = inspire, moyen = retiens, grave = expire
   breathVol: 60, // volume de ces sons (%)
   breathShow: 'none', // la respiration se voit par : none | word | colors | both | veil
@@ -55,6 +53,11 @@ function sanitize(raw0) {
     if (raw.rhythm === 'aucune') raw.breathSound = false;
   }
   delete raw.rhythm;
+  // 07/11 : plus de « simple pulsation » ; la case « respiration guidée » devient le rythme « aucun ».
+  if (raw.pulseOn === false) raw.breathPattern = 'aucun';
+  else if (raw.breathPattern === 'simple') raw.breathPattern = DEFAULTS.breathPattern;
+  delete raw.pulseOn;
+  delete raw.pulseSeconds;
   const r = { ...DEFAULTS, ...raw };
   const known = new Set(STATIONS.map((x) => x.id));
   r.radios = (Array.isArray(r.radios) ? r.radios : DEFAULTS.radios).filter((id) => known.has(id));
@@ -68,7 +71,6 @@ function sanitize(raw0) {
   };
   const pick = (v, list, def) => (list.includes(v) ? v : def);
   const color = (v, def) => (/^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : def);
-  r.pulseOn = !!r.pulseOn;
   r.breathSound = !!r.breathSound;
   r.breathLabels = !!r.breathLabels;
   r.autoChain = !!r.autoChain;
@@ -77,7 +79,6 @@ function sanitize(raw0) {
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
   r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
   r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
-  r.pulseSeconds = num(r.pulseSeconds, 1, 12, DEFAULTS.pulseSeconds, 0.5);
   r.breathVol = num(r.breathVol, 0, 100, DEFAULTS.breathVol);
   r.pulseIntensity = num(r.pulseIntensity, 5, 70, DEFAULTS.pulseIntensity, 5);
   r.autoChainDelay = num(r.autoChainDelay, 0, 60, DEFAULTS.autoChainDelay);
@@ -497,11 +498,12 @@ let guide = null; // { steps, t0 } : la respiration en cours (t0 = heure du prem
 
 function startGuide() {
   stopGuide();
-  if (!S.pulseOn) return;
-  const g = { steps: stepsFor(S.breathPattern, S.pulseSeconds), t0: Date.now() + 150 };
+  const steps = stepsFor(S.breathPattern);
+  if (!steps) return; // « aucun » : rien n'est guidé
+  const g = { steps, t0: Date.now() + 150 };
   guide = g;
   if (S.breathSound) {
-    breath.start(S.breathPattern, S.breathVol / 100, S.pulseSeconds).then((t0) => { if (guide === g && t0) g.t0 = t0; });
+    breath.start(S.breathPattern, S.breathVol / 100).then((t0) => { if (guide === g && t0) g.t0 = t0; });
   }
 }
 function stopGuide() {
@@ -521,9 +523,9 @@ function resetVisual() {
   document.body.classList.remove('ink-dark');
 }
 
-// Le mot de l'étape en cours, s'il doit s'afficher (pas pour la simple pulsation).
+// Le mot de l'étape en cours, s'il doit s'afficher.
 function guideWord() {
-  if (!guide || S.breathPattern === 'simple') return '';
+  if (!guide) return '';
   if (!(S.breathLabels || S.breathShow === 'word')) return '';
   const e = (Date.now() - guide.t0) / 1000;
   return e < 0 ? '' : stepAt(guide.steps, e).kind;
@@ -535,23 +537,23 @@ function applyGuide() {
   if (!guide) return resetVisual();
   const e = (Date.now() - guide.t0) / 1000;
   if (e < 0) return;
-  const show = S.breathShow, simple = S.breathPattern === 'simple';
+  const show = S.breathShow;
   const st = stepAt(guide.steps, e);
   const prev = guide.steps[(st.i - 1 + guide.steps.length) % guide.steps.length][0] || 'expire';
   const dark = S.pulseIntensity / 100;
   const endOf = (kind) => (kind === 'inspire' ? 1 : 0); // 1 = poumons pleins
   // Poumons pleins (1) ou vides (0) à l'instant : sert au mot qui grandit et au voile.
   const fill = st.kind === 'inspire' ? st.p : st.kind === 'expire' ? 1 - st.p : endOf(prev);
-  if ((show === 'word' || show === 'both') && !simple) {
+  if (show === 'word' || show === 'both') {
     subEl.style.transform = `scale(${lerp(1, show === 'word' ? 3 : 2.4, fill).toFixed(3)})`;
   } else subEl.style.transform = '';
-  if ((show === 'colors' || show === 'both') && !simple) {
+  if (show === 'colors' || show === 'both') {
     const glide = st.kind === 'retiens' ? Math.min(1.5, st.secs) : st.secs;
     const c = mixRgb(colorOf(prev), colorOf(st.kind), Math.min(1, (st.p * st.secs) / glide)); // la couleur glisse d'une étape à l'autre
     pulseEl.style.backgroundColor = `rgb(${c})`;
     pulseEl.style.opacity = st.cycle === 0 && st.i === 0 ? st.p : 1; // la première inspiration s'allume doucement
     document.body.classList.toggle('ink-dark', (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 > 0.6);
-  } else if (show === 'veil' || simple) {
+  } else if (show === 'veil') {
     pulseEl.style.backgroundColor = '#000';
     pulseEl.style.opacity = (dark * (1 - fill)).toFixed(3); // inspire : s'éclaircit ; expire : s'assombrit
     document.body.classList.remove('ink-dark');
@@ -924,7 +926,7 @@ function syncFields() {
   refreshVisibility();
 }
 function onSettingChanged(k) {
-  if (['pulseOn', 'breathPattern', 'pulseSeconds', 'breathSound'].includes(k) && timer.onBreak) startGuide();
+  if (['breathPattern', 'breathSound'].includes(k) && timer.onBreak) startGuide();
   if (k === 'breathVol') breath.setLevel(S.breathVol / 100);
   if (k === 'breakMusic' && timer.onBreak) { pauseMusicOff(); pauseMusicOn(); }
   if (k === 'notifyOn') askNotifyPermission();

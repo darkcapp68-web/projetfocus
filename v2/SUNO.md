@@ -73,10 +73,9 @@ Suno fabrique de la musique, pas des sons courts : il est plus simple de les fai
 | Apaisante | 4 s | — | 6 s |
 | Carrée | 4 s | 4 s | 4 s (et 4 s de retenue) |
 | 4-7-8 | 4 s | 7 s | 8 s |
-| Simple pulsation | la moitié de la durée réglée | — | l'autre moitié |
 
 **« Selon les modes »** : on peut fournir **un jeu pour tous les rythmes** (`default`) et/ou
-**un jeu par rythme** (`coherence`, `apaisante`, `carree`, `478`, `simple`). Un son absent
+**un jeu par rythme** (`coherence`, `apaisante`, `carree`, `478`). Un son absent
 est remplacé par la note de cloche.
 
 **Où les mettre** : dans `v2/audio/respiration/`, avec un fichier `manifest.json` qui dit
