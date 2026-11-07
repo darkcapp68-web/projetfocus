@@ -4,7 +4,7 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h47';
+const APP_VERSION = '07/11/2026 · 08h51';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -699,7 +699,11 @@ const timer = (() => {
     store.set('run', null);
     noise.set('none');
     stopGuide();
+    radioHeld = false; // Arrêter coupe aussi la radio : on ne la rend pas
     pauseMusicOff();
+    // La radio s'arrête, mais le souvenir (`radioWanted`) reste : Démarrer la relancera si elle
+    // jouait (07/11, demande de l'utilisateur).
+    if (wantOn) radioStop(false);
     leaveFullscreen();
     render();
   }
