@@ -271,3 +271,7 @@ body.phase-focus #btn-break { display: block; }
 .preset.on { border-color: var(--fg); }
 .preset:active { transform: scale(0.96); }
 body.running #presets { width: 0; margin-right: 0; opacity: 0; pointer-events: none; }
+
+/* Le fond suit le décompte (couleur d'origine → noir pendant le focus, retour en pause) ;
+   la transition adoucit les sauts (« Pause maintenant », Arrêter). */
+body { transition: background-color 2s linear; }

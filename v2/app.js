@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h28';
+const APP_VERSION = '07/11/2026 · 07h30';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -379,9 +379,31 @@ const timer = (() => {
     btn.textContent = run ? 'Arrêter' : 'Démarrer';
     btn.classList.toggle('primary', !run);
     if (run) {
+      const left = Math.max(0, (run.endAt - Date.now()) / 1000);
       clock.label(run.phase);
-      clock.draw(Math.max(0, (run.endAt - Date.now()) / 1000), run.total);
-    } else clock.reset();
+      clock.draw(left, run.total);
+      // Fond (07/11, demande de l'utilisateur) : pendant le focus, il glisse de la couleur
+      // d'origine au noir sur toute la durée ; pendant la pause, il revient du noir à la
+      // couleur d'origine.
+      const done = 1 - left / run.total;
+      paintBg(run.phase === 'focus' ? done : 1 - done);
+    } else {
+      clock.reset();
+      paintBg(0);
+    }
+  }
+
+  // `dark` : 0 = couleur d'origine, 1 = noir.
+  const BG = [0x1c, 0x1a, 0x4d];
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  let lastBg = '';
+  function paintBg(dark) {
+    const k = 1 - Math.min(1, Math.max(0, dark));
+    const c = '#' + BG.map((v) => Math.round(v * k).toString(16).padStart(2, '0')).join('');
+    if (c === lastBg) return;
+    lastBg = c;
+    document.body.style.backgroundColor = c;
+    themeMeta?.setAttribute('content', c); // barre du téléphone de la même couleur
   }
 
   function begin(phase) {
