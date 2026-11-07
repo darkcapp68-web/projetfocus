@@ -4,7 +4,7 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h02';
+const APP_VERSION = '07/11/2026 · 08h08';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -38,19 +38,6 @@ const DEFAULTS = {
   breathHoldColor: '#ffd36e', // doré
   breathExpireColor: '#000000', // noir
   pulseIntensity: 30, // assombrissement du voile (%)
-  coachMode: 'one', // une action à la fois : one | none
-  coachActions: [
-    'Lève-toi et marche un peu.',
-    'Bois un grand verre d’eau.',
-    'Regarde au loin pendant 20 secondes.',
-    'Étire le dos et les épaules.',
-    'Ouvre la fenêtre et respire l’air frais.',
-    'Fais rouler tes épaules, cinq fois dans chaque sens.',
-    'Ferme les yeux et respire lentement une minute.',
-    'Détends tes mains : ouvre, ferme, secoue.',
-    'Range une seule chose autour de toi.',
-    'Va jusqu’à la fenêtre et regarde le ciel.',
-  ],
   autoChain: true, // le focus reprend tout seul à la fin de la pause
   autoChainDelay: 0, // … après N secondes
   breakMusic: 'radio', // musique de la pause : radio | silence | calme
@@ -89,7 +76,6 @@ function sanitize(raw0) {
   r.notifyOn = !!r.notifyOn;
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
   r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
-  r.coachMode = pick(r.coachMode, ['one', 'none'], DEFAULTS.coachMode);
   r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
   r.pulseSeconds = num(r.pulseSeconds, 1, 12, DEFAULTS.pulseSeconds, 0.5);
   r.breathVol = num(r.breathVol, 0, 100, DEFAULTS.breathVol);
@@ -99,7 +85,9 @@ function sanitize(raw0) {
   r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
   r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
   r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);
-  r.coachActions = Array.isArray(r.coachActions) ? r.coachActions.map((x) => String(x).trim()).filter(Boolean) : [...DEFAULTS.coachActions];
+  // Coach et messages : mis de côté pour le moment (demande de l'utilisateur, 07/11).
+  delete r.coachMode;
+  delete r.coachActions;
   r.syncClientId = typeof r.syncClientId === 'string' && r.syncClientId.trim() ? r.syncClientId.trim() : DEFAULTS.syncClientId;
   return r;
 }
@@ -480,7 +468,7 @@ const clock = (() => {
 const noise = createNoise();
 noise.setLevel(S.noiseVol / 100);
 
-/* ---------- Pause : respiration (son et écran), coach, musique ---------- */
+/* ---------- Pause : respiration (son et écran), musique ---------- */
 // Pendant la pause, trois sons guident la respiration sans qu'on regarde l'écran :
 // aigu = inspire, moyen = retiens, grave = expire (breath.js). Comme la 1.0, la respiration
 // peut aussi se voir (le mot qui grandit, les couleurs, un voile sombre), au choix dans
@@ -555,41 +543,6 @@ function applyGuide() {
   }
 }
 
-/* ---------- Pause : coach ---------- */
-// Une action à la fois pendant la pause ; deux autres proposées au toucher (liste modifiable).
-const coachEl = $('#coach'), coachList = $('#coach-list');
-let coach = [], coachKey = '';
-
-function pickCoach() {
-  const a = [...S.coachActions];
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  coach = a.slice(0, 3);
-  coachKey = '';
-}
-
-function renderCoach(phase, ended) {
-  const key = `${phase}|${ended}|${S.coachMode}|${coach.join('|')}`;
-  if (key === coachKey) return;
-  coachKey = key;
-  coachEl.textContent = '';
-  coachList.replaceChildren();
-  if (phase !== 'break') return;
-  if (ended) { coachEl.textContent = 'Pause terminée.'; return; }
-  if (S.coachMode !== 'one' || !coach.length) return;
-  coachEl.textContent = coach[0];
-  coach.forEach((txt, i) => {
-    if (i === 0) return;
-    const li = document.createElement('li');
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = txt;
-    b.title = 'Plutôt ça';
-    b.addEventListener('click', () => { coach.splice(i, 1); coach.unshift(txt); coachKey = ''; });
-    li.appendChild(b);
-    coachList.appendChild(li);
-  });
-}
-
 /* ---------- Pause : plein écran, notifications ---------- */
 let weWentFullscreen = false;
 function enterFullscreen() {
@@ -653,7 +606,6 @@ const timer = (() => {
   let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total, ended?, resumeAt? } en cours, sinon null
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
   if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
-  if (run?.phase === 'break') pickCoach();
 
   let resumeLabel = '';
   function render() {
@@ -678,12 +630,10 @@ const timer = (() => {
       const done = 1 - left / run.total;
       paintBg(ph === 'focus' ? done : 1 - done);
       if (ph === 'break') applyGuide(); else resetVisual();
-      renderCoach(ph, !!run.ended);
     } else {
       clock.reset();
       paintBg(0);
       resetVisual();
-      renderCoach(null, false);
     }
   }
 
@@ -706,7 +656,6 @@ const timer = (() => {
     run = { phase, endAt: Date.now() + total * 1000, total };
     store.set('run', run);
     if (phase === 'break') {
-      pickCoach();
       startGuide(); // respiration : son et écran
       pauseMusicOn();
       enterFullscreen();
@@ -955,7 +904,6 @@ function syncFields() {
 function onSettingChanged(k) {
   if (['pulseOn', 'breathPattern', 'pulseSeconds', 'breathSound'].includes(k) && timer.onBreak) startGuide();
   if (k === 'breathVol') breath.setLevel(S.breathVol / 100);
-  if (k === 'coachMode' || k === 'coachActions') pickCoach();
   if (k === 'breakMusic' && timer.onBreak) { pauseMusicOff(); pauseMusicOn(); }
   if (k === 'notifyOn') askNotifyPermission();
   refreshVisibility();
@@ -970,7 +918,6 @@ for (const el of pauseFields) {
     S = sanitize({ ...S, [k]: readField(el) });
     saveS();
     if (el.tagName !== 'TEXTAREA') writeField(el, S[k]); // montre la valeur corrigée (limites)
-    else if (!S.coachActions.length) { /* liste vide : pas de coach */ }
     onSettingChanged(k);
   });
 }

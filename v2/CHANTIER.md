@@ -105,14 +105,15 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
    support est en place : `audio/respiration/` + `manifest.json`, un jeu par rythme ou
    `default`, sinon notes de cloche. **En attente des fichiers.**
 3. **Réglages de pause de la 1.0, sans les messages** : repris (Paramètres → Pause, voir
-   ci-dessous). Les messages bienveillants du focus ne sont **pas** repris.
+   ci-dessous). **Ni les messages bienveillants du focus, ni le coach** (les actions proposées
+   pendant la pause) ne sont repris : mis de côté « pour le moment » (précisé par l'utilisateur
+   le 07/11 ; un premier envoi avait repris le coach par erreur, retiré aussitôt).
 
 - 07/11 : **Paramètres → Pause** repris de la 1.0 : respiration guidée (rythmes cohérence
   cardiaque, apaisante, carrée, 4-7-8, simple pulsation avec « une respiration toutes les N s »),
   **sons de respiration** (réglage de la 2.0 : aigu / moyen / grave), « la respiration se voit
   par » (rien par défaut, le mot qui grandit, les couleurs, les deux, un voile sombre ;
   couleurs d'inspire / retenue / expire ; « écrire inspire / retiens / expire » ; voile réglable),
-  **coach** (une action à la fois + deux autres au toucher, liste modifiable, copiée de la 1.0),
   **reprise du focus** tout seul à la fin de la pause avec un délai réglable (0 par défaut) ou
   avec le bouton, **« maintenir pour reprendre »** (0 = un toucher ; réglable jusqu'à 10 s),
   plein écran au début de la pause (non par défaut), notification si la fenêtre est cachée
@@ -120,7 +121,7 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   même horloge. Fin de pause sans reprise automatique : « pause terminée » et le bouton attend.
   **Pas encore repris** de la 1.0 : pause longue après N cycles, nombre de cycles, « ding » de
   fin de pause, compte à rebours sonore (le son reste à décider avec l'oreille de l'utilisateur).
-  Testé sur 127.0.0.1 (réglages, mot / couleurs / voile, coach, maintenir, reprise auto ou à la
+  Testé sur 127.0.0.1 (réglages, mot / couleurs / voile, maintenir, reprise auto ou à la
   main, radio coupée pendant la pause et rendue) ; plein écran et notifications non testés.
 
 ## Test sur le téléphone

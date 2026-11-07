@@ -356,13 +356,6 @@ body.ink-dark { --fg: #1b1f24; --soft: rgba(27, 31, 36, 0.7); --glass: rgba(0, 0
 body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.04); }
 #sub { transform-origin: center; will-change: transform; }
 
-/* Coach : une action à la fois pendant la pause, deux autres au toucher. */
-#coach { display: none; margin: 0; max-width: 30ch; text-align: center; font-size: 18px; line-height: 1.35; }
-#coach-list { display: none; list-style: none; padding: 0; margin: 0; flex-wrap: wrap; gap: 8px; justify-content: center; }
-#coach-list button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--glass); color: var(--soft); font-size: 14px; }
-body.phase-break #coach:not(:empty) { display: block; }
-body.phase-break #coach-list:not(:empty) { display: flex; }
-
 /* « Reprendre le focus » : en mode « maintenir », la barre se remplit pendant le toucher. */
 #btn-resume.holding { background: linear-gradient(to right, var(--accent) calc(var(--p, 0) * 100%), var(--glass-strong) 0); color: #10143a; }
 #btn-resume { touch-action: none; user-select: none; -webkit-user-select: none; }
