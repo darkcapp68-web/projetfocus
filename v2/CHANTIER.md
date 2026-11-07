@@ -30,8 +30,9 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
   Android, la page reprend le décompte (le son revient au bouton radio). À 0 : retour au
   réglage pour l'instant (signal et question de la pause : à venir).
 
-- 07/11 : après Démarrer, **l'heure s'efface lentement** comme le « fondu lent » de la 1.0
-  (temps et « focus » jusqu'à 12 % puis retour, 16 s aller-retour) ; le **cercle et l'arc
+- 07/11 : après Démarrer, **l'heure s'efface** (temps et « focus ») : fondu jusqu'à
+  l'invisible en 4 s, invisible 10 s, retour en 4 s, puis ça repart (demande de
+  l'utilisateur, d'abord essayé comme le fondu lent de la 1.0 : 12 %, 16 s aller-retour) ; le **cercle et l'arc
   restent toujours visibles** pour le décompte ; un toucher rend l'heure visible 5 s.
 
 ## Test sur le téléphone
