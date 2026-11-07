@@ -62,6 +62,9 @@ main { flex: 1; }
   padding: 16px 16px 24px;
 }
 
+/* Onde en ligne : barres néon, des basses (cyan, à gauche) aux aigus (violet, à droite). */
+#wave { display: block; width: 100%; height: 120px; }
+
 .radio { display: flex; align-items: center; gap: 14px; }
 
 #btn-radio {
