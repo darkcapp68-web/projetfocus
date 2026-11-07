@@ -1,7 +1,7 @@
 // projetfocus 2.0 — socle : Paramètres, radio, volume. Rien de plus pour l'instant.
 'use strict';
 
-const APP_VERSION = '07/11/2026 · 07h13';
+const APP_VERSION = '07/11/2026 · 07h15';
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -39,8 +39,11 @@ function renderRadio() {
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = wantOn ? 'playing' : 'paused';
 }
 
+// On se souvient si la radio a été lancée ou coupée par l'utilisateur (`radioWanted`) :
+// Démarrer ne la lance que si elle était lancée la dernière fois (comme la 1.0).
 function radioOn() {
   wantOn = true;
+  store.set('radioWanted', true);
   // Une radio repart toujours en direct : on recharge le flux.
   player.crossOrigin = 'anonymous'; // permet d'analyser le son pour l'onde (la radio l'autorise)
   player.src = RADIO.url;
@@ -52,6 +55,7 @@ function radioOn() {
 
 function radioOff() {
   wantOn = false;
+  store.set('radioWanted', false);
   player.pause();
   player.removeAttribute('src');
   player.load(); // coupe vraiment la connexion au flux
@@ -307,7 +311,8 @@ const clock = (() => {
 })();
 
 /* ---------- Démarrer / Arrêter ---------- */
-// Démarrer lance le décompte et la radio (si elle ne joue pas). Le temps est calculé sur
+// Démarrer lance le décompte, et la radio seulement si elle était lancée la dernière fois
+// (07/11, demande de l'utilisateur ; souvenir `radioWanted`, coupée par défaut). Le temps est calculé sur
 // l'heure de fin (pas de dérive), et gardé sur l'appareil : si Android ferme ou recharge la
 // page, le décompte reprend là où il en était (leçon de la 1.0). À 0, retour au réglage
 // pour l'instant (la suite viendra : signal, question de la pause).
@@ -328,7 +333,7 @@ const timer = (() => {
     const total = clock.minutes * 60;
     run = { endAt: Date.now() + total * 1000, total };
     store.set('run', run);
-    if (!wantOn) radioOn();
+    if (!wantOn && store.get('radioWanted', false)) radioOn();
     render();
     loop();
   }

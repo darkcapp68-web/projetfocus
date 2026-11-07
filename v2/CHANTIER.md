@@ -23,8 +23,9 @@ Besoin : `CAHIER_DES_CHARGES.md`. La 1.0 reste à la racine du dépôt (étiquet
 - 07/11 : **Démarrer** sous l'horloge (demande de l'utilisateur : dans la 1.0, l'arc gardait
   l'échelle du réglage, perturbant). Au démarrage, le **cercle devient complet** quel que soit
   le temps choisi (20 min = un tour) et se vide jusqu'à 0, le point reculant jusqu'à midi ;
-  graduations cachées et horloge non réglable pendant le décompte. Démarrer lance aussi la
-  radio si elle ne joue pas. Le bouton devient **Arrêter** (retour au réglage, la radio
+  graduations cachées et horloge non réglable pendant le décompte. Démarrer ne lance la
+  radio que si elle était lancée la dernière fois (07/11, comme la 1.0 : souvenir
+  `projetfocus2.radioWanted`, mis à jour au bouton radio ; coupée la première fois). Le bouton devient **Arrêter** (retour au réglage, la radio
   continue). Décompte gardé sur l'appareil (`projetfocus2.run`) : rechargée ou fermée par
   Android, la page reprend le décompte (le son revient au bouton radio). À 0 : retour au
   réglage pour l'instant (signal et question de la pause : à venir).
