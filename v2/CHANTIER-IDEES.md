@@ -62,6 +62,15 @@ la page.
 | 8.2 | Coach par IA | Difficile | à définir |
 | 8.3 | Fond lié à la météo / au soleil | Moyen | à définir |
 | 8.4 | Fond coloré selon la charge de l'agenda | Moyen | à définir |
+| 9.1 | Installer la 2.0 sur le poste pro | Facile (sauf blocage de l'entreprise) | à définir |
+| 9.2 | Mêmes réglages sur les deux postes (Drive à la main) | Facile (déjà là) | à définir |
+| 9.3 | Petite fenêtre toujours visible au-dessus du travail | Moyen | à définir |
+| 10.1 | **Indicateur de disponibilité à 3 états** (dérangeable / urgence seulement / pas dérangeable) | **Facile** | à définir |
+| 10.2 | État qui suit le focus et la pause tout seul | Facile (après 10.1) | à définir |
+| 10.3 | État qui suit l'agenda (réunion, temps de concentration) | Moyen (après le point 1) | à définir |
+| 10.4 | Statut Teams / Slack / Google Chat mis à jour par l'appli | Difficile | à définir |
+| 10.5 | Voyant physique (lampe, busylight USB) | Difficile | à définir |
+| 10.6 | Lien que les collègues ouvrent pour voir mon état | Difficile | à définir |
 
 ---
 
@@ -195,16 +204,70 @@ l'APK est repris, le bouton dans la notification s'ajoute.
 - **8.3 Fond lié au réel** : météo de la ville, lever et coucher du soleil. *Moyen*.
 - **8.4 Fond coloré selon la charge de l'agenda** (point 1). *Moyen*.
 
+## 9. Sur le poste pro (demande de l'utilisateur, 15/11)
+
+But : utiliser la 2.0 aussi au travail, pas seulement sur le téléphone et le PC perso.
+
+- **9.1 Installer la 2.0 sur le poste pro** : ouvrir `…/projetfocus/v2/` dans Chrome ou Edge
+  puis « Installer » (fenêtre à part, icône dans le menu Démarrer, comme la 1.0 sur le PC perso).
+  *Facile*, sauf si l'entreprise bloque l'installation d'applis web, l'accès à GitHub Pages,
+  ou les flux radio (le son en direct passe par Internet). **À vérifier sur place** avant de
+  prévoir quoi que ce soit.
+- **9.2 Mêmes réglages sur les deux postes** : sauvegarde Google Drive à la main (déjà dans la
+  2.0). *Facile*, mais un compte Google **perso** sur un poste pro peut être refusé par la
+  politique de l'entreprise : sinon, export / import JSON par fichier.
+- **9.3 Petite fenêtre toujours au-dessus** du travail (minuteur et état en coin d'écran) :
+  possible avec la fenêtre « image dans l'image » des navigateurs récents (Document
+  Picture-in-Picture), pas avec une simple page. *Moyen*.
+- Question : le poste pro peut-il recevoir des notifications du navigateur (pour le rappel 2.1
+  et la fin de focus) ?
+
+## 10. Disponibilité : « suis-je dérangeable ? » (demande de l'utilisateur, 15/11)
+
+**But** : un indicateur à trois états, visible d'un coup d'œil, pour dire aux autres (et à
+soi-même) quand on peut être interrompu :
+- **Dérangeable** (vert),
+- **Dérangeable pour une urgence** (orange),
+- **Pas dérangeable** (rouge).
+
+Un focus protégé est aussi une réponse à « je ne suis pas discipliné » : l'appli défend le
+temps de concentration.
+
+- **10.1 Indicateur à l'écran** : trois états choisis d'un toucher, une couleur franche et un
+  mot, lisibles de loin (écran ou petite fenêtre, voir 9.3). État gardé sur l'appareil.
+  *Facile*. À décider : tient-il dans l'écran principal, ou est-ce un écran à part ?
+- **10.2 L'état suit la séance** : focus → « pas dérangeable » (ou « urgence seulement »,
+  au choix), pause → « dérangeable », fin de séance → retour à l'état d'avant. Réglable pour
+  chacun. *Facile* (après 10.1).
+- **10.3 L'état suit l'agenda** : réunion en cours → « pas dérangeable » ; évènement
+  « Temps de concentration » → « urgence seulement ». *Moyen* (dépend du point 1).
+- **10.4 Statut de la messagerie** (Teams, Slack, Google Chat) changé par l'appli : les
+  collègues le voient sans rien regarder d'autre. *Difficile* : connexion à l'API de la
+  messagerie, autorisation de l'entreprise souvent nécessaire, secrets à garder hors du dépôt
+  public. Piste plus simple : un raccourci qui ouvre la messagerie pour le changer à la main.
+- **10.5 Voyant physique** (lampe connectée, « busylight » USB posé sur le bureau) : *Difficile*
+  (matériel à acheter, pilote ou service web), mais visible par tous sans écran.
+- **10.6 Lien à partager** que les collègues ouvrent pour voir mon état en direct.
+  *Difficile* (il faut un serveur ou un service qui garde l'état hors de mon appareil).
+
+À décider avec l'utilisateur :
+- Qui doit voir l'état : seulement lui, les collègues dans la même pièce (écran visible), ou
+  les collègues à distance (messagerie) ?
+- Les états se choisissent à la main, ou suivent seuls le focus et l'agenda ?
+- Qu'est-ce qu'une « urgence » au travail (appel, message d'une personne précise) ?
+
 ---
 
 ## Ordre de travail proposé (à valider)
 
 1. Les **faciles qui aident à se lancer** : 2.1 (rappel par l'agenda), 2.2 (« juste 5 minutes »),
    7.1 (raccourci) : ils partagent le même lien `?demarrer=1`.
-2. Le **journal** (3.1, 3.3) puis la carte de chaleur (3.2).
-3. Point 1 (agenda), étape lecture seule (1.1, 1.2).
-4. Le **petit héros** (4.1) pour le plaisir.
-5. Le reste selon l'envie.
+2. **Poste pro** (9.1) : vérifier d'abord que l'installation et la radio passent au travail ;
+   puis l'**indicateur de disponibilité** (10.1, 10.2), facile et utile tout de suite.
+3. Le **journal** (3.1, 3.3) puis la carte de chaleur (3.2).
+4. Point 1 (agenda), étape lecture seule (1.1, 1.2), qui ouvre 10.3.
+5. Le **petit héros** (4.1) pour le plaisir.
+6. Le reste selon l'envie.
 
 À chaque étape : définir avec l'utilisateur, tester sur 127.0.0.1:8418, téléphone à la fin,
 noter ici ce qui est fait.
