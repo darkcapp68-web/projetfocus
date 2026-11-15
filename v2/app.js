@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 16h58';
+const APP_VERSION = '15/11/2026 · 17h06';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -261,14 +261,25 @@ const wave = (() => {
 
   function start() { if (!raf) raf = requestAnimationFrame(frame); }
 
-  function frame() {
+  // L'onde est dessinée environ 30 fois par seconde, à rythme régulier, au lieu de 60 (15/11, demande de
+  // l'utilisateur : « quelque chose d'agréable à voir », pas de la précision à la milliseconde). Sur la
+  // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
+  // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
+  // l'adaptation de sensibilité gardent la même vitesse réelle.
+  let lastDraw = 0;
+  function frame(t) {
     raf = 0;
     const live = wantOn && !player.paused && an && !document.hidden;
-    draw(live);
-    if (live) raf = requestAnimationFrame(frame);
+    if (!live) { draw(false, 1); return; }
+    raf = requestAnimationFrame(frame);
+    const now = t || performance.now();
+    if (now - lastDraw < 30) return; // on saute une image sur deux
+    const df = Math.min(4, (now - lastDraw) / 16.7);
+    lastDraw = now;
+    draw(true, df);
   }
 
-  function draw(live) {
+  function draw(live, df = 1) {
     const k = devicePixelRatio || 1, W = Math.round(canvas.clientWidth * k), H = Math.round(canvas.clientHeight * k);
     if (!W || !H) return;
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
@@ -277,7 +288,7 @@ const wave = (() => {
       an.getFloatFrequencyData(freq);
       let top = -200;
       for (let i = 1; i < 200; i++) top = Math.max(top, freq[i]);
-      peak = Math.max(top, peak - 0.04); // redescend doucement : une musique calme bouge aussi
+      peak = Math.max(top, peak - 0.04 * df); // redescend doucement : une musique calme bouge aussi
       level = (i) => Math.min(1, Math.max(0, (freq[i] - (peak - 42)) / 42));
     }
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
@@ -289,8 +300,10 @@ const wave = (() => {
       const f = i / Math.max(1, n - 1);
       // Chaque barre a sa propre sensibilité (son maximum récent) : les aigus bougent aussi.
       const raw = level ? level(Math.floor(2 * Math.pow(95, f))) : 0;
-      const top = hzMax[i] = Math.max(raw, (hzMax[i] || 0.2) * 0.997, 0.1);
-      const s = hz[i] = Math.max(raw / top, (hz[i] || 0) * 0.9);
+      const top = hzMax[i] = Math.max(raw, (hzMax[i] || 0.2) * Math.pow(0.997, df), 0.1);
+      // Montée adoucie (80 % du chemin à chaque image) et retombée douce : plus agréable à 30 images/s.
+      const target = raw / top, prev = hz[i] || 0;
+      const s = hz[i] = target > prev ? prev + (target - prev) * 0.8 : Math.max(target, prev * Math.pow(0.9, df));
       const env = 0.6 + 0.4 * Math.sin(Math.PI * Math.min(1, f * 1.15)); // plus haut vers le milieu
       h[i] = Math.max(bw / 2, (0.03 + 0.97 * s ** 1.3) * mid * 0.94 * env);
     }
