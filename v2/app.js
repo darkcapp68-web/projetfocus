@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 18h36';
+const APP_VERSION = '15/11/2026 · 18h38';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -30,13 +30,19 @@ const setAppH = () => document.documentElement.style.setProperty('--app-h', inne
 setAppH();
 addEventListener('resize', setAppH);
 
-// Téléphone : l'appli installée demande le paysage (15/11, demande de l'utilisateur : « tout en paysage, comme la tablette »).
-// Seulement sur un petit écran (le petit côté sous 600 px) et en appli installée : Chrome refuse le verrouillage dans un
-// onglet ordinaire. La tablette (déjà couchée) et le PC ne sont pas concernés.
+// Téléphone (15/11, demande de l'utilisateur : « tout en paysage, comme la tablette ») : sur un petit écran (petit côté sous
+// 600 px), en appli installée, le premier toucher passe en plein écran puis en paysage. Chrome n'accepte le verrouillage
+// de l'orientation que pour une page en plein écran, et seulement après un geste ; la tablette (déjà couchée) et le PC ne
+// sont pas concernés. Si on sort du plein écran (geste retour), le toucher suivant recouche l'écran.
 try {
   const smallest = Math.min(screen.width, screen.height);
-  if (smallest < 600 && matchMedia('(display-mode: standalone)').matches && screen.orientation?.lock) {
-    screen.orientation.lock('landscape').catch(() => { /* refusé : l'appli reste dans l'orientation courante */ });
+  if (smallest < 600 && matchMedia('(display-mode: standalone)').matches && screen.orientation?.lock && document.documentElement.requestFullscreen) {
+    const goLandscape = () => {
+      removeEventListener('pointerup', goLandscape, true);
+      document.documentElement.requestFullscreen().then(() => screen.orientation.lock('landscape')).catch(() => addEventListener('pointerup', goLandscape, true));
+    };
+    addEventListener('pointerup', goLandscape, true);
+    document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) addEventListener('pointerup', goLandscape, true); });
   }
 } catch { /* rien */ }
 
