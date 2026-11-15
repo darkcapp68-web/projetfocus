@@ -405,7 +405,7 @@ header, main, footer { position: relative; z-index: 1; }
     gap: 6px 28px;
     padding: 4px 32px 18px;
   }
-  #wave { grid-area: wave; height: 96px; }
+  #wave { grid-area: wave; height: 104px; }
   #player .radio { grid-area: radio; }
   #volume { grid-area: vol; }
 }
@@ -550,7 +550,7 @@ body.phase-break #btn-go { display: none; }
   #side { gap: 8px; width: min(420px, 40vw); padding-top: 80px; } /* la place de l'encadré du rdv est réservée : rien ne bouge quand il apparaît */
   #rdv { top: 0; bottom: auto; }
   #player { padding: 2px 24px 8px; gap: 2px 20px; grid-template-columns: 1fr 300px; }
-  #wave { height: 36px; }
+  #wave { height: 56px; }
   #btn-radio { width: 48px; height: 48px; }
   header { top: 4px; right: 8px; }
 }

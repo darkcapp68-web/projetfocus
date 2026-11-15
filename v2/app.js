@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 19h42';
+const APP_VERSION = '15/11/2026 · 19h50';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -70,7 +70,7 @@ const DEFAULTS = {
   breathPattern: 'coherence', // rythme (voir breath.js) ; « aucun » = pas de respiration guidée
   breathSound: true, // trois sons : aigu = inspire, moyen = retiens, grave = expire
   breathVol: 60, // volume de ces sons (%)
-  waveStyle: 'vagues', // onde de la radio : vagues | posees
+  waveKind: 'plage', // onde de la radio : plage | vagues | posees
   breathShow: 'none', // la respiration se voit par : none | word | colors | both | veil
   breathLabels: true, // écrire « inspire / retiens / expire » sous le temps
   breathInspireColor: '#8fd3ff', // bleu ciel
@@ -126,7 +126,7 @@ function sanitize(raw0) {
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
   r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
-  r.waveStyle = pick(r.waveStyle, ['vagues', 'posees'], DEFAULTS.waveStyle);
+  r.waveKind = pick(r.waveKind, ['plage', 'vagues', 'posees'], DEFAULTS.waveKind);
   r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
   r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
   r.breathVol = num(r.breathVol, 0, 100, DEFAULTS.breathVol);
@@ -284,7 +284,9 @@ const wave = (() => {
   // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
-  let lastDraw = 0, ink = '#111', inkAge = -1;
+  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, pAvg = 0.4;
+  const HM = 260, hist = new Float32Array(HM).fill(0.05); // la puissance des ~8 dernières secondes (plage)
+  const wetLine = [];
   function frame(t) {
     raf = 0;
     const live = wantOn && !player.paused && an && !document.hidden;
@@ -308,7 +310,17 @@ const wave = (() => {
       for (let i = 1; i < 200; i++) top = Math.max(top, freq[i]);
       peak = Math.max(top, peak - 0.04 * df); // redescend doucement : une musique calme bouge aussi
       level = (i) => Math.min(1, Math.max(0, (freq[i] - (peak - 42)) / 42));
-    }
+      // Puissance globale du moment (graves surtout, un peu de médiums) pour la plage : 0 à 1.
+      let bass = 0, mids = 0;
+      for (let i = 2; i < 30; i++) bass += level(i);
+      for (let i = 30; i < 120; i++) mids += level(i);
+      // Seul l'écart avec la puissance moyenne récente compte (sinon une musique toujours forte donnerait une mer plate) :
+      // au niveau moyen, une vague moyenne ; au-dessus, une grosse ; en dessous, une petite.
+      const x = 0.65 * bass / 28 + 0.35 * mids / 90;
+      pAvg += (x - pAvg) * Math.min(1, 0.02 * df);
+      pNow = Math.min(1, Math.max(0.05, 0.35 + (x - pAvg) * 9));
+    } else pNow = 0.05;
+    hist.copyWithin(0, 1); hist[HM - 1] = pNow;
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
     // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
@@ -339,16 +351,15 @@ const wave = (() => {
     if (!(++inkAge % 60)) ink = getComputedStyle(document.body).getPropertyValue('--fg').trim() || '#111';
     g.fillStyle = ink;
     const lv = (i, m) => Math.min(1, 1.5 * h[Math.floor(i * n / m)] / mid);
-    if (S.waveStyle === 'posees') {
+    if (S.waveKind === 'posees') {
       const st = 9 * k, w = 5 * k, m = Math.floor(W / st);
       for (let i = 0; i < m; i++) {
         const l = lv(i, m), a = Math.max(w, l * H * 0.85);
         g.globalAlpha = 0.5 + 0.4 * l;
         pill(i * st + (st - w) / 2, H - a - 4 * k, w, a);
       }
-    } else {
+    } else if (S.waveKind === 'vagues') {
       const t = performance.now() / 1000, m = 200, base = H - 4 * k;
-      // Couleurs choisies par l'utilisateur (15/11, prototype C) : indigo, violet, et une touche de corail sur la vague du dessus.
       const cols = ['#2c3f8f', '#6a4bb0', '#e0735c'];
       for (let j = 0; j < 3; j++) {
         g.globalAlpha = 0.45;
@@ -363,6 +374,54 @@ const wave = (() => {
         g.closePath();
         g.fill();
       }
+    } else {
+      // Plage (15/11, choix de l'utilisateur, prototype C) : le sable à gauche, avec le petit bonhomme ; la mer arrive
+      // par la droite. La puissance du moment naît au bord droit sous forme d'une vague, qui traverse l'écran jusqu'au
+      // sable (petite puissance, petite vague ; grosse puissance, grosse vague, les unes après les autres). Les vagues
+      // s'arrêtent au bonhomme, qui saute quand l'une d'elles lui arrive aux pieds. Écume corail sur les crêtes, sable
+      // mouillé là où l'eau est montée.
+      const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
+      const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
+      const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
+      const lay = [['#2c3f8f', 0.9, 0.56, 0.55, 0], ['#6a4bb0', 0.85, 0.65, 0.8, 4], ['#2c3f8f', 0.55, 0.73, 1, 9]];
+      lay.forEach(([col, al, lev, amp, sh], j) => {
+        const ys = [];
+        for (let i = 0; i <= N; i++) {
+          const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
+          ys.push(H * lev - e * amp * H * 0.62 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e));
+        }
+        g.globalAlpha = al; g.fillStyle = col;
+        g.beginPath(); g.moveTo(hx, H);
+        for (let i = 0; i <= N; i++) if (i / N * W >= hx) g.lineTo(i / N * W, ys[i]);
+        g.lineTo(W, H); g.closePath(); g.fill();
+        if (j > 0) {
+          g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = '#f3a08e'; g.lineWidth = Math.max(2, H / 34);
+          for (let i = 0; i < N; i++) {
+            const e = env(i / N, sh);
+            if (e > 0.4 && i / N * W >= hx) { g.globalAlpha = Math.min(1, (e - 0.4) * 2); g.beginPath(); g.moveTo(i / N * W, ys[i]); g.lineTo((i + 1) / N * W, ys[i + 1]); g.stroke(); }
+          }
+        }
+        if (j === 1) for (let i = 0; i <= N; i++) wetLine[i] = Math.min(ys[i], wetLine[i] === undefined ? H * 2 : wetLine[i] + H * 0.003);
+      });
+      g.globalAlpha = 1;
+      g.fillStyle = '#e9d5a6';
+      g.beginPath(); g.moveTo(0, H);
+      for (let x = 0; x <= Sx; x += 4 * k) g.lineTo(x, sand(x));
+      g.lineTo(Sx, sand(Sx)); g.lineTo(Sx, H); g.closePath(); g.fill();
+      g.strokeStyle = '#c4a874'; g.lineWidth = Math.max(3, H / 17); g.lineCap = 'round';
+      g.beginPath();
+      let on = false;
+      for (let i = 0; i <= N; i++) {
+        const x = i / N * W; if (x > Sx) break;
+        const y = sand(x);
+        if (wetLine[i] !== undefined && wetLine[i] < y + H * 0.03) { on ? g.lineTo(x, y + 2 * k) : g.moveTo(x, y + 2 * k); on = true; } else on = false;
+      }
+      g.stroke();
+      // Le petit bonhomme.
+      const hy = sand(hx) - 2 * k, near = env(hx / W, 4), jump = Math.max(0, near - 0.35) * H * 0.2, u = Math.max(k, H / 70);
+      g.fillStyle = '#1b2f5e'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
+      g.fillStyle = '#e0735c'; g.fillRect(hx - 3 * u, hy - jump - 4 * u, 2.4 * u, 4 * u); g.fillRect(hx + 0.6 * u, hy - jump - 4 * u, 2.4 * u, 4 * u);
+      g.fillStyle = '#dfe7f5'; g.fillRect(hx + 3 * u, hy - jump - 12 * u, 1.2 * u, 8 * u);
     }
     g.globalAlpha = 1;
   }
@@ -376,7 +435,7 @@ const wave = (() => {
 
   addEventListener('resize', () => { if (!raf) draw(false); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && wantOn) start(); });
-  return { listen, draw, settle, start };
+  return { listen, draw, settle, start, hist };
 })();
 wave.draw(false);
 
