@@ -505,6 +505,12 @@ soi-même.
   à droite de l'horloge, en paysage ; bouton ↻ pour actualiser (l'accord Google dure environ une
   heure, son renouvellement demande un geste, donc pas de mise à jour toute seule). Vu sur la
   tablette avec le compte perso. Pas encore : compte pro, agenda.
+  **Agenda du jour fait (15/11)** : à droite de l'horloge, au-dessus des mails (heure puis titre,
+  l'évènement en cours en bleu, 5 lignes au plus, ce qui est fini disparaît chaque minute) ;
+  horloge et boutons à gauche. Une seule connexion Google pour mails et agenda (portées
+  `gmail.metadata` et `calendar.readonly`, API Agenda activée dans Google Cloud), un seul ↻.
+  Vu sur la tablette avec l'agenda **principal du compte perso**. Reste : compte pro, type de
+  rdv (visio, appel), l'écran-panneau de disponibilité.
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
