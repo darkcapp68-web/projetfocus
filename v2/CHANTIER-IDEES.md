@@ -25,6 +25,9 @@ la page.
 
 | # | Idée | Facilité | Statut |
 | --- | --- | --- | --- |
+| 0 | **Principe : l'agenda guide la journée (focus libre ou « rdv »)** | Moyen | à valider |
+| 1.10 | Agenda : le focus passe de « libre » à « rdv » sans s'arrêter | Moyen | à définir |
+| 1.11 | Agenda : mes blocs de focus décrits précisément dans l'agenda | Moyen | à définir |
 | 1.1 | Agenda : afficher le prochain rendez-vous | Moyen | à définir |
 | 1.2 | Agenda : régler le focus sur le créneau libre | Moyen | à définir |
 | 1.3 | Agenda : prévenir avant qu'une séance déborde | Moyen (page ouverte) / Difficile (écran éteint) | à définir |
@@ -75,6 +78,55 @@ la page.
 
 ---
 
+## 0. Principe directeur : l'agenda guide la journée *(décidé dans l'esprit le 15/11, à valider)*
+
+L'utilisateur le dit : **l'agenda doit déterminer le chantier**, et c'est lui qui décrit ses
+temps de façon précise dans son agenda ; l'appli suit.
+
+- **Journée sans évènement : le focus est libre.** Comme aujourd'hui : il règle son temps,
+  démarre, l'appli ne dit rien de plus.
+- **Journée avec un rendez-vous : le focus passe de « libre » à « rdv », sans s'arrêter.** Le
+  minuteur continue ; l'écran se met à montrer le rendez-vous (heure, compte à rebours, titre)
+  et la séance se **cale sur lui** (elle finit avant, avec une marge). Le but : **« je
+  n'oublie rien »**, sans casser la concentration.
+- **Les temps viennent de l'agenda.** Au lieu de régler à la main 25 min ou 50 min, l'utilisateur
+  écrit dans son agenda des blocs précis (ex. « Focus 14h–15h10 », « Pause 15h10–15h25 »,
+  « Réunion 16h ») ; l'appli les lit et propose / lance le bon temps.
+- **L'appli ne remplace pas l'agenda** : les notifications de rendez-vous restent celles de
+  Google Agenda (fiables, écran éteint). L'appli apporte l'**affichage** et le **calage** de la
+  séance, pas une deuxième alarme.
+
+### États de l'écran (proposition)
+| État | Quand | Ce qu'on voit |
+| --- | --- | --- |
+| **Libre** | aucun évènement à venir (ou plus tard dans la journée) | écran actuel, temps réglé à la main |
+| **Rdv proche** | un évènement approche (par ex. dans moins de 60 min, réglable) | le focus continue ; en plus : « rdv 14h dans 38 min », fin de séance calée avant |
+| **Rdv en cours** | l'évènement a commencé | focus arrêté proprement, indicateur « pas dérangeable » (10.2), musique coupée (1.8), on rappelle quoi |
+| **Après le rdv** | l'évènement est fini | « on reprend ? » avec le temps libre jusqu'au suivant |
+
+### Questions à trancher
+- **Comment reconnaître un bloc de focus** dans l'agenda ? Un agenda dédié « Focus », un mot
+  au début du titre (« Focus … »), une couleur, ou le type « Temps de concentration » de
+  Google ? (le plus simple : un mot au début du titre)
+- **Quel agenda compte pour « rdv »** : le pro seulement, ou aussi le perso (point 1.7) ?
+- **Journée sans bloc de focus mais avec des rdv** : l'appli propose seulement des créneaux
+  libres (« 52 min avant 14h »), ou lance rien tant que tu ne démarres pas ?
+- **Si un rdv commence pendant une pause ou un focus** : la séance s'arrête toute seule, ou
+  l'appli attend ton geste (rappel doux) ? À rapprocher de la leçon de la 1.0 : « ne jamais
+  couper dans le dos ».
+- **Écran éteint** : l'affichage « rdv » n'a de sens que l'écran allumé ; la sécurité vient des
+  notifications Google Agenda (déjà là). À confirmer que cela suffit.
+- **Données du travail** : titres de réunions affichés **seulement à l'écran**, jamais envoyés
+  ailleurs (voir le coach 8.2).
+
+### Ce que ça change dans le reste du chantier
+- Le **point 1 (agenda)** passe **en premier** : 1.1 (lecture), 1.10 (libre → rdv), 1.11 (blocs
+  décrits dans l'agenda).
+- **10.2 / 10.3** (indicateur de disponibilité), **8.2** (coach), **2.1** (rappel d'heure fixe : les
+  blocs de l'agenda *sont* les rappels) et **1.9** (« Absent ») s'appuient dessus.
+
+---
+
 ## 1. Lien avec mes agendas Google (premier point voulu par l'utilisateur)
 
 **But** : que le focus tienne compte de la vraie journée (réunions, rendez-vous), au lieu de
@@ -118,6 +170,13 @@ vivre à côté d'elle.
    - À décider : refuser les invitations pendant un focus,
      ou seulement afficher « occupé » ? Annuler l'évènement quand on arrête le focus avant la
      fin (l'appli le raccourcit ou le supprime) ?
+
+10. **Libre → rdv sans s'arrêter** *(15/11, voir le point 0)* : le focus en cours continue, mais
+    se cale sur le prochain évènement et l'affiche. *Moyen* (après 1.1).
+11. **Blocs de focus décrits dans l'agenda** *(15/11, voir le point 0)* : les évènements
+    « Focus … » donnent le temps de focus et de pause à lancer ; l'utilisateur planifie
+    précisément ses temps dans l'agenda, l'appli les suit. *Moyen* (après 1.1 ; lecture du
+    titre et des heures seulement).
 
 ### Façons techniques de s'y prendre
 | Piste | Avantages | Limites |
@@ -367,13 +426,17 @@ temps de concentration.
 
 ## Ordre de travail proposé (à valider)
 
-1. Les **faciles qui aident à se lancer** : 2.1 (rappel par l'agenda), 2.2 (« juste 5 minutes »),
-   7.1 (raccourci) : ils partagent le même lien `?demarrer=1`.
-2. **Poste pro** (9.1) : vérifier d'abord que l'installation et la radio passent au travail ;
-   puis l'**indicateur de disponibilité** (10.1, 10.2), facile et utile tout de suite.
-3. Le **journal** (3.1, 3.3) puis la carte de chaleur (3.2).
-4. Point 1 (agenda), étape lecture seule (1.1, 1.2), qui ouvre 10.3.
-5. Le **petit héros** (4.1) pour le plaisir.
+L'agenda détermine le chantier (point 0) : on commence par lui.
+
+1. **Agenda, lecture seule** (1.1), puis **libre → rdv** (1.10) et **blocs de focus dans
+   l'agenda** (1.11). Avant : vérifier avec l'utilisateur que le compte pro accepte la
+   connexion (voir 1.9).
+2. **Lancer plus facilement** : 2.1 (rappel d'heure fixe, qui devient les blocs de l'agenda),
+   2.2 (« juste 5 minutes »), 7.1 (raccourci), qui partagent le lien `?demarrer=1`.
+3. **Poste pro** (9.1), puis l'**indicateur de disponibilité** (10.1, 10.2, 10.3).
+4. Le **journal** (3.1, 3.3), la carte de chaleur (3.2), puis le coach (8.2) qui s'appuie sur
+   l'agenda et le journal.
+5. Le **monde qui pousse** (4.2) et le petit héros (4.1) pour le plaisir.
 6. Le reste selon l'envie.
 
 À chaque étape : définir avec l'utilisateur, tester sur 127.0.0.1:8418, téléphone à la fin,
