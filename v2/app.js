@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 22h20';
+const APP_VERSION = '15/11/2026 · 22h40';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -348,8 +348,11 @@ const wave = (() => {
       }
     } else {
       const t = performance.now() / 1000, m = 200, base = mid + H * 0.22;
+      // Couleurs choisies par l'utilisateur (15/11, prototype C) : indigo, violet, et une touche de corail sur la vague du dessus.
+      const cols = ['#2c3f8f', '#6a4bb0', '#e0735c'];
       for (let j = 0; j < 3; j++) {
-        g.globalAlpha = 0.22 + 0.1 * j;
+        g.globalAlpha = 0.45;
+        g.fillStyle = cols[j];
         g.beginPath();
         g.moveTo(0, H);
         for (let i = 0; i <= m; i++) {
