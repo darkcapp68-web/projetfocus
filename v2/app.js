@@ -287,7 +287,8 @@ const wave = (() => {
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
   let prevB = -60, lastOn = 0, spT = 1, spd = 1, spAcc = 0, lastT = 0, cphase = 0; // vitesse des vagues liée au tempo (plage)
   let lz = []; // TEMP
-  const iois = []; // les derniers écarts entre deux coups de basse (s)
+  const onsT = []; // les instants des derniers coups de basse (s)
+  let rate = 0;
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
   function frame(t) {
@@ -325,27 +326,16 @@ const wave = (() => {
       pS += (Math.min(1, Math.max(0.12, 0.45 + 0.28 * z)) - pS) * Math.min(1, 0.6 * df);
       if (!isFinite(pS) || !isFinite(bm) || !isFinite(bv)) { pS = 0.3; bm = b; bv = 25; }
       pNow = pS;
-      // Vitesse des vagues liée au tempo (15/11, demande de l'utilisateur : « une vitesse moyenne entre le classique, lent, et
-      // la techno, rapide ») : on mesure l'écart entre les coups de basse ; s'il est régulier, le tempo (ramené entre 70 et 170
-      // BPM) règle la vitesse entre 0,85 (80 BPM) et 1,25 (150 BPM) ; sans battement net (classique), vitesse lente, 0,75.
+      // Vitesse des vagues liée à l'activité rythmique (15/11, demande de l'utilisateur : « une vitesse moyenne entre le
+      // classique, lent, et la techno, rapide »). Mesurer un vrai tempo (BPM) sur une radio en direct est peu fiable (des
+      // coups de basse manqués donnent des écarts multiples) ; on compte plutôt les coups de basse par seconde sur les 8
+      // dernières secondes : peu (classique), vitesse 0,75 ; beaucoup (techno), jusqu'à 1,25 ; entre les deux, progressif.
       const tn = performance.now() / 1000;
-      lz = [+z.toFixed(2), +b.toFixed(1), +bm.toFixed(1), +Math.sqrt(bv).toFixed(2), live ? 1 : 0]; // TEMP
-      if (z > 1 && b > prevB && tn - lastOn > 0.3) {
-        if (lastOn && tn - lastOn < 1.5) { iois.push(tn - lastOn); if (iois.length > 14) iois.shift(); }
-        lastOn = tn;
-      }
+      if (z > 1 && b > prevB && tn - lastOn > 0.3) { onsT.push(tn); lastOn = tn; }
       prevB = b;
-      spT = 0.75;
-      if (iois.length >= 6) {
-        const srt = [...iois].sort((x, y) => x - y), med = srt[srt.length >> 1];
-        const mad = srt.map((x) => Math.abs(x - med)).sort((x, y) => x - y)[srt.length >> 1];
-        if (mad < 0.2 * med) {
-          let bpm = 60 / med;
-          while (bpm < 70) bpm *= 2;
-          while (bpm > 170) bpm /= 2;
-          spT = 0.85 + 0.4 * Math.min(1, Math.max(0, (bpm - 80) / 70));
-        }
-      }
+      while (onsT.length && tn - onsT[0] > 8) onsT.shift();
+      rate = onsT.length / 8;
+      spT = 0.75 + 0.5 * Math.min(1, Math.max(0, (rate - 0.3) / 1.2));
     } else { pNow = 0.05; spT = 1; }
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
@@ -484,7 +474,7 @@ const wave = (() => {
 
   addEventListener('resize', () => { if (!raf) draw(false); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && wantOn) start(); });
-  return { listen, draw, settle, start, hist, dbg: () => ({ lz, spd, spT, iois: iois.map((x) => +x.toFixed(2)) }) };
+  return { listen, draw, settle, start, hist, dbg: () => ({ lz, spd, spT, rate }) };
 })();
 wave.draw(false); window.__wave = wave; // TEMP
 
