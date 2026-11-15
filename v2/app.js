@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h19';
+const APP_VERSION = '15/11/2026 · 14h30';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1083,11 +1083,15 @@ function renderAgenda() {
   agendaList.textContent = '';
   for (const e of left.slice(0, AGENDA_MAX)) {
     const cur = !e.allDay && e.start.getTime() <= now;
-    agendaList.append(line(cur ? 'now' : '', ['when', e.allDay ? 'jour' : hhmm(e.start)], ['title', e.title]));
+    const cells = [['when', e.allDay ? 'jour' : hhmm(e.start)], ['title', e.title]];
+    if (e.kind) cells.push(['kind', e.kind]);
+    agendaList.append(line(cur ? 'now' : '', ...cells));
   }
   if (left.length > AGENDA_MAX) agendaList.append(line('more', ['when', ''], ['title', `+ ${left.length - AGENDA_MAX} autres`]));
 }
 setInterval(renderAgenda, 60000);
+// Diagnostic (15/11) : ce que l'appli a reconnu pour chaque évènement, sans leur contenu.
+window.__agendaDiag = () => (agendaItems || []).map((e) => ({ titre: e.title, type: e.kind, indices: e.diag }));
 
 const problem = (e) => (e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`);
 let mailBusy = false;
