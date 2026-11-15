@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h46';
+const APP_VERSION = '15/11/2026 · 20h49';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -331,7 +331,11 @@ const wave = (() => {
       // coups de basse manqués donnent des écarts multiples) ; on compte plutôt les coups de basse par seconde sur les 8
       // dernières secondes : peu (classique), vitesse 0,25 ; beaucoup (techno), jusqu'à 0,65 ; entre les deux, progressif.
       const tn = performance.now() / 1000;
-      if (z > 1 && b > prevB && tn - lastOn > 0.3) { onsT.push(tn); lastOn = tn; }
+      // Un coup de basse = une MONTÉE RAPIDE des graves (plus de 60 dB par seconde) au-dessus de leur moyenne : une grosse caisse
+      // monte d'un coup, un violoncelle ou une nappe montent doucement et ne comptent pas (15/11 : le classique faisait
+      // autant de « coups » que la techno quand on comparait seulement à la moyenne).
+      const rise = (b - prevB) / Math.max(0.016, tn - lastT);
+      if (rise > 60 && z > 0.3 && tn - lastOn > 0.3) { onsT.push(tn); lastOn = tn; }
       prevB = b;
       while (onsT.length && tn - onsT[0] > 12) onsT.shift();
       rate = onsT.filter((x) => tn - x <= 8).length / 8;
