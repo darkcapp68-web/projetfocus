@@ -1,13 +1,18 @@
 /* projetfocus 2.0 — pensé pour la tablette posée en paysage sur le bureau (décision du 15/11),
    mais le portrait reste utilisable : gros boutons, peu de choses. */
 :root {
-  --bg: #1c1a4d;
-  --fg: #ffffff;
-  --soft: rgba(255, 255, 255, 0.65);
-  --glass: rgba(255, 255, 255, 0.12);
-  --glass-strong: rgba(255, 255, 255, 0.22);
-  --accent: #8fd3ff;
+  /* Fond en pastel (15/11, demande de l'utilisateur : 4 couleurs, texte noir) : le fond est posé par
+     app.js selon l'état (défaut, focus perso, focus rdv, focus absolu). Texte sombre par défaut ;
+     la classe « ink-light » (voile sombre de la respiration) remet le texte clair. */
+  --bg: #a8d1f5;
+  --fg: #111111;
+  --on-fg: #ffffff;
+  --soft: rgba(17, 17, 17, 0.72);
+  --glass: rgba(0, 0, 0, 0.08);
+  --glass-strong: rgba(0, 0, 0, 0.16);
+  --accent: #0b4f8a;
 }
+body.ink-light { --fg: #ffffff; --on-fg: #1c1a4d; --soft: rgba(255, 255, 255, 0.65); --glass: rgba(255, 255, 255, 0.12); --glass-strong: rgba(255, 255, 255, 0.22); --accent: #8fd3ff; }
 
 * { box-sizing: border-box; }
 
@@ -75,15 +80,16 @@ main {
 body.running #dial { cursor: default; }
 body.running #ticks { opacity: 0; } /* les graduations valent pour le réglage, pas le décompte */
 #dial:focus { outline: none; }
-#dial:focus-visible .track { stroke: rgba(255, 255, 255, 0.6); }
+#dial:focus-visible .track { stroke: rgba(0, 0, 0, 0.6); }
 body.adjusting #dial { cursor: grabbing; }
-#dial .track { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.22); stroke-width: 5; }
+#dial .track { fill: rgba(0, 0, 0, 0.04); stroke: rgba(0, 0, 0, 0.25); stroke-width: 5; }
+body.ink-light #dial .track { fill: rgba(255, 255, 255, 0.05); stroke: rgba(255, 255, 255, 0.22); }
 #arc { fill: none; stroke: var(--fg); stroke-width: 5; stroke-linecap: round; transition: opacity 0.4s; }
 #knob { fill: var(--fg); transition: opacity 0.4s; }
 #ticks { opacity: 0; transition: opacity 0.5s ease; }
-#ticks line { stroke: rgba(255, 255, 255, 0.35); stroke-width: 1; }
-#ticks line.major { stroke: rgba(255, 255, 255, 0.6); }
-#ticks text { fill: rgba(255, 255, 255, 0.55); font-size: 10px; text-anchor: middle; dominant-baseline: central; }
+#ticks line { stroke: rgba(0, 0, 0, 0.35); stroke-width: 1; }
+#ticks line.major { stroke: rgba(0, 0, 0, 0.6); }
+#ticks text { fill: rgba(0, 0, 0, 0.55); font-size: 10px; text-anchor: middle; dominant-baseline: central; }
 body.adjusting #ticks, body.show-ticks #ticks { opacity: 1; }
 #center {
   position: absolute;
@@ -149,13 +155,14 @@ body.adjusting #ticks, body.show-ticks #ticks { opacity: 1; }
   border-radius: 999px;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 16px center / 12px;
+  background: var(--glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 16px center / 12px;
   color: var(--fg);
   font: inherit;
   font-weight: 600;
   text-overflow: ellipsis;
 }
 #sel-player-radio option, #sel-player-radio optgroup { color: #111; }
+body.ink-light #sel-player-radio { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
 #radio-state { color: var(--soft); font-size: 14px; }
 
 /* Curseur de volume large et épais : facile au doigt. */
@@ -193,6 +200,7 @@ dialog {
   background: #26245e;
   color: var(--fg);
 }
+dialog { --fg: #ffffff; --on-fg: #1c1a4d; --soft: rgba(255, 255, 255, 0.65); --glass: rgba(255, 255, 255, 0.12); --glass-strong: rgba(255, 255, 255, 0.22); --accent: #8fd3ff; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
 .sheet { padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; }
@@ -220,7 +228,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
   font-size: 18px;
   font-weight: 600;
 }
-#btn-start.primary { background: var(--fg); color: var(--bg); }
+#btn-start.primary { background: var(--fg); color: var(--on-fg); }
 #btn-start:active { transform: scale(0.97); }
 
 /* Après Démarrer, l'heure (temps et « focus ») s'efface jusqu'à l'invisible en 10 s, reste
@@ -358,8 +366,6 @@ details.more > summary { font-weight: 500; color: var(--soft); min-height: 44px;
    derrière tout le contenu, sans gêner les touchers. */
 #pulse { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; background: #000; }
 header, main, footer { position: relative; z-index: 1; }
-body.ink-dark { --fg: #1b1f24; --soft: rgba(27, 31, 36, 0.7); --glass: rgba(0, 0, 0, 0.1); --glass-strong: rgba(0, 0, 0, 0.18); }
-body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.04); }
 #sub { transform-origin: center; will-change: transform; }
 
 /* « Reprendre le focus » : en mode « maintenir », la barre se remplit pendant le toucher. */
@@ -406,7 +412,7 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
   main { align-items: center; padding: 56px 32px 0; }
   #left { flex: none; gap: 14px; }
   #controls { gap: 12px; }
-  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 450px)), 36vw, 460px); }
+  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 495px)), 36vw, 460px); }
   #side { display: flex; flex-direction: column; gap: 14px; flex: none; width: min(440px, 40vw); }
   .sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
   .sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -439,3 +445,10 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
 #rdv-kind:empty { display: none; }
 #rdv-title { margin-top: 2px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #rdv-time { font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
+
+/* Focus absolu (15/11) : un petit interrupteur sous les boutons de l'horloge. */
+#btn-abs { min-height: 36px; padding: 0 16px; border: 2px solid transparent; border-radius: 999px; background: var(--glass); color: var(--soft); font-size: 13px; }
+#btn-abs[aria-pressed="true"] { background: var(--fg); color: var(--on-fg); font-weight: 600; }
+
+/* Couleurs des 4 états (Paramètres → Couleurs). */
+.sheet label.swatch { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }

@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h42';
+const APP_VERSION = '15/11/2026 · 14h48';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -66,6 +66,11 @@ const DEFAULTS = {
   fullscreenOnBreak: false, // plein écran au début de la pause
   holdSeconds: 0, // « Reprendre le focus » : 0 = un toucher ; sinon, toucher maintenu N secondes
   notifyOn: false, // notifications mises de côté (15/11, demande de l'utilisateur : elles n'ont pas bien marché selon les versions)
+  // Les 4 couleurs de fond (15/11, demande de l'utilisateur) : pastel, texte noir.
+  colorDefault: '#a8d1f5', // bleu : au repos et en pause
+  colorFocus: '#a9e2b7', // vert : focus perso
+  colorRdv: '#ffcf9e', // orange : le focus tombe sur un rdv de l'agenda
+  colorAbsolute: '#f4a6a6', // rouge : focus absolu
   syncClientId: CLIENT_ID,
 };
 
@@ -107,6 +112,7 @@ function sanitize(raw0) {
   r.pulseIntensity = num(r.pulseIntensity, 5, 70, DEFAULTS.pulseIntensity, 5);
   r.autoChainDelay = num(r.autoChainDelay, 0, 60, DEFAULTS.autoChainDelay);
   r.holdSeconds = num(r.holdSeconds, 0, 10, DEFAULTS.holdSeconds);
+  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) r[k] = color(r[k], DEFAULTS[k]);
   r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
   r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
   r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);
@@ -544,7 +550,7 @@ const colorOf = (kind) => hexToRgb(kind === 'inspire' ? S.breathInspireColor : k
 function resetVisual() {
   pulseEl.style.opacity = 0;
   subEl.style.transform = '';
-  document.body.classList.remove('ink-dark');
+  document.body.classList.remove('ink-light');
 }
 
 // Le mot de l'étape en cours, s'il doit s'afficher.
@@ -576,14 +582,14 @@ function applyGuide() {
     const c = mixRgb(colorOf(prev), colorOf(st.kind), Math.min(1, (st.p * st.secs) / glide)); // la couleur glisse d'une étape à l'autre
     pulseEl.style.backgroundColor = `rgb(${c})`;
     pulseEl.style.opacity = st.cycle === 0 && st.i === 0 ? st.p : 1; // la première inspiration s'allume doucement
-    document.body.classList.toggle('ink-dark', (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 > 0.6);
+    document.body.classList.toggle('ink-light', (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255 <= 0.6); // teinte foncée : texte clair
   } else if (show === 'veil') {
     pulseEl.style.backgroundColor = '#000';
     pulseEl.style.opacity = (dark * (1 - fill)).toFixed(3); // inspire : s'éclaircit ; expire : s'assombrit
-    document.body.classList.remove('ink-dark');
+    document.body.classList.toggle('ink-light', dark * (1 - fill) > 0.35); // voile assez sombre : texte clair
   } else {
     pulseEl.style.opacity = 0;
-    document.body.classList.remove('ink-dark');
+    document.body.classList.remove('ink-light');
   }
 }
 
@@ -651,8 +657,17 @@ const timer = (() => {
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
   if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
 
+  // Focus absolu (15/11) : un interrupteur sous l'horloge ; il retombe quand la séance s'arrête.
+  let absolute = store.get('absolute', false);
+  let wasRunning = !!run;
+  const btnAbs = $('#btn-abs');
+  const setAbsolute = (v) => { absolute = !!v; store.set('absolute', absolute); render(); };
+
   let resumeLabel = '';
   function render() {
+    if (wasRunning && !run && absolute) { absolute = false; store.set('absolute', false); }
+    wasRunning = !!run;
+    btnAbs.setAttribute('aria-pressed', String(absolute));
     const b = document.body;
     const ph = run?.phase;
     b.classList.toggle('running', !!run);
@@ -669,30 +684,34 @@ const timer = (() => {
       // Sous le temps : « focus », « pause », ou l'action de respiration en cours.
       clock.label(ph, run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
       clock.draw(left, run.total);
-      // Fond (07/11, demande de l'utilisateur) : pendant le focus, il glisse de la couleur
-      // d'origine au noir sur toute la durée ; pendant la pause, il revient du noir à la
-      // couleur d'origine.
-      const done = 1 - left / run.total;
-      paintBg(ph === 'focus' ? done : 1 - done);
+      paintBg();
       if (ph === 'break') applyGuide(); else resetVisual();
     } else {
       clock.reset();
-      paintBg(0);
+      paintBg();
       resetVisual();
     }
   }
 
-  // `dark` : 0 = couleur d'origine, 1 = noir.
-  const BG = [0x1c, 0x1a, 0x4d];
+  // Fond (15/11, demande de l'utilisateur) : 4 couleurs pastel selon l'état, texte noir.
+  //  défaut (repos, pause) · focus perso · focus rdv (un rdv de l'agenda tombe sur le focus) · focus absolu.
+  // Priorité : absolu, puis rdv, puis perso. Le changement glisse en 2 s (voir style.css).
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   let lastBg = '';
-  function paintBg(dark) {
-    const k = 1 - Math.min(1, Math.max(0, dark));
-    const c = '#' + BG.map((v) => Math.round(v * k).toString(16).padStart(2, '0')).join('');
+  function stateColor() {
+    if (!run || run.phase === 'break') return S.colorDefault;
+    if (absolute) return S.colorAbsolute;
+    const cl = document.body.classList;
+    if (cl.contains('rdv-now') || cl.contains('rdv-soon')) return S.colorRdv;
+    return S.colorFocus;
+  }
+  function paintBg() {
+    const c = stateColor();
+    document.body.classList.toggle('absolute', !!run && run.phase !== 'break' && absolute);
     if (c === lastBg) return;
     lastBg = c;
     document.body.style.backgroundColor = c;
-    themeMeta?.setAttribute('content', c); // barre du téléphone de la même couleur
+    themeMeta?.setAttribute('content', c); // barre de l'appareil de la même couleur
   }
 
   function begin(phase) {
@@ -817,9 +836,14 @@ const timer = (() => {
     get running() { return !!run; },
     get onBreak() { return run?.phase === 'break' && !run.ended; },
     get endAt() { return run?.endAt || 0; },
+    get absolute() { return absolute; },
+    setAbsolute,
+    paint: paintBg,
     render,
   };
 })();
+
+$('#btn-abs').addEventListener('click', () => timer.setAbsolute(!timer.absolute));
 
 /* ---------- Heure bien visible au toucher ---------- */
 // Pendant le décompte, l'heure s'efface lentement (voir style.css) ; un toucher la rend
@@ -1042,6 +1066,12 @@ const sync = createSync({
   },
 });
 
+$('#btn-colors-reset').addEventListener('click', () => {
+  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) S[k] = DEFAULTS[k];
+  saveS();
+  for (const el of pauseFields) if (el.dataset.k?.startsWith('color')) writeField(el, S[el.dataset.k]);
+  timer.render();
+});
 $('#btn-sync-save').addEventListener('click', () => sync.save());
 $('#btn-sync-load').addEventListener('click', () => {
   if (confirm('Reprendre les paramètres sauvegardés sur Google Drive ? Ceux de cet appareil seront remplacés (tu pourras revenir en arrière).')) sync.load();
@@ -1114,6 +1144,7 @@ function updateRdv() {
   b.classList.toggle('rdv-soon', m?.state === 'soon');
   for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind === k);
   rdvBox.hidden = !m;
+  timer.paint(); // le fond passe à la couleur « focus rdv » (ou revient)
   if (!m) return;
   const min = Math.max(1, Math.round((m.e.start.getTime() - Date.now()) / 60000));
   const left = Math.max(1, Math.round((m.e.end.getTime() - Date.now()) / 60000));

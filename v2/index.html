@@ -56,6 +56,7 @@
     <button id="btn-break" type="button">Pause maintenant</button>
     <button id="btn-resume" type="button">Reprendre le focus</button>
     <button id="btn-start" type="button" class="primary">Démarrer</button>
+    <button id="btn-abs" type="button" aria-pressed="false">Focus absolu</button>
     </div>
     </div>
     <!-- À droite (15/11, demande de l'utilisateur) : l'agenda du jour au-dessus, les mails en dessous ;
@@ -134,6 +135,16 @@
           <label>Maintenir pour reprendre (secondes) <small>0 = un simple toucher</small><input type="number" min="0" max="10" data-k="holdSeconds"></label>
           <label class="chk" hidden>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
         </details>
+      </details>
+
+      <details class="sec">
+        <summary>Couleurs <small>défaut, focus perso, focus rdv, focus absolu</small></summary>
+        <p class="note">Le fond change selon l'état. Le texte est noir : choisis des couleurs claires (pastel).</p>
+        <label class="swatch">Par défaut (au repos, en pause)<input type="color" data-k="colorDefault"></label>
+        <label class="swatch">Focus perso<input type="color" data-k="colorFocus"></label>
+        <label class="swatch">Focus rdv (un rdv de l'agenda tombe sur le focus)<input type="color" data-k="colorRdv"></label>
+        <label class="swatch">Focus absolu (bouton sous l'horloge)<input type="color" data-k="colorAbsolute"></label>
+        <div class="buttons"><button type="button" id="btn-colors-reset">Remettre les couleurs pastel</button></div>
       </details>
 
       <details class="sec">

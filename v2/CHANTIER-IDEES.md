@@ -537,6 +537,18 @@ lieu) si l'agenda le dit. L'appli pose aussi des classes sur la page (`rdv-now` 
 et `rdv-meet`, `rdv-teams`…) pour brancher les adaptations ci-dessous sans tout refaire. Le focus
 ne s'arrête jamais tout seul.
 
+**Fait aussi (15/11, demande de l'utilisateur) : 4 couleurs de fond en pastel, texte noir.**
+Bleu pastel au repos et en pause (**défaut**), vert pastel pour le **focus perso**, orange pastel
+quand un rdv de l'agenda tombe sur le focus (**focus rdv**, en cours ou qui commence avant la
+fin), rouge pastel pour le **focus absolu**. Priorité : absolu, puis rdv, puis perso. Les 4
+couleurs se règlent dans Paramètres → Couleurs (bouton pour remettre le pastel). Le fond glisse
+en 2 s d'une couleur à l'autre. L'ancien fond indigo qui s'assombrissait est retiré. Le texte
+est noir partout (la fenêtre des Paramètres reste sombre ; le voile sombre de la respiration
+remet le texte clair). **Focus absolu** : un interrupteur « Focus absolu » sous l'horloge ; il
+retombe quand la séance s'arrête. Pour l'instant il ne fait **que changer la couleur** : ce
+qu'il doit faire de plus est à définir (par ex. masquer les mails, indicateur « pas
+dérangeable » du point 10, couper les autres sons).
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |
