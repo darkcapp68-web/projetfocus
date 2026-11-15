@@ -507,7 +507,7 @@ body.phase-break #btn-go { display: none; }
 /* Téléphone en portrait (15/11, demande de l'utilisateur : « la même chose que sur la tablette ») : l'anneau en haut,
    les modes et les durées en rangées dessous, le grand bouton, puis le rdv, l'agenda et les mails ; la page défile. */
 @media (max-width: 700px) and (orientation: portrait) {
-  main { align-items: stretch; justify-content: flex-start; gap: 18px; padding: 0 16px 16px; }
+  main { flex: 1 0 auto; min-height: auto; align-items: stretch; justify-content: flex-start; gap: 18px; padding: 0 16px 16px; } /* grandit avec son contenu : le lecteur reste dessous */
   #left { width: 100%; gap: 14px; }
   #dock { flex-direction: column; gap: 14px; }
   #dial-wrap { order: 1; --dial-size: min(calc(100vw - 48px), 44vh, 400px); }
