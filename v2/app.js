@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h30';
+const APP_VERSION = '15/11/2026 · 14h34';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -816,6 +816,7 @@ const timer = (() => {
   return {
     get running() { return !!run; },
     get onBreak() { return run?.phase === 'break' && !run.ended; },
+    get endAt() { return run?.endAt || 0; },
     render,
   };
 })();
@@ -1090,6 +1091,40 @@ function renderAgenda() {
   if (left.length > AGENDA_MAX) agendaList.append(line('more', ['when', ''], ['title', `+ ${left.length - AGENDA_MAX} autres`]));
 }
 setInterval(renderAgenda, 60000);
+// Rdv qui correspond au focus (15/11, demande de l'utilisateur) : tant qu'un décompte tourne, on
+// cherche dans l'agenda un rdv en cours, ou qui commence avant la fin du décompte. S'il y en a un,
+// on l'affiche à gauche sous l'horloge et on pose des classes sur la page (rdv-now / rdv-soon,
+// rdv-meet / rdv-teams / rdv-zoom / rdv-appel / rdv-lieu) pour les adaptations à choisir plus tard
+// (voir CHANTIER-IDEES.md). Le focus ne s'arrête jamais tout seul.
+const rdvBox = $('#rdv');
+const KIND_CLASSES = ['meet', 'teams', 'zoom', 'appel', 'lieu'];
+function rdvMatch() {
+  if (!agendaItems || !timer.running) return null;
+  const now = Date.now(), end = timer.endAt || now;
+  const timed = agendaItems.filter((e) => !e.allDay);
+  const cur = timed.find((e) => e.start.getTime() <= now && e.end.getTime() > now);
+  if (cur) return { e: cur, state: 'now' };
+  const soon = timed.find((e) => e.start.getTime() > now && e.start.getTime() < end);
+  return soon ? { e: soon, state: 'soon' } : null;
+}
+function updateRdv() {
+  const m = rdvMatch();
+  const b = document.body;
+  b.classList.toggle('rdv-now', m?.state === 'now');
+  b.classList.toggle('rdv-soon', m?.state === 'soon');
+  for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind === k);
+  rdvBox.hidden = !m;
+  if (!m) return;
+  const min = Math.max(1, Math.round((m.e.start.getTime() - Date.now()) / 60000));
+  const left = Math.max(1, Math.round((m.e.end.getTime() - Date.now()) / 60000));
+  $('#rdv-state').textContent = m.state === 'now' ? 'Rdv en cours' : `Rdv dans ${min} min`;
+  $('#rdv-kind').textContent = m.e.kind === 'lieu' ? 'sur place' : m.e.kind;
+  $('#rdv-title').textContent = m.e.title;
+  $('#rdv-time').textContent = `${hhmm(m.e.start)} – ${hhmm(m.e.end)}` + (m.state === 'now' ? ` · fin dans ${left} min` : '');
+}
+setInterval(updateRdv, 5000);
+for (const id of ['#btn-start', '#btn-break', '#btn-resume']) $(id).addEventListener('click', () => setTimeout(updateRdv, 150));
+
 // Diagnostic (15/11) : ce que l'appli a reconnu pour chaque évènement, sans leur contenu.
 window.__agendaDiag = () => (agendaItems || []).map((e) => ({ titre: e.title, type: e.kind, indices: e.diag }));
 
@@ -1110,7 +1145,7 @@ async function refreshGoogle() {
   }
   const [mails, agenda] = await Promise.allSettled([mail.last10(), mail.today()]);
   const at = hhmm(new Date());
-  if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); setStatus(agendaStatus, 'à jour à ' + at); }
+  if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); updateRdv(); setStatus(agendaStatus, 'à jour à ' + at); }
   else setStatus(agendaStatus, problem(agenda.reason), 'warn');
   if (mails.status === 'fulfilled') {
     mailList.textContent = '';

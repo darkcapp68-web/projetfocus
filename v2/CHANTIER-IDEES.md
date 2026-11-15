@@ -523,6 +523,38 @@ soi-même.
   écrit la séance dans l'**agenda** (point 1.4) et la tablette la lit (l'agenda sert de
   messager, sans serveur à nous, mais avec un petit retard) ; ou un petit serveur (à éviter).
 
+### Quand le focus tombe sur un rdv de l'agenda (décision de l'utilisateur, 15/11)
+
+**Principe** : l'appli détecte si le focus **correspond à un rdv de l'agenda** (un rdv en cours,
+ou qui commence avant la fin du focus) et, si c'est le cas, **change l'interface**. Les
+adaptations se **choisissent ici** (à cocher avec l'utilisateur) ; seul le minimum est fait.
+
+**Fait (minimum, 15/11)** : le rdv correspondant s'affiche **à gauche**, sous l'horloge : « RDV EN
+COURS » ou « RDV DANS N MIN », son titre, ses heures, et son type (Meet, Teams, Zoom, appel,
+lieu) si l'agenda le dit. L'appli pose aussi des classes sur la page (`rdv-now` ou `rdv-soon`,
+et `rdv-meet`, `rdv-teams`…) pour brancher les adaptations ci-dessous sans tout refaire. Le focus
+ne s'arrête jamais tout seul.
+
+**Adaptations possibles (à choisir)**
+
+| # | Adaptation | Facilité | Choix |
+| --- | --- | --- | --- |
+| A | Le fond change de couleur pendant le rdv (une teinte par type : Meet, Teams, appel, sur place) | Facile | à choisir |
+| B | Un message à la place de « FOCUS » sous l'horloge (« En rdv · Meet ») | Facile | à choisir |
+| C | La musique se coupe pour une visio ou un appel, et reprend à la fin du rdv si elle jouait | Moyen (écran allumé) / Difficile (écran éteint) | à choisir |
+| D | Les autres sons (dings, bruit de fond, respiration) se coupent aussi | Facile | à choisir |
+| E | L'indicateur de disponibilité passe en « pas dérangeable » (point 10.2) | Facile (après 10.1) | à choisir |
+| F | Un bouton « Rejoindre » ouvre le lien Meet ou Teams du rdv | Facile | à choisir |
+| G | Les mails se masquent pendant une visio (écran partagé : ne pas montrer ses mails) | Facile | à choisir |
+| H | Le panneau de la tablette affiche « EN RDV » en grand, lisible de loin | Facile | à choisir |
+| I | Un rappel discret quelques minutes avant le rdv (un son doux, ou un message) | Moyen | à choisir |
+| J | À la fin du rdv : « on reprend ? » avec le temps libre jusqu'au suivant | Moyen | à choisir |
+| K | Règles différentes par type (sur place : musique gardée ; visio : coupée) réglables | Moyen | à choisir |
+
+**À préciser avec l'utilisateur** : lesquelles garder ; pour C, quels types coupent la musique ;
+si l'adaptation s'applique seulement quand le rdv est **en cours** ou aussi **juste avant** (« rdv
+dans 10 min »).
+
 ### Constats sur la tablette (15/11, mesurés par adb)
 - Samsung SM-T550, Android 7.1.1, 1,4 Go de RAM, remise à zéro. **Chrome mis à jour de 64 à 101**
   (maximum du Play Store pour cet Android) : **la 2.0 démarre et marche** (radio, onde,

@@ -406,7 +406,7 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
   main { align-items: center; padding: 56px 32px 0; }
   #left { flex: none; gap: 14px; }
   #controls { gap: 12px; }
-  #dial-wrap { --dial-size: min(max(220px, calc(var(--app-h, 100vh) - 410px)), 36vw, 460px); }
+  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 450px)), 36vw, 460px); }
   #side { display: flex; flex-direction: column; gap: 14px; flex: none; width: min(440px, 40vw); }
   .sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
   .sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -430,3 +430,12 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
   #mail-list li.unread .from::before { content: "● "; color: var(--accent); }
   #mail-list .subject { flex: 1; min-width: 0; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
+
+/* Rdv de l'agenda qui correspond au focus (15/11), à gauche sous l'horloge. */
+#rdv { width: min(380px, 100%); padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
+#rdv[hidden] { display: none; }
+#rdv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+#rdv-kind { padding: 0 8px; border-radius: 999px; background: var(--glass-strong); color: var(--fg); letter-spacing: 0; text-transform: none; }
+#rdv-kind:empty { display: none; }
+#rdv-title { margin-top: 2px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#rdv-time { font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
