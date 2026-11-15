@@ -164,9 +164,14 @@ export function createMail({ getClientId }) {
 
     // Oublie le jeton (et le révoque côté Google).
     forget() {
-      try { if (token) window.google?.accounts?.oauth2?.revoke(token, () => {}); } catch { /* rien */ }
+      const t = token;
+      try {
+        if (t && window.google?.accounts?.oauth2?.revoke) window.google.accounts.oauth2.revoke(t, () => {});
+        else if (t) fetch('https://oauth2.googleapis.com/revoke', { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'token=' + encodeURIComponent(t) }).catch(() => {});
+      } catch { /* rien */ }
       token = null;
-      try { localStorage.removeItem(TOK_KEY); } catch { /* rien */ }
+      granted = { mail: false, agenda: false };
+      try { localStorage.removeItem(TOK_KEY); localStorage.removeItem(OK_KEY); } catch { /* rien */ }
     },
   };
 }

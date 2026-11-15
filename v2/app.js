@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 17h44';
+const APP_VERSION = '15/11/2026 · 17h57';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1276,6 +1276,17 @@ try {
   renderAges();
   updateRdv();
 } catch { /* cache illisible : on l'ignore */ }
+// Se déconnecter du compte Google (15/11, demande de l'utilisateur : passer du compte perso au compte pro).
+$('#btn-google-out').addEventListener('click', () => {
+  mail.forget(); // révoque l'accès chez Google, efface le jeton et le souvenir « déjà accordé »
+  try { localStorage.removeItem(CACHE_KEY); } catch { /* rien */ }
+  agendaItems = null; mailsData = null; agendaAt = mailsAt = 0;
+  emptyNote(agendaList, 'Touche ↻ pour afficher ton agenda et tes mails.');
+  mailList.textContent = '';
+  setStatus(agendaStatus, ''); setStatus(mailStatus, '');
+  updateRdv();
+  $('#google-out-status').textContent = 'Déconnecté. Touche ↻ pour choisir un compte.';
+});
 const staleMs = () => Date.now() - Math.max(agendaAt, mailsAt);
 if (mail.tokenValid) refreshGoogle(true);
 setInterval(() => { if (mail.tokenValid && !document.hidden && staleMs() > 270000) refreshGoogle(true); }, 60000);
