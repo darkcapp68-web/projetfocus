@@ -598,3 +598,15 @@ body.running #btn-go2 .i-stop { display: block; }
 /* Tempo estimé (essais de l'utilisateur) : un petit texte au coin haut droit de l'onde, côté radio ; en portrait, sous l'onde. */
 #bpm { font-size: 12px; color: var(--soft); text-align: center; min-height: 1em; font-variant-numeric: tabular-nums; }
 @media (min-width: 900px), (orientation: landscape) and (max-height: 600px) { #bpm { grid-area: wave; align-self: start; justify-self: end; text-align: right; } }
+
+/* Focus concentré : écran épuré (12.3, demande de l'utilisateur, 15/11). Plus d'agenda ni de mails ; l'encart rdv reste (s'il y a un
+   rdv) ; en paysage (tablette et téléphone), l'icône Paramètres passe tout à gauche, l'encart rdv est en haut de la partie droite et
+   tout le reste de cette partie est le titre pulsant. */
+body.absolute #agenda, body.absolute #mails { display: none; }
+@keyframes dnd-pulse-flow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+@media (orientation: landscape) and (min-width: 900px), (orientation: landscape) and (max-height: 600px) {
+  body.absolute header { right: auto; left: 12px; }
+  body.absolute #side { align-self: stretch; padding-top: 0; }
+  body.absolute #rdv { position: static; width: 100%; margin: 0; }
+  body.absolute #dnd { position: static; flex: 1; display: flex; align-items: center; justify-content: center; align-self: center; width: 60%; max-width: none; padding: 0; transform: none; font-size: clamp(18px, 2.4vw, 28px); animation-name: dnd-pulse-flow; }
+}
