@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h30';
+const APP_VERSION = '15/11/2026 · 20h39';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -286,7 +286,6 @@ const wave = (() => {
   // l'adaptation de sensibilité gardent la même vitesse réelle.
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
   let prevB = -60, lastOn = 0, spT = 1, spd = 1, spAcc = 0, lastT = 0, cphase = 0; // vitesse des vagues liée au tempo (plage)
-  let lz = []; // TEMP
   const onsT = []; // les instants des derniers coups de basse (s)
   let rate = 0;
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
@@ -474,9 +473,9 @@ const wave = (() => {
 
   addEventListener('resize', () => { if (!raf) draw(false); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && wantOn) start(); });
-  return { listen, draw, settle, start, hist, dbg: () => ({ lz, spd, spT, rate }) };
+  return { listen, draw, settle, start };
 })();
-wave.draw(false); window.__wave = wave; // TEMP
+wave.draw(false);
 
 /* ---------- Volume ---------- */
 volume.value = store.get('volume', 70);

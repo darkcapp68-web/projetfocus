@@ -28,6 +28,7 @@ la page.
 | --- | --- | --- | --- |
 | 12.1 | **Menu des musiques « moderne »** : le sélecteur de radio du lecteur et la liste du menu (Paramètres → Musiques et sons) au même style que le reste de l'appli (carte claire, coins arrondis, une ligne par radio avec sa pastille) | Facile | **fait (15/11)** : un bouton ouvre une carte comme les Paramètres, radios rangées par groupe, la radio en cours cochée en indigo |
 | 12.2 | **Mieux centrer la radio** : le bouton lecture, le nom de la radio, la ligne de texte dessous (« technolovers.fm · techno ») et le curseur de volume, alignés et centrés les uns par rapport aux autres (tablette et téléphone couché) | Facile | **fait (15/11)** : le nom de la radio, la ligne dessous et le curseur de volume sont centrés sur la même colonne (à droite du bouton lecture), mesuré au pixel |
+| 12.3 | **Focus concentré : écran épuré** (décidé avec l'utilisateur, 15/11). En mode concentré : (1) l'**agenda** et les **mails** disparaissent ; (2) si on est **dans un rdv de l'agenda**, l'**encart rdv** reste affiché ; (3) l'encart rdv est **fixé en haut de la partie droite** ; (4) l'icône **Paramètres (toast) se glisse tout à gauche** de l'écran ; (5) **tout le reste du cadre de droite est le titre pulsant « NE PAS DÉRANGER »** (au lieu d'être en haut au milieu de l'écran, où il touche l'anneau sur le téléphone couché) | Moyen | à faire |
 
 ---
 
@@ -128,6 +129,7 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 | --- | --- | --- | --- |
 | 12.1 | **Menu des musiques « moderne »** (demande de l'utilisateur, 15/11) | Facile | **fait (15/11)** |
 | 12.2 | **Mieux centrer la radio, son texte et le volume** (demande de l'utilisateur, 15/11) | Facile | **fait (15/11)** |
+| 12.3 | **Focus concentré : écran épuré** (demande de l'utilisateur, 15/11) : plus d'agenda ni de mails ; l'encart rdv reste si on est dans un rdv ; titre « NE PAS DÉRANGER » à droite | Moyen | **à faire** |
 | 0 | **Principe : l'agenda guide la journée (focus libre ou « rdv »)** | Moyen | à valider |
 | 1.10 | Agenda : le focus passe de « libre » à « rdv » (couleur + message), sans jamais s'arrêter | Moyen | choisi (voir point 0) |
 | 1.11 | Agenda : mes blocs de focus décrits précisément dans l'agenda | Moyen | à définir |
