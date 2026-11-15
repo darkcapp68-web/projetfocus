@@ -26,7 +26,7 @@ la page.
 | # | Idée | Facilité | Statut |
 | --- | --- | --- | --- |
 | 0 | **Principe : l'agenda guide la journée (focus libre ou « rdv »)** | Moyen | à valider |
-| 1.10 | Agenda : le focus passe de « libre » à « rdv » sans s'arrêter | Moyen | à définir |
+| 1.10 | Agenda : le focus passe de « libre » à « rdv » (couleur + message), sans jamais s'arrêter | Moyen | choisi (voir point 0) |
 | 1.11 | Agenda : mes blocs de focus décrits précisément dans l'agenda | Moyen | à définir |
 | 1.1 | Agenda : afficher le prochain rendez-vous | Moyen | à définir |
 | 1.2 | Agenda : régler le focus sur le créneau libre | Moyen | à définir |
@@ -34,8 +34,8 @@ la page.
 | 1.4 | Agenda : écrire les séances dans un agenda dédié | Moyen | à définir |
 | 1.5 | Agenda : lien « ajouter à l'agenda » (une séance à la fois) | Facile | à définir |
 | 1.6 | Agenda : réserver des blocs de focus à l'avance | Difficile | à définir |
-| 1.7 | Agenda : choisir plusieurs agendas | Moyen | à définir |
-| 1.8 | Agenda : mode réunion (musique coupée) | Moyen | à définir |
+| 1.7 | Agenda : choisir plusieurs agendas | Moyen | écarté pour l'instant (pro seulement) |
+| 1.8 | Agenda : mode réunion (musique coupée selon le type de rdv : visio, appel…, reprise ensuite) | Moyen | choisi (voir point 0) |
 | 1.9 | **Agenda pro (Google) : me mettre « Absent » en un geste** (refus auto des invitations) | Moyen | à définir |
 | 2.1 | **Rappel d'heure fixe (9h, 14h) avec bouton « Démarrer »** | **Facile via l'agenda / Difficile seul** | à définir |
 | 2.2 | « Juste 5 minutes » | Facile | à définir |
@@ -96,26 +96,61 @@ temps de façon précise dans son agenda ; l'appli suit.
   Google Agenda (fiables, écran éteint). L'appli apporte l'**affichage** et le **calage** de la
   séance, pas une deuxième alarme.
 
-### États de l'écran (proposition)
-| État | Quand | Ce qu'on voit |
-| --- | --- | --- |
-| **Libre** | aucun évènement à venir (ou plus tard dans la journée) | écran actuel, temps réglé à la main |
-| **Rdv proche** | un évènement approche (par ex. dans moins de 60 min, réglable) | le focus continue ; en plus : « rdv 14h dans 38 min », fin de séance calée avant |
-| **Rdv en cours** | l'évènement a commencé | focus arrêté proprement, indicateur « pas dérangeable » (10.2), musique coupée (1.8), on rappelle quoi |
-| **Après le rdv** | l'évènement est fini | « on reprend ? » avec le temps libre jusqu'au suivant |
+### Décisions de l'utilisateur (15/11)
+- **Seulement l'agenda pro** compte (le perso est laissé de côté ; le point 1.7 « plusieurs
+  agendas » n'est plus nécessaire pour l'instant).
+- **Le passage au rdv se voit** : l'écran **change de couleur** et un **message** s'écrit
+  (« Rdv : … jusqu'à 15h »).
+- **Le focus ne s'arrête jamais tout seul**, même quand le rdv se termine : le minuteur tourne
+  toujours, c'est l'utilisateur qui l'arrête. Le rdv est un **état de l'écran**, pas une
+  coupure.
+- **La musique suit le type de rdv** : elle se **coupe** pour un rdv en visio ou au téléphone
+  (Meet, Teams, appel…) et **reprend à la fin du rdv si elle jouait** avant.
 
-### Questions à trancher
-- **Comment reconnaître un bloc de focus** dans l'agenda ? Un agenda dédié « Focus », un mot
-  au début du titre (« Focus … »), une couleur, ou le type « Temps de concentration » de
-  Google ? (le plus simple : un mot au début du titre)
-- **Quel agenda compte pour « rdv »** : le pro seulement, ou aussi le perso (point 1.7) ?
-- **Journée sans bloc de focus mais avec des rdv** : l'appli propose seulement des créneaux
-  libres (« 52 min avant 14h »), ou lance rien tant que tu ne démarres pas ?
-- **Si un rdv commence pendant une pause ou un focus** : la séance s'arrête toute seule, ou
-  l'appli attend ton geste (rappel doux) ? À rapprocher de la leçon de la 1.0 : « ne jamais
-  couper dans le dos ».
-- **Écran éteint** : l'affichage « rdv » n'a de sens que l'écran allumé ; la sécurité vient des
-  notifications Google Agenda (déjà là). À confirmer que cela suffit.
+### États de l'écran
+| État | Quand | Ce qu'on voit | Le minuteur |
+| --- | --- | --- | --- |
+| **Libre** | aucun évènement proche | écran actuel | tourne |
+| **Rdv proche** | un évènement approche (par ex. dans moins de 60 min, réglable) | en plus : « rdv 14h dans 38 min » | tourne |
+| **Rdv en cours** | l'évènement a commencé | **fond d'une autre couleur** + message ; musique coupée si le type l'exige ; indicateur « pas dérangeable » (10.2) | **tourne toujours** |
+| **Après le rdv** | l'heure de fin est passée | retour à la couleur normale ; musique relancée si elle jouait | tourne toujours |
+
+### Règles selon le type de rdv *(musique, sons, couleur)*
+Le type se **devine à partir de l'évènement Google** (champs lus : lien de visio, lieu, titre,
+description) :
+
+| Type | Comment le reconnaître | Musique | Signaux sonores (dings, bruit) |
+| --- | --- | --- | --- |
+| **Visio Google Meet** | l'évènement a un lien Meet (`conferenceData`) | coupée | coupés |
+| **Visio Teams / Zoom** | lien `teams.microsoft.com`, `zoom.us` dans le lieu ou la description | coupée | coupés |
+| **Appel téléphonique** | mot « tél », « appel », « call » ou un numéro dans le titre / lieu | coupée | coupés |
+| **Présentiel** (lieu physique, sans lien) | lieu rempli, pas de lien | au choix (par défaut : coupée) | au choix |
+| **Autre / sans détail** | aucun indice | au choix (par défaut : gardée) | gardés |
+
+- Chaque ligne se règle dans **Paramètres → Agenda** (garder / couper), avec un mot-clé
+  personnalisable (ex. « [appel] » au début du titre pour forcer le type).
+- **Reprise** : à l'heure de fin du rdv, la radio repart **si elle jouait juste avant** (souvenir
+  de la 1.0 / `radioWanted`), rechargée en direct. Si l'utilisateur a coupé la musique
+  lui-même pendant le rdv, elle ne repart pas.
+- **Les 3 dings de respiration** (pause) et les **bruits de fond** suivent la même règle :
+  rien ne doit sonner dans une visio.
+- À décider : avant le début, l'appli prévient-elle (« rdv Teams dans 2 min, musique coupée
+  alors ») ou coupe-t-elle d'un coup à l'heure ?
+
+### Limite à connaître (à tester sur le téléphone)
+Couper la musique à l'heure exacte du rdv demande que la page soit réveillée. **Écran allumé,
+page ouverte : ça marche.** **Écran éteint :** Android peut retarder la page (jusqu'à une minute
+ou plus) et la musique continuerait au début d'une visio. Pistes : couper la musique un peu
+**avant** (marge réglable), ou compter sur la notification Google Agenda pour que
+l'utilisateur agisse ; la solution fiable serait l'APK (7.2 / 2.1). Leçon de la 1.0 : « tout
+doit marcher écran éteint » reste le test d'acceptation.
+
+### Questions encore ouvertes
+- **Comment reconnaître un bloc de focus** dans l'agenda ? Un mot au début du titre
+  (« Focus … ») reste le plus simple ; sinon un agenda dédié ou le type « Temps de
+  concentration » de Google.
+- **Couleur du rdv** : une couleur fixe (ex. rouge sourd), ou celle de l'évènement dans
+  Google Agenda ?
 - **Données du travail** : titres de réunions affichés **seulement à l'écran**, jamais envoyés
   ailleurs (voir le coach 8.2).
 
