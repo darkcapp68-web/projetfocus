@@ -492,6 +492,13 @@ soi-même.
   Google de l'entreprise. Le seul moyen sûr de le savoir : **essayer** une connexion avec le
   compte pro (test à faire avec l'utilisateur). Sans cette autorisation, retour à la solution
   sans code : le widget Gmail de la tablette.
+  **Essai fait le 15/11 sur la tablette : ça marche.** Paramètres → Mails affiche les 10 derniers
+  mails de la boîte de réception (expéditeur et objet, texte seulement, point pour les non lus),
+  avec la portée `gmail.metadata` et le compte perso de l'utilisateur ; l'API Gmail est activée
+  dans le projet Google Cloud « projetfocus ». Piège sur la tablette (Chrome 101) : si on passe
+  par « Continuer en tant que… » (connexion à Chrome) pendant l'autorisation, l'onglet se
+  recharge et Google répond « 400 » sur `gis_transform` ; il faut recommencer et choisir le
+  compte directement. Reste à essayer avec le **compte pro** (l'administrateur peut refuser).
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
