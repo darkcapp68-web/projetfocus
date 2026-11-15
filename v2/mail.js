@@ -44,12 +44,14 @@ export function createMail({ getClientId }) {
           reject(new Error('accès aux mails non accordé : reconnecte-toi et coche la case des mails'));
           return;
         }
+        try { localStorage.setItem('projetfocus2.mailOk', '1'); } catch { /* rien */ }
         token = r.access_token;
         tokenExp = Date.now() + Number(r.expires_in || 3600) * 1000;
         resolve(token);
       };
       onTokenError = (e) => reject(new Error(e?.type || 'fenêtre fermée'));
-      client.requestAccessToken({ prompt: 'select_account' });
+      // Première fois : choix du compte ; ensuite la fenêtre Google se referme seule.
+      client.requestAccessToken({ prompt: localStorage.getItem('projetfocus2.mailOk') ? '' : 'select_account' });
     });
   }
 

@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h04';
+const APP_VERSION = '15/11/2026 · 14h12';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1056,17 +1056,18 @@ undoBtn.addEventListener('click', () => {
   note('Réglages d’avant remis sur cet appareil.');
 });
 
-// Mails (essai, 15/11) : les 10 derniers, en liste de texte (expéditeur, objet), sans lien.
+// Mails (15/11) : les 10 derniers sur l'écran principal, une ligne chacun (expéditeur, objet),
+// sans lien, visibles aussi pendant le focus (demande de l'utilisateur). Mise à jour au toucher
+// de ↻ : l'accord Google dure environ une heure et son renouvellement demande un geste.
 const mail = createMail({ getClientId: () => S.syncClientId });
-const mailList = $('#mail-list'), mailStatus = $('#mail-status'), mailClear = $('#btn-mail-clear');
-function mailReset(text = '') {
-  mailList.textContent = '';
-  mailStatus.textContent = text;
+const mailList = $('#mail-list'), mailStatus = $('#mail-status'), mailBtn = $('#btn-mail');
+let mailBusy = false;
+async function refreshMails() {
+  if (mailBusy) return;
+  mailBusy = true;
+  mailBtn.disabled = true;
+  mailStatus.textContent = 'connexion…';
   mailStatus.dataset.kind = '';
-  mailClear.hidden = true;
-}
-$('#btn-mail').addEventListener('click', async () => {
-  mailReset('Connexion à Google…');
   try {
     const items = await mail.last10();
     mailList.textContent = '';
@@ -1078,17 +1079,17 @@ $('#btn-mail').addEventListener('click', async () => {
       li.append(from, subject);
       mailList.append(li);
     }
-    mailStatus.textContent = items.length ? `${items.length} derniers mails de la boîte de réception.` : 'Boîte de réception vide.';
-    mailStatus.dataset.kind = 'ok';
-    mailClear.hidden = false;
+    if (!items.length) mailList.innerHTML = '<li class="empty">Boîte de réception vide.</li>';
+    mailStatus.textContent = 'à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   } catch (e) {
-    mailReset(e.message === 'sans identifiant'
-      ? 'Ajoute d’abord l’ID client Google (voir Sauvegarde).'
-      : `Mails indisponibles (${e.message}).`);
+    mailStatus.textContent = e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`;
     mailStatus.dataset.kind = 'warn';
+  } finally {
+    mailBusy = false;
+    mailBtn.disabled = false;
   }
-});
-mailClear.addEventListener('click', () => { mail.forget(); mailReset('Liste effacée, jeton oublié.'); });
+}
+mailBtn.addEventListener('click', refreshMails);
 
 // Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
 $('#btn-export').addEventListener('click', () => {

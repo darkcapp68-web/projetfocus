@@ -381,8 +381,8 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
    sur deux lignes (onde en largeur, puis radio et volume côte à côte). */
 @media (orientation: landscape) and (min-width: 900px) {
   main { flex-direction: row; gap: 56px; padding: 0 32px; }
-  #dial-wrap { --dial-size: min(calc(var(--app-h, 100vh) - 290px), 46vw, 460px); }
-  #controls { flex: none; min-width: 240px; }
+  #dial-wrap { --dial-size: min(calc(var(--app-h, 100vh) - 290px), 36vw, 460px); }
+  #controls { flex: none; width: min(440px, 40vw); }
   #player {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -396,9 +396,22 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
   #volume { grid-area: vol; }
 }
 
-/* Mails (essai) : une liste de texte, sans lien. */
-#mail-list { margin: 8px 0; padding-left: 22px; }
-#mail-list li { margin: 8px 0; line-height: 1.3; }
-#mail-list .from { font-weight: 600; }
-#mail-list li.unread .from::before { content: "● "; color: var(--accent); }
-#mail-list .subject { display: block; color: var(--soft); font-size: 14px; overflow-wrap: anywhere; }
+/* Derniers mails (15/11) : sur l'écran principal, en paysage seulement (tablette de bureau), une
+   ligne par mail : expéditeur en gras puis objet. Visible aussi pendant le focus. */
+#mails { display: none; }
+@media (orientation: landscape) and (min-width: 900px) {
+  #mails { display: block; width: 100%; margin-top: 4px; }
+  #mails-head { display: flex; align-items: center; gap: 10px; color: var(--soft); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+  #mails-head > span:first-child { font-weight: 600; }
+  #mail-status { flex: 1; text-transform: none; letter-spacing: 0; font-size: 12px; text-align: right; }
+  #mail-status[data-kind="warn"] { color: #ffb4a8; }
+  #btn-mail { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--glass); font-size: 20px; line-height: 1; }
+  #btn-mail:active { background: var(--glass-strong); }
+  #btn-mail:disabled { opacity: 0.5; }
+  #mail-list { list-style: none; margin: 6px 0 0; padding: 0; }
+  #mail-list li { display: flex; gap: 8px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--glass); font-size: 14px; line-height: 1.25; min-width: 0; }
+  #mail-list li.empty { color: var(--soft); border-top: 0; }
+  #mail-list .from { flex: none; max-width: 38%; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #mail-list li.unread .from::before { content: "● "; color: var(--accent); }
+  #mail-list .subject { flex: 1; min-width: 0; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}

@@ -49,6 +49,15 @@
     <button id="btn-break" type="button">Pause maintenant</button>
     <button id="btn-resume" type="button">Reprendre le focus</button>
     <button id="btn-start" type="button" class="primary">Démarrer</button>
+    <!-- Derniers mails (15/11) : une ligne chacun, visible aussi pendant le focus (demande de l'utilisateur). -->
+    <section id="mails" aria-label="Derniers mails">
+      <div id="mails-head">
+        <span>Mails</span>
+        <span id="mail-status" aria-live="polite"></span>
+        <button id="btn-mail" type="button" aria-label="Actualiser les mails">↻</button>
+      </div>
+      <ol id="mail-list"><li class="empty">Touche ↻ pour afficher tes derniers mails.</li></ol>
+    </section>
     </div>
   </main>
 
@@ -107,17 +116,6 @@
           <label>Maintenir pour reprendre (secondes) <small>0 = un simple toucher</small><input type="number" min="0" max="10" data-k="holdSeconds"></label>
           <label class="chk" hidden>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
         </details>
-      </details>
-
-      <details class="sec">
-        <summary>Mails <small>essai : les 10 derniers</small></summary>
-        <p class="note">Affiche l'expéditeur et l'objet des 10 derniers mails de la boîte de réception (jamais le contenu). Rien n'est gardé sur l'appareil.</p>
-        <div class="buttons">
-          <button type="button" id="btn-mail">Afficher mes 10 derniers mails</button>
-          <button type="button" id="btn-mail-clear" class="link" hidden>Effacer la liste</button>
-        </div>
-        <p id="mail-status" class="note" aria-live="polite"></p>
-        <ol id="mail-list"></ol>
       </details>
 
       <details class="sec">
