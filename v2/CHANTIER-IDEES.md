@@ -181,7 +181,32 @@ l'APK est repris, le bouton dans la notification s'ajoute.
 
 - **4.1 Petit héros** qui avance pendant le focus et dort au camp en pause (code existant en 1.0,
   `drawHero()`), sans dépendre de la musique. *Moyen* (porter et alléger le code de la 1.0).
-- **4.2 Un monde qui pousse** : un arbre par séance, une forêt, une ville en pixels. *Moyen*.
+- **4.2 Un monde qui pousse** *(précisé le 15/11, idée retenue pour approfondir)* : chaque
+  séance de focus terminée fait pousser quelque chose dans un monde en pixels qui reste d'une
+  séance à l'autre. *Moyen*.
+  - **Version « forêt »** : un arbre par séance terminée ; 100 séances = une forêt. Les arbres
+    se placent un à un sur un petit paysage (collines, ciel du moment), de variétés différentes
+    (sapin, chêne, bouleau comme dans la 1.0).
+  - **Version « ville »** : une maison, un pont, une tour par séance ; un quartier après 100.
+  - **Choix possible** : forêt, ville, ou les deux au fil des niveaux (la forêt pousse, puis un
+    village s'installe au milieu).
+  - **Ce qui compte comme une séance** : un focus **mené à son terme** (pas un « Arrêter »),
+    pour que l'arbre se mérite. Un focus coupé court donne une **pousse** qui ne grandit pas.
+    À décider : la taille de l'arbre suit-elle la durée (25 min = petit, 90 min = grand) ?
+  - **Où ça se voit** : un petit écran « Mon monde » ouvert depuis l'écran de réglage (pas
+    pendant le focus, pour garder l'écran sobre), ou une bande en bas qui s'agrandit. Le nouvel
+    arbre apparaît à la fin du focus, avec un petit mouvement.
+  - **Stockage** : la liste des séances (date, durée, sorte d'arbre, place) sur l'appareil ;
+    sauvegarde Drive à la main comme les réglages, pour retrouver sa forêt sur le téléphone et
+    le poste pro. Même base que le journal (3.1) : faire d'abord le journal, la forêt s'en
+    déduit.
+  - **Points d'attention** : les arbres s'accumulent (100, 500…) : prévoir de dessiner
+    seulement la partie visible et de faire défiler le paysage ; garder un dessin léger sur le
+    téléphone (canevas, pas d'animation continue, comme la leçon de la 1.0).
+  - **Variantes pour entretenir l'envie** : saisons (neige l'hiver, feuilles d'automne selon la
+    vraie date), animaux qui s'installent (oiseaux au bout de 20 arbres, biche au bout de 50,
+    clin d'œil à la 1.0), un arbre qui meurt si l'on abandonne trop de séances (optionnel,
+    risque de décourager : à n'ajouter que si l'utilisateur le veut).
 - **4.3 Créature à élever** (principe de Forest) : elle souffre si on abandonne. *Moyen*.
 - **4.4 Boss de la semaine** : une grosse séance de 90 min pour le battre. *Moyen*.
 - Niveaux, pièces et progression gardés sur l'appareil, pas sur le Drive.
