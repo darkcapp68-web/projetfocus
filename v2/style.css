@@ -520,7 +520,7 @@ body.phase-break #btn-go { display: none; }
 }
 
 /* Téléphone couché (15/11, demande de l'utilisateur : tout en paysage, comme la tablette) : la même mise en page, serrée pour
-   une hauteur d'environ 470 px — anneau plus petit, boutons un peu réduits, lecteur compact, 4 mails au lieu de 7. */
+   une hauteur d'environ 470 px — anneau plus petit, boutons un peu réduits, lecteur compact (mêmes 7 mails que la tablette). */
 @media (orientation: landscape) and (max-height: 600px) {
   main { padding: 12px 24px 0; }
   #left { gap: 8px; }
@@ -538,7 +538,6 @@ body.phase-break #btn-go { display: none; }
   #controls { gap: 8px; }
   #side { gap: 8px; width: min(420px, 40vw); padding-top: 80px; } /* la place de l'encadré du rdv est réservée : rien ne bouge quand il apparaît */
   #rdv { top: 0; bottom: auto; }
-  #mail-list li:nth-child(n+5) { display: none; }
   #player { padding: 2px 24px 8px; gap: 2px 20px; grid-template-columns: 1fr 300px; }
   #wave { height: 36px; }
   #btn-radio { width: 48px; height: 48px; }
