@@ -14,8 +14,18 @@
 <body>
   <div id="pulse" aria-hidden="true"></div>
   <header>
-    <button id="btn-settings" type="button" aria-haspopup="dialog">Paramètres<span id="update-dot" hidden></span></button>
+    <button id="btn-settings" type="button" aria-haspopup="dialog" aria-label="Paramètres"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="update-dot" hidden></span></button>
   </header>
+
+  <!-- En haut à gauche (15/11, demande de l'utilisateur) : Arrêter (croix) et Démarrer (start), en icônes. -->
+  <div id="toolbar">
+    <button id="btn-stop" type="button" aria-label="Arrêter" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button id="btn-start" type="button" aria-label="Démarrer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+    </button>
+  </div>
 
   <main>
     <div id="left">
@@ -41,27 +51,31 @@
       </div>
     </div>
     </div>
-    <!-- Le rdv de l'agenda qui correspond au focus (15/11) : en cours, ou qui commence avant la fin. -->
-    <div id="rdv" hidden>
-      <div id="rdv-head"><span id="rdv-state"></span><span id="rdv-kind"></span></div>
-      <div id="rdv-title"></div>
-      <div id="rdv-time"></div>
-    </div>
     <!-- Au repos : ce que règle l'horloge (comme la 1.0). Pendant le focus : « Pause maintenant ». -->
     <div id="controls">
     <div id="setup">
       <button type="button" id="edit-focus" class="seg on">focus <b id="v-focus">25</b> min</button>
       <button type="button" id="edit-break" class="seg">pause <b id="v-break">5</b> min</button>
     </div>
-    <button id="btn-break" type="button">Pause maintenant</button>
-    <button id="btn-resume" type="button">Reprendre le focus</button>
-    <button id="btn-start" type="button" class="primary">Démarrer</button>
-    <button id="btn-abs" type="button" aria-pressed="false">Focus absolu</button>
+    <!-- 3 boutons (15/11, demande de l'utilisateur) : le mode du focus (normal ou concentré = absolu) et « Pause maintenant ».
+         En pause, seulement « Reprendre ». -->
+    <div id="modes" role="group" aria-label="Mode du focus">
+      <button type="button" id="btn-normal" class="mode" aria-pressed="true">Focus normal</button>
+      <button type="button" id="btn-conc" class="mode" aria-pressed="false">Focus concentré</button>
+      <button id="btn-break" type="button" class="mode">Pause maintenant</button>
+    </div>
+    <button id="btn-resume" type="button">Reprendre</button>
     </div>
     </div>
     <!-- À droite (15/11, demande de l'utilisateur) : l'agenda du jour au-dessus, les mails en dessous ;
          visibles aussi pendant le focus. Une seule actualisation (↻) pour les deux. -->
     <aside id="side">
+    <!-- Le rdv de l'agenda qui correspond au focus (15/11) : en cours, ou qui commence avant la fin ; au-dessus de l'agenda. -->
+    <div id="rdv" hidden>
+      <div id="rdv-head"><span id="rdv-state"></span><span id="rdv-kind"></span></div>
+      <div id="rdv-title"></div>
+      <div id="rdv-time"></div>
+    </div>
       <section id="agenda" aria-label="Agenda du jour">
         <div class="sec-head">
           <span class="sec-title">Agenda</span>
@@ -138,13 +152,10 @@
       </details>
 
       <details class="sec">
-        <summary>Couleurs <small>défaut, focus perso, focus rdv, focus absolu</small></summary>
-        <p class="note">Le fond change selon l'état. Le texte est noir : choisis des couleurs claires (pastel).</p>
-        <label class="swatch">Par défaut (au repos, en pause)<input type="color" data-k="colorDefault"></label>
-        <label class="swatch">Focus perso<input type="color" data-k="colorFocus"></label>
-        <label class="swatch">Focus rdv (un rdv de l'agenda tombe sur le focus)<input type="color" data-k="colorRdv"></label>
-        <label class="swatch">Focus absolu (bouton sous l'horloge)<input type="color" data-k="colorAbsolute"></label>
-        <div class="buttons"><button type="button" id="btn-colors-reset">Remettre les couleurs pastel</button></div>
+        <summary>Couleurs <small>fond</small></summary>
+        <p class="note">Un seul fond, en bleu pastel doux (15/11). Le texte est noir : choisis une couleur plutôt claire, mais pas éblouissante.</p>
+        <label class="swatch">Couleur du fond<input type="color" data-k="colorDefault"></label>
+        <div class="buttons"><button type="button" id="btn-colors-reset">Remettre le bleu doux</button></div>
       </details>
 
       <details class="sec">

@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h55';
+const APP_VERSION = '15/11/2026 · 15h03';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -67,12 +67,9 @@ const DEFAULTS = {
   holdSeconds: 0, // « Reprendre le focus » : 0 = un toucher ; sinon, toucher maintenu N secondes
   notifyOn: false, // notifications mises de côté (15/11, demande de l'utilisateur : elles n'ont pas bien marché selon les versions)
   // Les 4 couleurs de fond (15/11, demande de l'utilisateur) : pastel, texte noir.
-  // Pastels « doux » (15/11 : les premiers, plus clairs, éblouissaient sur la tablette) : tons
-  // moyens, moins vifs, texte noir toujours lisible.
-  colorDefault: '#86a9c9', // bleu : au repos et en pause
-  colorFocus: '#8dba9a', // vert : focus perso
-  colorRdv: '#d4a373', // orange : le focus tombe sur un rdv de l'agenda
-  colorAbsolute: '#c98686', // rouge : focus absolu
+  // Un seul fond (15/11, demande de l'utilisateur : « on revient sur un fond plutôt bleu pastel ») :
+  // un bleu pastel doux (les premiers pastels, plus clairs, éblouissaient sur la tablette), texte noir.
+  colorDefault: '#86a9c9',
   syncClientId: CLIENT_ID,
 };
 
@@ -114,12 +111,11 @@ function sanitize(raw0) {
   r.pulseIntensity = num(r.pulseIntensity, 5, 70, DEFAULTS.pulseIntensity, 5);
   r.autoChainDelay = num(r.autoChainDelay, 0, 60, DEFAULTS.autoChainDelay);
   r.holdSeconds = num(r.holdSeconds, 0, 10, DEFAULTS.holdSeconds);
-  // Les premiers pastels (plus clairs) sont remplacés par les doux ; un choix personnel est gardé.
-  const OLD_PASTELS = { colorDefault: '#a8d1f5', colorFocus: '#a9e2b7', colorRdv: '#ffcf9e', colorAbsolute: '#f4a6a6' };
-  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) {
-    r[k] = color(r[k], DEFAULTS[k]);
-    if (r[k] === OLD_PASTELS[k]) r[k] = DEFAULTS[k];
-  }
+  // Un seul fond : le bleu doux. Les anciens choix par état (4 couleurs) sont retirés ; le premier bleu,
+  // trop clair, est remplacé par le doux ; un choix personnel est gardé.
+  r.colorDefault = color(r.colorDefault, DEFAULTS.colorDefault);
+  if (r.colorDefault === '#a8d1f5') r.colorDefault = DEFAULTS.colorDefault;
+  delete r.colorFocus; delete r.colorRdv; delete r.colorAbsolute;
   r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
   r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
   r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);
@@ -659,22 +655,23 @@ function pauseMusicOff() {
 // page, le décompte reprend là où il en était (leçon de la 1.0). À la fin du focus : retour
 // au réglage pour l'instant (la question « On fait une pause ? » reste à faire).
 const timer = (() => {
-  const btn = $('#btn-start'), btnBreak = $('#btn-break'), btnResume = $('#btn-resume');
+  const btn = $('#btn-start'), btnStop = $('#btn-stop'), btnBreak = $('#btn-break'), btnResume = $('#btn-resume');
+  const btnNormal = $('#btn-normal'), btnConc = $('#btn-conc');
   let run = store.get('run', null); // { phase: 'focus' | 'break', endAt, total, ended?, resumeAt? } en cours, sinon null
   if (run && !(run.endAt > Date.now())) run = null; // fini pendant que la page était fermée
   if (run && run.phase !== 'break') run.phase = 'focus'; // décompte enregistré avant la pause
 
-  // Focus absolu (15/11) : un interrupteur sous l'horloge ; il retombe quand la séance s'arrête.
+  // Focus concentré (= absolu, 15/11) : un des deux modes du focus ; il retombe en « normal » quand la séance s'arrête.
   let absolute = store.get('absolute', false);
   let wasRunning = !!run;
-  const btnAbs = $('#btn-abs');
   const setAbsolute = (v) => { absolute = !!v; store.set('absolute', absolute); render(); };
 
   let resumeLabel = '';
   function render() {
     if (wasRunning && !run && absolute) { absolute = false; store.set('absolute', false); }
     wasRunning = !!run;
-    btnAbs.setAttribute('aria-pressed', String(absolute));
+    btnNormal.setAttribute('aria-pressed', String(!absolute));
+    btnConc.setAttribute('aria-pressed', String(absolute));
     const b = document.body;
     const ph = run?.phase;
     b.classList.toggle('running', !!run);
@@ -682,9 +679,10 @@ const timer = (() => {
     b.classList.toggle('phase-focus', ph === 'focus');
     b.classList.toggle('phase-break', ph === 'break');
     b.classList.toggle('break-ended', !!run?.ended);
-    btn.textContent = run ? 'Arrêter' : 'Démarrer';
-    btn.classList.toggle('primary', !run);
-    const rl = S.holdSeconds > 0 ? `Maintenir pour reprendre (${S.holdSeconds} s)` : 'Reprendre le focus';
+    btn.disabled = !!run; // Démarrer : au repos seulement
+    btnStop.disabled = !run; // Arrêter : pendant une séance
+    btnBreak.disabled = ph !== 'focus'; // Pause maintenant : pendant le focus
+    const rl = S.holdSeconds > 0 ? `Maintenir pour reprendre (${S.holdSeconds} s)` : 'Reprendre';
     if (rl !== resumeLabel) { resumeLabel = rl; btnResume.textContent = rl; }
     if (run) {
       const left = run.ended ? 0 : Math.max(0, (run.endAt - Date.now()) / 1000);
@@ -700,21 +698,13 @@ const timer = (() => {
     }
   }
 
-  // Fond (15/11, demande de l'utilisateur) : 4 couleurs pastel selon l'état, texte noir.
-  //  défaut (repos, pause) · focus perso · focus rdv (un rdv de l'agenda tombe sur le focus) · focus absolu.
-  // Priorité : absolu, puis rdv, puis perso. Le changement glisse en 2 s (voir style.css).
+  // Fond (15/11, demande de l'utilisateur) : un seul bleu pastel doux, texte noir. Le mode du
+  // focus (normal, concentré) se lit sur les boutons ; la classe « absolute » reste sur la page.
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   let lastBg = '';
-  function stateColor() {
-    if (!run || run.phase === 'break') return S.colorDefault;
-    if (absolute) return S.colorAbsolute;
-    const cl = document.body.classList;
-    if (cl.contains('rdv-now') || cl.contains('rdv-soon')) return S.colorRdv;
-    return S.colorFocus;
-  }
   function paintBg() {
-    const c = stateColor();
     document.body.classList.toggle('absolute', !!run && run.phase !== 'break' && absolute);
+    const c = S.colorDefault;
     if (c === lastBg) return;
     lastBg = c;
     document.body.style.backgroundColor = c;
@@ -801,7 +791,8 @@ const timer = (() => {
   setInterval(() => { if (due()) finish(); else if (run) render(); }, 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loop(); });
 
-  btn.addEventListener('click', () => (run ? stop() : start()));
+  btn.addEventListener('click', () => { if (!run) start(); });
+  btnStop.addEventListener('click', () => { if (run) stop(); });
   btnBreak.addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
 
   // « Reprendre le focus » : un simple toucher ou, si réglé, un toucher MAINTENU (geste
@@ -850,7 +841,8 @@ const timer = (() => {
   };
 })();
 
-$('#btn-abs').addEventListener('click', () => timer.setAbsolute(!timer.absolute));
+$('#btn-normal').addEventListener('click', () => timer.setAbsolute(false));
+$('#btn-conc').addEventListener('click', () => timer.setAbsolute(true));
 
 /* ---------- Heure bien visible au toucher ---------- */
 // Pendant le décompte, l'heure s'efface lentement (voir style.css) ; un toucher la rend
@@ -1074,9 +1066,9 @@ const sync = createSync({
 });
 
 $('#btn-colors-reset').addEventListener('click', () => {
-  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) S[k] = DEFAULTS[k];
+  S.colorDefault = DEFAULTS.colorDefault;
   saveS();
-  for (const el of pauseFields) if (el.dataset.k?.startsWith('color')) writeField(el, S[el.dataset.k]);
+  for (const el of pauseFields) if (el.dataset.k === 'colorDefault') writeField(el, S.colorDefault);
   timer.render();
 });
 $('#btn-sync-save').addEventListener('click', () => sync.save());
@@ -1151,7 +1143,6 @@ function updateRdv() {
   b.classList.toggle('rdv-soon', m?.state === 'soon');
   for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind === k);
   rdvBox.hidden = !m;
-  timer.paint(); // le fond passe à la couleur « focus rdv » (ou revient)
   if (!m) return;
   const min = Math.max(1, Math.round((m.e.start.getTime() - Date.now()) / 60000));
   const left = Math.max(1, Math.round((m.e.end.getTime() - Date.now()) / 60000));
@@ -1161,7 +1152,7 @@ function updateRdv() {
   $('#rdv-time').textContent = `${hhmm(m.e.start)} – ${hhmm(m.e.end)}` + (m.state === 'now' ? ` · fin dans ${left} min` : '');
 }
 setInterval(updateRdv, 5000);
-for (const id of ['#btn-start', '#btn-break', '#btn-resume']) $(id).addEventListener('click', () => setTimeout(updateRdv, 150));
+for (const id of ['#btn-start', '#btn-stop', '#btn-break', '#btn-resume']) $(id).addEventListener('click', () => setTimeout(updateRdv, 150));
 
 // Diagnostic (15/11) : ce que l'appli a reconnu pour chaque évènement, sans leur contenu.
 window.__agendaDiag = () => (agendaItems || []).map((e) => ({ titre: e.title, type: e.kind, indices: e.diag }));

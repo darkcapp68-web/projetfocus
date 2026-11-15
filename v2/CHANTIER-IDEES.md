@@ -555,6 +555,15 @@ dérangeable » du point 10, couper les autres sons).
 premiers pastels passent aux doux ; un choix personnel est gardé. Si c'est encore trop clair :
 fond sombre teinté avec texte blanc, ou pastel le jour et sombre le soir (à décider).
 
+**Changement de méthode (15/11, demande de l'utilisateur) : un seul fond, trois boutons.** Les 4
+couleurs par état sont retirées : le fond est **un seul bleu pastel doux** (réglable dans
+Paramètres → Couleurs). Le mode se lit sur les boutons, sous l'horloge : **Focus normal**,
+**Focus concentré** (= absolu : il ne fait pour l'instant rien de plus que se mémoriser, à définir)
+et **Pause maintenant** (grisé au repos). **En pause, seulement « Reprendre ».** **✕ Arrêter** et
+**▶ Démarrer** sont des icônes en haut à gauche (Démarrer au repos, Arrêter pendant une séance) ;
+Paramètres est une roue crantée en haut à droite. **Le rdv correspondant s'affiche au-dessus de
+l'agenda**, dans la colonne de droite.
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |

@@ -45,12 +45,17 @@ header {
 
 #btn-settings {
   position: relative;
-  min-height: 48px;
-  padding: 0 20px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
-  background: var(--glass);
+  border-radius: 50%;
+  background: var(--glass-strong);
+  color: var(--fg);
+  display: grid;
+  place-items: center;
 }
+#btn-settings svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 #btn-settings:active { background: var(--glass-strong); }
 #update-dot {
   position: absolute;
@@ -217,19 +222,13 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
 }
 .wide.hot { background: var(--accent); color: #10143a; font-weight: 600; }
 
-/* Démarrer / Arrêter : gros bouton sous l'horloge. */
-#btn-start {
-  min-width: 200px;
-  min-height: 56px;
-  padding: 0 32px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--glass);
-  font-size: 18px;
-  font-weight: 600;
-}
-#btn-start.primary { background: var(--fg); color: var(--on-fg); }
-#btn-start:active { transform: scale(0.97); }
+/* Arrêter (croix) et Démarrer (start) : icônes rondes en haut à gauche (15/11). */
+#toolbar { position: absolute; top: 12px; left: 16px; z-index: 3; display: flex; gap: 10px; }
+#toolbar button { width: 52px; height: 52px; border: 0; border-radius: 50%; background: var(--glass-strong); color: var(--fg); display: grid; place-items: center; }
+#toolbar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+#btn-start svg { fill: currentColor; stroke-width: 1.6; }
+#toolbar button:active:not(:disabled) { transform: scale(0.94); }
+#toolbar button:disabled { opacity: 0.32; }
 
 /* Après Démarrer, l'heure (temps et « focus ») s'efface jusqu'à l'invisible en 10 s, reste
    invisible 10 s, revient en 10 s, puis repart aussitôt (07/11, demande de l'utilisateur ;
@@ -259,16 +258,15 @@ body.running:not(.awake) #center { animation: time-fade 31s ease-in-out infinite
 .seg.on { border-color: var(--fg); color: var(--fg); }
 body.running #setup { display: none; }
 
-/* Pendant le focus : lancer la pause tout de suite. */
-#btn-break {
-  display: none;
-  min-height: 48px;
-  padding: 0 24px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--glass-strong);
-}
-body.phase-focus #btn-break { display: block; }
+/* 3 boutons sous l'horloge (15/11) : Focus normal, Focus concentré (= absolu), Pause maintenant.
+   En pause, seulement « Reprendre ». */
+#modes { display: flex; gap: 8px; width: 100%; }
+.mode { flex: 1 1 auto; min-height: 48px; padding: 0 14px; border: 2px solid transparent; border-radius: 999px; background: var(--glass); color: var(--soft); font-size: 13.5px; white-space: nowrap; }
+.mode[aria-pressed="true"] { border-color: var(--fg); color: var(--fg); font-weight: 600; }
+#btn-break.mode { background: var(--glass-strong); color: var(--fg); }
+.mode:active:not(:disabled) { transform: scale(0.97); }
+.mode:disabled { opacity: 0.4; }
+body.phase-break #modes { display: none; }
 
 /* Préréglages à gauche de l'horloge (avant Démarrer) : focus en gros, pause dessous.
    Au démarrage, ils se replient et l'horloge glisse au centre. */
@@ -409,10 +407,10 @@ header, main, footer { position: relative; z-index: 1; }
 #side { display: none; }
 @media (orientation: landscape) and (min-width: 900px) {
   header { position: absolute; top: 0; right: 0; z-index: 3; } /* au-dessus de main, sinon main reçoit les touchers du bouton Paramètres */
-  main { align-items: center; padding: 56px 32px 0; }
+  main { align-items: center; padding: 72px 32px 0; }
   #left { flex: none; gap: 14px; }
   #controls { gap: 12px; }
-  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 495px)), 36vw, 460px); }
+  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 420px)), 36vw, 460px); }
   #side { display: flex; flex-direction: column; gap: 14px; flex: none; width: min(440px, 40vw); }
   .sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
   .sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -438,7 +436,7 @@ header, main, footer { position: relative; z-index: 1; }
 }
 
 /* Rdv de l'agenda qui correspond au focus (15/11), à gauche sous l'horloge. */
-#rdv { width: min(380px, 100%); padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
+#rdv { width: 100%; padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
 #rdv[hidden] { display: none; }
 #rdv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
 #rdv-kind { padding: 0 8px; border-radius: 999px; background: var(--glass-strong); color: var(--fg); letter-spacing: 0; text-transform: none; }
@@ -446,9 +444,5 @@ header, main, footer { position: relative; z-index: 1; }
 #rdv-title { margin-top: 2px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #rdv-time { font-size: 12px; color: var(--soft); font-variant-numeric: tabular-nums; }
 
-/* Focus absolu (15/11) : un petit interrupteur sous les boutons de l'horloge. */
-#btn-abs { min-height: 36px; padding: 0 16px; border: 2px solid transparent; border-radius: 999px; background: var(--glass); color: var(--soft); font-size: 13px; }
-#btn-abs[aria-pressed="true"] { background: var(--fg); color: var(--on-fg); font-weight: 600; }
-
-/* Couleurs des 4 états (Paramètres → Couleurs). */
+/* Couleur du fond (Paramètres → Couleurs). */
 .sheet label.swatch { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
