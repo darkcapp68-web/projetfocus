@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h11';
+const APP_VERSION = '15/11/2026 · 20h12';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -288,6 +288,7 @@ const wave = (() => {
   const pulses = [];
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
+  let histT = performance.now() / 1000;
   function frame(t) {
     raf = 0;
     const live = wantOn && !player.paused && an && !document.hidden;
@@ -335,7 +336,11 @@ const wave = (() => {
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
     } else pNow = 0.05;
-    hist.copyWithin(0, 1); hist[HM - 1] = pNow;
+    // L'histoire avance à vitesse réelle (30 échantillons par seconde), quel que soit le nombre d'images dessinées : sur la
+    // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
+    const tH = performance.now() / 1000, nH = Math.min(HM, Math.floor((tH - histT) * 30));
+    for (let q = 0; q < nH; q++) { hist.copyWithin(0, 1); hist[HM - 1] = pNow; }
+    if (nH > 0) histT += nH / 30;
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
     // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
