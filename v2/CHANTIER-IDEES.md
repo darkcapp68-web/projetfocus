@@ -499,6 +499,12 @@ soi-même.
   par « Continuer en tant que… » (connexion à Chrome) pendant l'autorisation, l'onglet se
   recharge et Google répond « 400 » sur `gis_transform` ; il faut recommencer et choisir le
   compte directement. Reste à essayer avec le **compte pro** (l'administrateur peut refuser).
+  **Décision du 15/11 : les objets des mails se voient sur l'écran principal, aussi pendant le
+  focus** (l'utilisateur lit ses mails avec ses propres outils quand il veut ; la tablette n'est
+  qu'un coup d'œil). Fait : liste de 10 lignes (expéditeur en gras, objet, point bleu si non lu)
+  à droite de l'horloge, en paysage ; bouton ↻ pour actualiser (l'accord Google dure environ une
+  heure, son renouvellement demande un geste, donc pas de mise à jour toute seule). Vu sur la
+  tablette avec le compte perso. Pas encore : compte pro, agenda.
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
