@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h17';
+const APP_VERSION = '15/11/2026 · 21h18';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -870,7 +870,7 @@ function pauseMusicOff() {
 // (qu'on peut faire « maintenir »). Arrêter ramène au réglage. Le temps est calculé sur
 // l'heure de fin (pas de dérive), et gardé sur l'appareil : si Android ferme ou recharge la
 // page, le décompte reprend là où il en était (leçon de la 1.0). À la fin du focus : retour
-// au réglage pour l'instant (la question « On fait une pause ? » reste à faire).
+// au réglage pour l'instant (la question « Une pause ? » reste à faire).
 const timer = (() => {
   const btn = $('#btn-start'), btnStop = $('#btn-stop'), btnBreak = $('#btn-break'), btnResume = $('#btn-resume');
   const btnNormal = $('#btn-normal'), btnConc = $('#btn-conc');
@@ -908,7 +908,7 @@ const timer = (() => {
       askBox.hidden = !asking;
       const left = asking ? Math.max(0, (run.askAt - Date.now()) / 1000) : run.ended ? 0 : Math.max(0, (run.endAt - Date.now()) / 1000);
       // Sous le temps : « focus », « pause », ou l'action de respiration en cours.
-      clock.label(ph, asking ? 'on fait une pause ?' : run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
+      clock.label(ph, asking ? 'une pause ?' : run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
       clock.draw(left, asking ? 10 : run.total);
       if (S.countdown && !asking && !run.ended) {
         const sec = Math.ceil(left);
@@ -1018,7 +1018,7 @@ const timer = (() => {
       run.askAt = Date.now() + 10000;
       store.set('run', run);
       chime();
-      notify('On fait une pause ?', 'Sans réponse, la pause commence dans 10 s.');
+      notify('Une pause ?', 'Sans réponse, la pause commence dans 10 s.');
       render();
       return;
     }

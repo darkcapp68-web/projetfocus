@@ -58,7 +58,7 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 ### À régler / à décider (les questions)
 
 **Comportement du minuteur**
-1. **Fin de focus.** *Décidé le 15/11 : règle de la 1.0, faite (à vérifier à l'usage) : clochette, question « On fait une pause ? » 10 s (Oui / Non, encore un focus ; sans réponse, la pause commence), puis le focus reprend tout seul à la fin de la pause, sans fin jusqu'à Arrêter. Compte à rebours sonore (dings de plus en plus rapprochés dans les 10 dernières secondes, à 10, 8, 6 puis de 5 à 1) avant la pause ET avant le focus, réglable dans Paramètres → Pause.* Avant : retour silencieux au repos, rien ne sonnait. Le cahier des charges
+1. **Fin de focus.** *Décidé le 15/11 : règle de la 1.0, faite (à vérifier à l'usage) : clochette, question « Une pause ? » 10 s (Oui / Non, encore un focus ; sans réponse, la pause commence), puis le focus reprend tout seul à la fin de la pause, sans fin jusqu'à Arrêter. Compte à rebours sonore (dings de plus en plus rapprochés dans les 10 dernières secondes, à 10, 8, 6 puis de 5 à 1) avant la pause ET avant le focus, réglable dans Paramètres → Pause.* Avant : retour silencieux au repos, rien ne sonnait. Le cahier des charges
    voulait un signal les 10 dernières secondes, puis « On fait une pause ? » (pause si tu réponds ;
    si pas de réponse en 15 s, le focus repart). **On le fait ? Quel son ? 10 ou 15 secondes ?**
 2. **Focus concentré** ne fait que changer le dégradé. **Que doit-il faire de plus ?** Masquer les
