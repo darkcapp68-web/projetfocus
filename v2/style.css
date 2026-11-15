@@ -412,29 +412,31 @@ header, main, footer { position: relative; z-index: 1; }
   #controls { gap: 12px; }
   #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 350px)), 32vw, 460px); }
   #side { display: flex; flex-direction: column; gap: 14px; flex: none; width: min(440px, 40vw); }
-  .sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
-  .sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-  .sec-status { flex: 1; text-align: right; font-size: 12px; }
-  .sec-status[data-kind="warn"] { color: #ffb4a8; }
-  .sec-status[data-kind="stale"] { color: var(--fg); font-weight: 700; }
-  #btn-mail { flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--glass); font-size: 18px; line-height: 1; }
-  #btn-mail:active { background: var(--glass-strong); }
-  #btn-mail:disabled { opacity: 0.5; }
-  #side ol { list-style: none; margin: 0; padding: 0; }
-  #side li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--glass); font-size: 12px; line-height: 1.25; min-width: 0; }
-  #side li.empty { color: var(--soft); border-top: 0; }
-  /* Agenda : l'heure puis le titre ; l'évènement en cours se détache. */
-  #agenda-list .when { flex: none; width: 3.4em; font-weight: 600; font-variant-numeric: tabular-nums; }
-  #agenda-list .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #agenda-list li.now { color: var(--accent); }
-  #agenda-list li.now .title { font-weight: 600; }
-  #agenda-list li.more { color: var(--soft); }
-  #agenda-list .kind { flex: none; padding: 0 8px; border-radius: 999px; background: var(--glass-strong); font-size: 11px; font-weight: 600; }
-  /* Mails : expéditeur en gras puis objet. */
-  #mail-list .from { flex: none; max-width: 38%; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #mail-list li.unread .from::before { content: "● "; color: var(--accent); }
-  #mail-list .subject { flex: 1; min-width: 0; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
+
+/* Listes de la colonne de droite (agenda, mails) : communes à la tablette et au téléphone. */
+.sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
+.sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.sec-status { flex: 1; text-align: right; font-size: 12px; }
+.sec-status[data-kind="warn"] { color: #ffb4a8; }
+.sec-status[data-kind="stale"] { color: var(--fg); font-weight: 700; }
+#btn-mail { flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--glass); font-size: 18px; line-height: 1; }
+#btn-mail:active { background: var(--glass-strong); }
+#btn-mail:disabled { opacity: 0.5; }
+#side ol { list-style: none; margin: 0; padding: 0; }
+#side li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; border-top: 1px solid var(--glass); font-size: 12px; line-height: 1.25; min-width: 0; }
+#side li.empty { color: var(--soft); border-top: 0; }
+/* Agenda : l'heure puis le titre ; l'évènement en cours se détache. */
+#agenda-list .when { flex: none; width: 3.4em; font-weight: 600; font-variant-numeric: tabular-nums; }
+#agenda-list .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#agenda-list li.now { color: var(--accent); }
+#agenda-list li.now .title { font-weight: 600; }
+#agenda-list li.more { color: var(--soft); }
+#agenda-list .kind { flex: none; padding: 0 8px; border-radius: 999px; background: var(--glass-strong); font-size: 11px; font-weight: 600; }
+/* Mails : expéditeur en gras puis objet. */
+#mail-list .from { flex: none; max-width: 38%; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#mail-list li.unread .from::before { content: "● "; color: var(--accent); }
+#mail-list .subject { flex: 1; min-width: 0; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Rdv de l'agenda qui correspond au focus (15/11), à gauche sous l'horloge. */
 #rdv { position: absolute; left: 0; right: 0; bottom: calc(100% + 12px); width: 100%; padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
@@ -501,3 +503,18 @@ body.phase-break #btn-go { display: none; }
 /* Les icônes ✕ et ▶ du coin sont retirées (15/11, demande de l'utilisateur) : le grand bouton sous l'anneau suffit.
    Les boutons restent dans la page, cachés, car le grand bouton les actionne. */
 #toolbar { display: none; }
+
+/* Téléphone en portrait (15/11, demande de l'utilisateur : « la même chose que sur la tablette ») : l'anneau en haut,
+   les modes et les durées en rangées dessous, le grand bouton, puis le rdv, l'agenda et les mails ; la page défile. */
+@media (max-width: 700px) and (orientation: portrait) {
+  main { align-items: stretch; justify-content: flex-start; gap: 18px; padding: 0 16px 16px; }
+  #left { width: 100%; gap: 14px; }
+  #dock { flex-direction: column; gap: 14px; }
+  #dial-wrap { order: 1; --dial-size: min(calc(100vw - 48px), 44vh, 400px); }
+  #rail-modes { order: 2; flex-direction: row; width: auto; gap: 22px; }
+  #durations { order: 3; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; width: auto; gap: 8px; }
+  .rail-cap:not(:first-child) { margin-top: 0; margin-left: 12px; }
+  #side { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+  #rdv { position: static; }
+  #player { padding-top: 4px; }
+}
