@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h02';
+const APP_VERSION = '15/11/2026 · 20h04';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -284,7 +284,8 @@ const wave = (() => {
   // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
-  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, pAvg = 0.4;
+  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, pAvg = 0.4, nextPulse = 0;
+  const pulses = [];
   const HM = 260, hist = new Float32Array(HM).fill(0.05); // la puissance des ~8 dernières secondes (plage)
   const wetLine = [];
   function frame(t) {
@@ -314,11 +315,22 @@ const wave = (() => {
       let bass = 0, mids = 0;
       for (let i = 2; i < 30; i++) bass += level(i);
       for (let i = 30; i < 120; i++) mids += level(i);
-      // Seul l'écart avec la puissance moyenne récente compte (sinon une musique toujours forte donnerait une mer plate) :
-      // au niveau moyen, une vague moyenne ; au-dessus, une grosse ; en dessous, une petite.
+      // Une seule vague à la fois, dont le sommet est tiré au hasard (demande de l'utilisateur, 15/11) : toutes les 1 à 2,5 s
+      // une vague naît à droite ; sa hauteur est aléatoire, un peu plus haute quand la musique est plus forte que d'habitude.
       const x = 0.65 * bass / 28 + 0.35 * mids / 90;
       pAvg += (x - pAvg) * Math.min(1, 0.02 * df);
-      pNow = Math.min(1, Math.max(0.05, 0.35 + (x - pAvg) * 9));
+      const tn = performance.now() / 1000;
+      if (tn > nextPulse) {
+        const gain = Math.min(1.2, Math.max(0.6, 0.8 + (x - pAvg) * 6));
+        pulses.push({ tb: tn, h: (0.3 + 0.7 * Math.random()) * gain });
+        nextPulse = tn + 1 + Math.random() * 1.5;
+      }
+      pNow = 0.05;
+      for (let q = pulses.length - 1; q >= 0; q--) {
+        const d = (tn - pulses[q].tb) / 0.5;
+        if (d > 4) { pulses.splice(q, 1); continue; }
+        pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
+      }
     } else pNow = 0.05;
     hist.copyWithin(0, 1); hist[HM - 1] = pNow;
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
@@ -383,25 +395,25 @@ const wave = (() => {
       const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
       const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
-      const lay = [['#14325c', 0.92, 0.56, 0.55, 0], ['#2f8fd6', 0.85, 0.65, 0.8, 4], ['#1f9d9a', 0.6, 0.73, 1, 9]];
-      lay.forEach(([col, al, lev, amp, sh], j) => {
+      const lay = [['#2f8fd6', 1, 0.6, 1, 0, 0], ['#14325c', 1, 0.6, 1, 0, H * 0.1]]; // azur dessus, bleu sombre dessous : une vague en deux couleurs
+      lay.forEach(([col, al, lev, amp, sh, dy], j) => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
           const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
-          ys.push(H * lev - e * amp * H * 0.31 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e));
+          ys.push(H * lev - e * amp * H * 0.31 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
         g.globalAlpha = al; g.fillStyle = col;
         g.beginPath(); g.moveTo(hx, H);
         for (let i = 0; i <= N; i++) if (i / N * W >= hx) g.lineTo(i / N * W, ys[i]);
         g.lineTo(W, H); g.closePath(); g.fill();
-        if (j > 0) {
+        if (j === 0) {
           g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = '#eaf6fb'; g.lineWidth = Math.max(2, H / 34);
           for (let i = 0; i < N; i++) {
             const e = env(i / N, sh);
             if (e > 0.4 && i / N * W >= hx) { g.globalAlpha = Math.min(1, (e - 0.4) * 2); g.beginPath(); g.moveTo(i / N * W, ys[i]); g.lineTo((i + 1) / N * W, ys[i + 1]); g.stroke(); }
           }
         }
-        if (j === 1) for (let i = 0; i <= N; i++) wetLine[i] = Math.min(ys[i], wetLine[i] === undefined ? H * 2 : wetLine[i] + H * 0.003);
+        if (j === 0) for (let i = 0; i <= N; i++) wetLine[i] = Math.min(ys[i], wetLine[i] === undefined ? H * 2 : wetLine[i] + H * 0.003);
       });
       g.globalAlpha = 1;
       g.fillStyle = '#e9d5a6';
