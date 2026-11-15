@@ -33,6 +33,7 @@ la page.
 | 1.6 | Agenda : réserver des blocs de focus à l'avance | Difficile | à définir |
 | 1.7 | Agenda : choisir plusieurs agendas | Moyen | à définir |
 | 1.8 | Agenda : mode réunion (musique coupée) | Moyen | à définir |
+| 1.9 | **Agenda pro : me mettre « Absent » en un geste** (refus auto des invitations) | Moyen (Google) / Difficile (Outlook) | à définir |
 | 2.1 | **Rappel d'heure fixe (9h, 14h) avec bouton « Démarrer »** | **Facile via l'agenda / Difficile seul** | à définir |
 | 2.2 | « Juste 5 minutes » | Facile | à définir |
 | 2.3 | Rituel d'une ligne avant de lancer | Facile | à définir |
@@ -97,6 +98,25 @@ vivre à côté d'elle.
    *Moyen*.
 8. **Mode réunion** : pendant un évènement, la musique se coupe et l'appli ne propose rien.
    *Moyen*.
+
+9. **Agenda pro en « Absent », facilement** *(ajouté le 15/11, demande de l'utilisateur)* : un
+   bouton (ou un état de l'indicateur 10.1, « pas dérangeable ») qui crée dans l'agenda pro un
+   évènement « Absent » pour la durée du focus ou de la journée, pour que les collègues le
+   voient et que les invitations soient refusées toutes seules. Selon l'outil de l'entreprise :
+   - **Google Agenda** : l'API sait créer un évènement de type **« Absent du bureau »**
+     (`eventType: outOfOffice`, avec refus automatique des invitations) ou **« Temps de
+     concentration »** (`focusTime`, selon l'offre Google Workspace de l'entreprise) ; ces
+     types ne s'écrivent que dans l'agenda **principal** du compte. Portée d'écriture
+     `calendar.events`. *Moyen*. Un compte pro peut interdire l'accès aux applis tierces : à
+     vérifier.
+   - **Outlook / Microsoft 365** : possible par Microsoft Graph (évènement « absent du
+     bureau »), mais l'entreprise doit autoriser l'appli. *Difficile*.
+   - **Sans autorisation** : un lien qui ouvre la création d'évènement dans l'agenda pro, à
+     finir à la main (le type « Absent » se choisit alors à la main). *Facile*, mais pas
+     « en un geste ».
+   - À décider : agenda pro = Google ou Outlook ? Refuser les invitations pendant un focus,
+     ou seulement afficher « occupé » ? Annuler l'évènement quand on arrête le focus avant la
+     fin (l'appli le raccourcit ou le supprime) ?
 
 ### Façons techniques de s'y prendre
 | Piste | Avantages | Limites |
@@ -241,6 +261,7 @@ temps de concentration.
   chacun. *Facile* (après 10.1).
 - **10.3 L'état suit l'agenda** : réunion en cours → « pas dérangeable » ; évènement
   « Temps de concentration » → « urgence seulement ». *Moyen* (dépend du point 1).
+- **10.3 bis** : « pas dérangeable » peut aussi mettre l'agenda pro en « Absent » (point 1.9).
 - **10.4 Statut de la messagerie** (Teams, Slack, Google Chat) changé par l'appli : les
   collègues le voient sans rien regarder d'autre. *Difficile* : connexion à l'API de la
   messagerie, autorisation de l'entreprise souvent nécessaire, secrets à garder hors du dépôt
