@@ -223,9 +223,10 @@ dialog::backdrop { background: rgba(28, 44, 80, 0.45); -webkit-backdrop-filter: 
   min-height: 52px;
   border: 0;
   border-radius: 14px;
-  background: var(--glass);
+  background: var(--glass-strong);
+  color: var(--fg);
 }
-.wide.hot { background: var(--accent); color: #10143a; font-weight: 600; }
+.wide.hot { background: var(--accent); color: #fff; font-weight: 600; }
 
 /* Arrêter (croix) et Démarrer (start) : icônes rondes en haut à gauche (15/11). */
 #toolbar { position: absolute; top: 12px; left: 16px; z-index: 3; display: flex; gap: 10px; }
