@@ -110,12 +110,24 @@
         <svg class="stop" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
       </button>
       <div class="radio-text">
-        <select id="sel-player-radio" aria-label="Choisir la radio"></select>
+        <select id="sel-player-radio" aria-label="Choisir la radio" tabindex="-1"></select>
+        <button id="radio-pick" type="button" aria-haspopup="dialog"><span id="radio-pick-name">Radio</span></button>
         <div id="radio-state">minimal techno</div>
       </div>
     </div>
     <input id="volume" type="range" min="0" max="100" step="1" aria-label="Volume">
   </footer>
+
+  <!-- Menu des radios (15/11, demande de l'utilisateur : même style que les Paramètres) : remplace la liste déroulante du téléphone. -->
+  <dialog id="radio-menu" aria-label="Choisir la radio">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2>Radios</h2>
+        <button id="radio-menu-close" type="button" aria-label="Fermer">✕</button>
+      </div>
+      <div id="radio-menu-list"></div>
+    </div>
+  </dialog>
 
   <dialog id="settings" aria-label="Paramètres">
     <div class="sheet">

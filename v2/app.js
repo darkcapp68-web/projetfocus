@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h22';
+const APP_VERSION = '15/11/2026 · 20h24';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1026,10 +1026,50 @@ function fillRadioSelects() {
   const shown = STATIONS.filter((x) => S.radios.includes(x.id));
   groupedOptions(shown, $('#sel-radio'), S.radio);
   groupedOptions(shown, $('#sel-player-radio'), S.radio);
+  renderRadioMenu();
 }
 function syncRadioSelects() {
   for (const sel of [$('#sel-radio'), $('#sel-player-radio')]) if (sel.value !== S.radio) sel.value = S.radio;
+  renderRadioMenu();
 }
+
+// Menu des radios, au style des Paramètres : une carte claire, les radios rangées par groupe, la radio en cours cochée.
+const radioMenu = $('#radio-menu');
+function renderRadioMenu() {
+  const shown = STATIONS.filter((x) => S.radios.includes(x.id));
+  const cur = STATIONS.find((x) => x.id === S.radio);
+  $('#radio-pick-name').textContent = cur ? cur.name : 'Radio';
+  const list = $('#radio-menu-list');
+  list.replaceChildren();
+  let group = null;
+  for (const x of shown) {
+    if (x.group !== group) {
+      group = x.group;
+      const t = document.createElement('div');
+      t.className = 'radio-group';
+      t.textContent = group;
+      list.appendChild(t);
+    }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'radio-row' + (x.id === S.radio ? ' on' : '');
+    b.textContent = x.name;
+    b.addEventListener('click', () => {
+      radioMenu.close();
+      const sel = $('#sel-player-radio');
+      sel.value = x.id;
+      sel.dispatchEvent(new Event('change'));
+    });
+    list.appendChild(b);
+  }
+}
+$('#radio-pick').addEventListener('click', () => {
+  renderRadioMenu();
+  radioMenu.showModal();
+  radioMenu.querySelector('.radio-row.on')?.scrollIntoView({ block: 'center' });
+});
+$('#radio-menu-close').addEventListener('click', () => radioMenu.close());
+radioMenu.addEventListener('click', (e) => { if (e.target === radioMenu) radioMenu.close(); });
 
 function buildSounds() {
   fillRadioSelects();
