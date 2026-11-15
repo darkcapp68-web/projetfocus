@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h30';
+const APP_VERSION = '15/11/2026 · 21h50';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -282,7 +282,7 @@ const wave = (() => {
   // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
-  let lastDraw = 0;
+  let lastDraw = 0, ink = '#111', inkAge = -1;
   function frame(t) {
     raf = 0;
     const live = wantOn && !player.paused && an && !document.hidden;
@@ -330,34 +330,18 @@ const wave = (() => {
     }
     // Barres en gélule (bouts ronds), avec un halo rond autour.
     const pill = (x, y, w, hh) => { g.beginPath(); g.roundRect(x, y, w, hh, w / 2); g.fill(); };
-    // Plus de couleur (07/11, demande de l'utilisateur) : tout l'arc-en-ciel froid et chaud,
-    // du vert-cyan (basses, à gauche) au magenta-rose (aigus, à droite), qui glisse lentement
-    // avec le temps ; les barres les plus hautes s'éclaircissent et virent un peu au chaud.
-    const drift = Math.sin(performance.now() / 5000) * 35;
-    g.globalCompositeOperation = 'lighter';
-    // Halo (15/11) : UN seul contour lumineux autour de toute l'onde, avec un dégradé horizontal de
-    // teintes, au lieu d'un halo par barre (146 formes en moins par image). Mesuré sur la tablette :
-    // l'onde passe de ~9,5 ms à ~5,7 ms par image, avec la même lueur.
-    const gr = g.createLinearGradient(0, 0, W, 0);
-    for (let j = 0; j <= 8; j++) { const ff = j / 8; gr.addColorStop(ff, `hsl(${(150 + ff * 210 + drift + 360) % 360} 100% 58%)`); }
-    g.beginPath();
-    for (let i = 0; i < n; i++) { const x = i * step + step / 2, y = mid - h[i] - k; if (i) g.lineTo(x, y); else g.moveTo(x, y); }
-    for (let i = n - 1; i >= 0; i--) g.lineTo(i * step + step / 2, mid + h[i] + k);
-    g.closePath();
-    g.globalAlpha = 0.18; g.fillStyle = gr; g.strokeStyle = gr; g.lineWidth = bw * 1.6; g.lineJoin = 'round';
-    g.fill(); g.stroke();
+    // Une seule teinte (15/11, demande de l'utilisateur : l'arc-en-ciel ne lui plaît plus) : la couleur du texte du
+    // moment (noir, ou blanc quand le fond est foncé), posée franchement ; les barres les plus hautes sont un peu plus
+    // opaques. Plus de halo : l'onde est aussi plus légère à dessiner.
+    if (!(++inkAge % 60)) ink = getComputedStyle(document.body).getPropertyValue('--fg').trim() || '#111';
+    g.fillStyle = ink;
     for (let i = 0; i < n; i++) {
-      const f = i / Math.max(1, n - 1), a = h[i], loud = Math.min(1, a / (mid * 0.6));
-      const x = i * step + (step - bw) / 2;
-      const hue = (150 + f * 210 + drift - loud * 25 + 360) % 360;
-      g.globalAlpha = 0.92;
-      g.fillStyle = `hsl(${hue} 100% ${66 + loud * 14}%)`;
-      pill(x, mid - a, bw, 2 * a);
+      const a = h[i], loud = Math.min(1, a / (mid * 0.6));
+      g.globalAlpha = 0.55 + 0.4 * loud;
+      pill(i * step + (step - bw) / 2, mid - a, bw, 2 * a);
     }
     // Ligne du milieu
-    g.globalCompositeOperation = 'source-over';
-    g.globalAlpha = 0.22;
-    g.fillStyle = '#fff';
+    g.globalAlpha = 0.25;
     g.fillRect(0, mid - 0.5 * k, W, k);
     g.globalAlpha = 1;
   }
