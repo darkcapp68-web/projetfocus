@@ -618,3 +618,10 @@ body.absolute #agenda, body.absolute #mails { display: none; }
 #ask #ask-yes { background: var(--fg); color: var(--on-fg); }
 body.asking #center { animation: none; opacity: 1; } /* pendant la question de fin de focus, le décompte reste bien visible (pas de fondu de l'heure) */
 body.test-mode #sub::after { content: " · essai 10 s"; }
+
+/* Tablette aussi (15/11, demande de l'utilisateur) : Démarrer / Arrêter à gauche de l'anneau, sous la Pause, comme sur le téléphone couché ;
+   le grand bouton sous l'anneau est caché. */
+@media (orientation: landscape) and (min-width: 900px) {
+  #btn-go { display: none; }
+  body #btn-go2 { display: grid; width: 56px; height: 56px; margin-top: 6px; }
+}
