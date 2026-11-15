@@ -13,11 +13,21 @@ Rien n'est décidé ; chaque idée se définit avec l'utilisateur avant d'écrir
 - **Difficile** : serveur, appli Android (APK), ou dépend de ce qu'Android laisse faire à une
   page quand l'écran est éteint.
 
-Statuts : `à définir` · `choisi` · `en cours` · `fait` · `écarté`.
+Statuts : `idée` (`à définir`) · `à faire` · `choisi` · `en cours` · `fait` · `écarté`.
+**Tout ce qui n'est pas marqué `à faire` reste une idée** (décision de l'utilisateur, 15/11).
 
 Contraintes : PWA sans serveur ni build, dépôt public (aucun secret dedans), tout Android,
 réglages `projetfocus2.*`, tout doit marcher écran éteint, pas de son fabriqué en continu par
 la page.
+
+---
+
+## À faire (demandes de l'utilisateur, 15/11)
+
+| # | À faire | Facilité | Statut |
+| --- | --- | --- | --- |
+| 12.1 | **Menu des musiques « moderne »** : le sélecteur de radio du lecteur et la liste du menu (Paramètres → Musiques et sons) au même style que le reste de l'appli (carte claire, coins arrondis, une ligne par radio avec sa pastille) | Facile | à faire |
+| 12.2 | **Mieux centrer la radio** : le bouton lecture, le nom de la radio, la ligne de texte dessous (« technolovers.fm · techno ») et le curseur de volume, alignés et centrés les uns par rapport aux autres (tablette et téléphone couché) | Facile | à faire |
 
 ---
 
@@ -116,6 +126,8 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 
 | # | Idée | Facilité | Statut |
 | --- | --- | --- | --- |
+| 12.1 | **Menu des musiques « moderne »** (demande de l'utilisateur, 15/11) | Facile | **à faire** |
+| 12.2 | **Mieux centrer la radio, son texte et le volume** (demande de l'utilisateur, 15/11) | Facile | **à faire** |
 | 0 | **Principe : l'agenda guide la journée (focus libre ou « rdv »)** | Moyen | à valider |
 | 1.10 | Agenda : le focus passe de « libre » à « rdv » (couleur + message), sans jamais s'arrêter | Moyen | choisi (voir point 0) |
 | 1.11 | Agenda : mes blocs de focus décrits précisément dans l'agenda | Moyen | à définir |

@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h14';
+const APP_VERSION = '15/11/2026 · 20h15';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -331,16 +331,16 @@ const wave = (() => {
       prevB = b;
       pNow = 0.05;
       for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.35;
+        const d = (tn - pulses[q].tb) / 0.45;
         if (d > 4) { pulses.splice(q, 1); continue; }
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
     } else pNow = 0.05;
-    // L'histoire avance à vitesse réelle (30 échantillons par seconde), quel que soit le nombre d'images dessinées : sur la
+    // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
-    const tH = performance.now() / 1000, nH = Math.min(HM, Math.floor((tH - histT) * 30));
+    const tH = performance.now() / 1000, nH = Math.min(HM, Math.floor((tH - histT) * 60));
     for (let q = 0; q < nH; q++) { hist.copyWithin(0, 1); hist[HM - 1] = pNow; }
-    if (nH > 0) histT += nH / 30;
+    if (nH > 0) histT += nH / 60;
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
     // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
