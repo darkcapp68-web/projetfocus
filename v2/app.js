@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 17h17';
+const APP_VERSION = '15/11/2026 · 17h29';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -440,10 +440,6 @@ const clock = (() => {
     label(editing);
     dial.setAttribute('aria-valuenow', String(mins[editing]));
     dial.setAttribute('aria-label', editing === 'focus' ? 'Durée du focus en minutes' : 'Durée de la pause en minutes');
-    $('#v-focus').textContent = mins.focus;
-    $('#v-break').textContent = mins.break;
-    $('#edit-focus').classList.toggle('on', editing === 'focus');
-    $('#edit-break').classList.toggle('on', editing === 'break');
     draw(mins[editing] * 60);
     markPreset();
   }
@@ -455,22 +451,25 @@ const clock = (() => {
 
   function edit(what) { editing = what; showSetup(); showTicks(); }
 
-  // Préréglages (07/11, demande de l'utilisateur) : 25/5, 50/10, 90/20 d'un toucher.
-  // Celui qui correspond aux temps réglés est entouré.
-  const presets = [...document.querySelectorAll('.preset')];
+  // Durées (15/11, demande de l'utilisateur, dock) : focus 25 / 50 / 90 et pause 5 / 10, à droite de
+  // l'anneau. Toucher une durée la règle et fait régler cette durée par l'anneau ; « Focus » / « Pause » (au-dessus
+  // des boutons) choisissent ce que règle l'anneau. Celle qui correspond au temps réglé est pleine.
+  const durs = [...document.querySelectorAll('.dur')], caps = [...document.querySelectorAll('.rail-cap')];
   function markPreset() {
-    for (const b of presets) b.classList.toggle('on', +b.dataset.f === mins.focus && +b.dataset.b === mins.break);
+    for (const b of durs) b.classList.toggle('on', mins[b.dataset.kind] === +b.dataset.v);
+    for (const c of caps) c.classList.toggle('on', c.dataset.edit === editing);
   }
-  for (const b of presets) {
+  for (const b of durs) {
     b.addEventListener('click', () => {
-      mins.focus = +b.dataset.f;
-      mins.break = +b.dataset.b;
+      const k = b.dataset.kind;
+      mins[k] = +b.dataset.v;
+      editing = k;
       save();
       showSetup();
+      showTicks();
     });
   }
-  $('#edit-focus').addEventListener('click', () => edit('focus'));
-  $('#edit-break').addEventListener('click', () => edit('break'));
+  for (const c of caps) c.addEventListener('click', () => edit(c.dataset.edit));
 
   // Graduations : affichées au toucher, effacées quelques secondes après.
   function showTicks() {
@@ -878,6 +877,8 @@ const timer = (() => {
   };
 })();
 
+// Grand bouton sous l'anneau : démarre au repos, arrête pendant une séance (comme les icônes du coin).
+$('#btn-go').addEventListener('click', () => (document.body.classList.contains('running') ? $('#btn-stop') : $('#btn-start')).click());
 $('#btn-normal').addEventListener('click', () => timer.setAbsolute(false));
 $('#btn-conc').addEventListener('click', () => timer.setAbsolute(true));
 

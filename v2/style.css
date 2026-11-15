@@ -386,7 +386,7 @@ header, main, footer { position: relative; z-index: 1; }
 @media (orientation: landscape) and (min-width: 900px) {
   main { flex-direction: row; gap: 56px; padding: 0 32px; }
   #dial-wrap { --dial-size: min(calc(var(--app-h, 100vh) - 290px), 36vw, 460px); }
-  #controls { flex: none; width: min(440px, 40vw); }
+  #controls { flex: none; }
   #player {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -410,7 +410,7 @@ header, main, footer { position: relative; z-index: 1; }
   main { align-items: center; padding: 72px 32px 0; }
   #left { flex: none; gap: 14px; }
   #controls { gap: 12px; }
-  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 420px)), 36vw, 460px); }
+  #dial-wrap { --dial-size: min(max(200px, calc(var(--app-h, 100vh) - 350px)), 32vw, 460px); }
   #side { display: flex; flex-direction: column; gap: 14px; flex: none; width: min(440px, 40vw); }
   .sec-head { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--soft); }
   .sec-title { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -464,3 +464,33 @@ body.absolute #dnd { display: block; will-change: transform; animation: dnd-puls
   0%, 100% { transform: translateX(-50%) scale(1); }
   50% { transform: translateX(-50%) scale(1.5); }
 }
+
+/* Dock (15/11) : modes et pause à gauche de l'anneau, durées à droite, grand bouton sous l'anneau. */
+#dock { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.rail { display: flex; flex-direction: column; align-items: center; gap: 9px; }
+#rail-modes { width: 64px; gap: 12px; }
+.dock-btn { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0; border: 0; background: none; color: var(--soft); font-size: 11px; }
+.dock-btn .ico { width: 46px; height: 46px; border-radius: 50%; background: var(--glass-strong); color: var(--fg); display: grid; place-items: center; }
+.dock-btn .ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dock-btn[aria-pressed="true"] { color: var(--fg); font-weight: 600; }
+.dock-btn[aria-pressed="true"] .ico { background: var(--fg); color: var(--on-fg); }
+.dock-btn:active:not(:disabled) .ico { transform: scale(0.94); }
+.dock-btn:disabled { opacity: 0.4; }
+body.phase-break #rail-modes { display: none; }
+
+#durations { width: 46px; overflow: hidden; transition: width 0.5s ease, margin 0.5s ease, opacity 0.4s ease; }
+.rail-cap { border: 0; background: none; padding: 0; min-height: 22px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+.rail-cap:not(:first-child) { margin-top: 8px; }
+.rail-cap.on { color: var(--fg); font-weight: 700; }
+.dur { width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--glass); color: var(--fg); font-size: 15px; font-weight: 600; }
+.dur.on { background: var(--fg); color: var(--on-fg); }
+.dur:active { transform: scale(0.94); }
+body.running #durations, body.phase-break #durations { width: 0; margin-left: -14px; opacity: 0; pointer-events: none; }
+
+#btn-go { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--fg); color: var(--on-fg); display: grid; place-items: center; }
+#btn-go svg { width: 28px; height: 28px; fill: currentColor; stroke: none; }
+#btn-go .i-stop { display: none; }
+body.running #btn-go .i-play { display: none; }
+body.running #btn-go .i-stop { display: block; }
+body.phase-break #btn-go { display: none; }
+#btn-go:active { transform: scale(0.95); }

@@ -674,6 +674,14 @@ adaptations du focus concentré restent à décider (question 2 de l'audit).
 **Style du titre : « B », capitales espacées** (choisi par l'utilisateur le 15/11 parmi 6 propositions : A gras, B capitales espacées, C plaque noire, D cadre, E cloche barrée + texte, F fin et grand). Un choix de style dans les Paramètres reste possible.
 **Le titre pulse** (15/11, demande de l'utilisateur) : de sa taille normale vers 50 % plus grand (20 % au début, élargi sur demande), puis retour, en boucle de 3,2 s ; réglable dans `style.css` (`dnd-pulse`).
 
+**Partie gauche en « dock » (15/11, demande de l'utilisateur, proposition 4)** : l'anneau est inchangé ;
+**à gauche** trois boutons ronds avec icône : Normal, Concentré, Pause (pause = « maintenant », grisé au repos) ;
+**à droite** les durées : **Focus 25 / 50 / 90** et **Pause 5 / 10** (au repos seulement ; elles se replient
+pendant la séance) ; « Focus » et « Pause » au-dessus des boutons choisissent ce que règle l'anneau, qui se
+règle toujours au geste (une durée hors préréglage se règle à l'anneau, aucun bouton n'est alors plein) ;
+**sous l'anneau** un grand bouton rond : ▶ au repos, ■ (arrêter) pendant la séance ; en pause, seulement
+« Reprendre ». Les icônes ✕ et ▶ du coin restent (doublon voulu avec le grand bouton : à retirer si inutile).
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |
