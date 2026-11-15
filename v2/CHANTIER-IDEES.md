@@ -60,7 +60,7 @@ la page.
 | 7.3 | Ne pas déranger automatique | Difficile (APK) | à définir |
 | 7.4 | Vibration sur la montre | Difficile | à définir |
 | 8.1 | Focus à deux | Difficile | à définir |
-| 8.2 | Coach par IA | Difficile | à définir |
+| 8.2 | Coach qui s'appuie sur l'agenda et le journal (phrases à modèles, puis vraie IA) | Moyen (modèles) / Difficile (IA) | à définir |
 | 8.3 | Fond lié à la météo / au soleil | Moyen | à définir |
 | 8.4 | Fond coloré selon la charge de l'agenda | Moyen | à définir |
 | 9.1 | Installer la 2.0 sur le poste pro | Facile (sauf blocage de l'entreprise) | à définir |
@@ -276,8 +276,37 @@ l'APK est repris, le bouton dans la notification s'ajoute.
 
 - **8.1 Focus à deux** (« body doubling ») : un lien à partager, chacun voit que l'autre
   travaille, sans messagerie. *Difficile* (petit serveur ou service tiers).
-- **8.2 Coach par IA** : une phrase écrite d'après le journal, à la place de messages fixes.
-  *Difficile* (clé d'API et relais : coût, secret).
+- **8.2 Coach qui s'adapte à l'agenda** *(précisé le 15/11, demande de l'utilisateur : « à
+  adapter par rapport à l'agenda, ce serait mieux »)* : une phrase courte, écrite d'après
+  **l'agenda (point 1) et le journal (3.1)**, à la place des 40 messages fixes de la 1.0 (laissés
+  de côté dans la 2.0). *Moyen* avec des phrases à modèles, *Difficile* avec une vraie IA.
+  - **Exemples tirés de l'agenda** : « Réunion à 14h, tu as 45 min : un focus de 40 ? » · « Grosse
+    journée (5 h de réunions) : vise une seule séance, et protège-la. » · « Journée libre :
+    c'est le moment du travail de fond. » · « Réunion dans 10 min : termine ce que tu fais, pas
+    de nouvelle tâche. » · « Après la réunion, une vraie pause avant de reprendre. »
+  - **Exemples tirés du journal** : « 3 jours de suite, bravo. » · « Plus calme que d'habitude
+    cette semaine : une petite séance pour relancer ? » · « C'est ta 100ᵉ séance. »
+  - **Quand elle parle** : à l'ouverture (écran de réglage), à la question de fin de focus et
+    pendant la pause ; **jamais pendant le focus** (l'écran reste sobre).
+  - **Deux niveaux** :
+    1. **Phrases à modèles**, fabriquées par l'appli avec des règles (créneau libre, nombre de
+       réunions, série de jours…). Aucun coût, aucun secret, marche hors ligne, **rien ne quitte
+       l'appareil**. *Moyen*. Suffit sans doute pour la plupart des cas.
+    2. **Vraie IA** (modèle de langage) pour des phrases plus variées et plus justes. *Difficile* :
+       il faut une clé d'API, qui ne peut **jamais** être dans le dépôt public ; solution
+       possible : l'utilisateur colle sa propre clé dans les Paramètres (gardée sur l'appareil,
+       appels depuis la page), avec un coût par phrase très faible. Sinon un petit relais en
+       ligne (serveur à maintenir).
+  - **Vie privée (important pour l'agenda pro)** : envoyer à un service d'IA ce qu'il y a dans
+    l'agenda du travail est sensible. Règle proposée : ne jamais envoyer les **titres, lieux ni
+    participants**, seulement des chiffres (« réunion dans 40 min, 3 h de réunions
+    aujourd'hui »). Avec les modèles de phrases, la question ne se pose pas. À vérifier aussi : le
+    règlement de l'entreprise sur les outils d'IA.
+  - **Dépend de** : le point 1 (lecture de l'agenda, 1.1) et le journal (3.1). Sans eux, le coach
+    n'a rien à dire de plus qu'avant.
+  - **À décider** : modèles d'abord, IA ensuite (recommandé) ? Quel ton (bienveillant comme
+    dans la 1.0, plus direct) ? Peut-il proposer une action (« lance un focus de 40 min »)
+    avec un bouton, ou seulement parler ?
 - **8.3 Fond lié au réel** : météo de la ville, lever et coucher du soleil. *Moyen*.
 - **8.4 Fond coloré selon la charge de l'agenda** (point 1). *Moyen*.
 
