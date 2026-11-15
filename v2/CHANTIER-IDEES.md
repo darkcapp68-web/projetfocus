@@ -33,7 +33,7 @@ la page.
 | 1.6 | Agenda : réserver des blocs de focus à l'avance | Difficile | à définir |
 | 1.7 | Agenda : choisir plusieurs agendas | Moyen | à définir |
 | 1.8 | Agenda : mode réunion (musique coupée) | Moyen | à définir |
-| 1.9 | **Agenda pro : me mettre « Absent » en un geste** (refus auto des invitations) | Moyen (Google) / Difficile (Outlook) | à définir |
+| 1.9 | **Agenda pro (Google) : me mettre « Absent » en un geste** (refus auto des invitations) | Moyen | à définir |
 | 2.1 | **Rappel d'heure fixe (9h, 14h) avec bouton « Démarrer »** | **Facile via l'agenda / Difficile seul** | à définir |
 | 2.2 | « Juste 5 minutes » | Facile | à définir |
 | 2.3 | Rituel d'une ligne avant de lancer | Facile | à définir |
@@ -109,12 +109,13 @@ vivre à côté d'elle.
      types ne s'écrivent que dans l'agenda **principal** du compte. Portée d'écriture
      `calendar.events`. *Moyen*. Un compte pro peut interdire l'accès aux applis tierces : à
      vérifier.
-   - **Outlook / Microsoft 365** : possible par Microsoft Graph (évènement « absent du
-     bureau »), mais l'entreprise doit autoriser l'appli. *Difficile*.
    - **Sans autorisation** : un lien qui ouvre la création d'évènement dans l'agenda pro, à
      finir à la main (le type « Absent » se choisit alors à la main). *Facile*, mais pas
      « en un geste ».
-   - À décider : agenda pro = Google ou Outlook ? Refuser les invitations pendant un focus,
+   - **Précisé le 15/11 : l'agenda pro est Google** (Outlook écarté). Reste à vérifier : l'offre
+     Workspace de l'entreprise (« Absent du bureau » et « Temps de concentration » en dépendent)
+     et si le compte pro accepte une appli tierce (administrateur Google Workspace).
+   - À décider : refuser les invitations pendant un focus,
      ou seulement afficher « occupé » ? Annuler l'évènement quand on arrête le focus avant la
      fin (l'appli le raccourcit ou le supprime) ?
 
