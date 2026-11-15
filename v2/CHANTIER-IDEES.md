@@ -8,7 +8,9 @@ Statuts : `idée` · `à faire` · `en cours` · `fait` · `écarté`. Facilité
 
 ## À faire
 
-Rien pour l'instant.
+| # | À faire | Facilité | Statut |
+| --- | --- | --- | --- |
+| 13.1 | **Mettre le dépôt Git à jour avec la note de version** (demande de l'utilisateur, 15/11) : écrire la note de version de la 2.0 (ce qui change depuis la 1.0, en quelques lignes lisibles), la ranger dans le dépôt (par exemple `CHANGELOG.md` et le `README.md` du site), et marquer la version dans Git (étiquette et page « Release » de GitHub). Le numéro affiché dans les Paramètres reste l'heure de publication ; la note de version porte le vrai numéro de la 2.0. | Facile | **à faire** |
 
 ## Idée retenue
 
