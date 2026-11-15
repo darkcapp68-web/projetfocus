@@ -69,6 +69,10 @@ la page.
 | 9.1 | Installer la 2.0 sur le poste pro | Facile (sauf blocage de l'entreprise) | à définir |
 | 9.2 | Mêmes réglages sur les deux postes (Drive à la main) | Facile (déjà là) | à définir |
 | 9.3 | Petite fenêtre toujours visible au-dessus du travail | Moyen | à définir |
+| 11.1 | **Tablette de bureau** : écran-panneau toujours allumé (focus + disponibilité) | Facile | à définir |
+| 11.2 | Tablette : agenda pro du jour | Moyen (même connexion que le point 1) | à définir |
+| 11.3 | Tablette : derniers mails pro | Difficile (Gmail, autorisation de l'entreprise) | à définir |
+| 11.4 | Tablette : le focus lancé ailleurs s'y affiche aussi | Difficile (synchro entre appareils) | à définir |
 | 10.1 | **Indicateur de disponibilité à 3 états** (dérangeable / urgence seulement / pas dérangeable) | **Facile** | à définir |
 | 10.2 | État qui suit le focus et la pause tout seul | Facile (après 10.1) | à définir |
 | 10.3 | État qui suit l'agenda (réunion, temps de concentration) | Moyen (après le point 1) | à définir |
@@ -459,10 +463,61 @@ temps de concentration.
 
 ---
 
+## 11. La tablette de bureau *(idée de l'utilisateur, 15/11 : une vieille Samsung récupérée)*
+
+**Idée** : une vieille tablette Android posée sur le bureau devient un **tableau de bord du
+poste** : le focus et la disponibilité en grand (point 10), l'agenda pro du jour, les derniers
+mails pro. C'est le « bon outil pour montrer mon focus » aux collègues à côté, et aussi pour
+soi-même.
+
+- **11.1 Écran-panneau** (*Facile*) : l'appli installée depuis Chrome, en plein écran, écran
+  toujours allumé (Wake Lock), tablette sur le chargeur. Couleur franche et mot lisible de
+  loin (« Focus jusqu'à 15h10 », « Dérangeable », « Urgence seulement »). Mode « bureau » avec
+  grosse horloge quand rien ne tourne.
+- **11.2 Agenda pro du jour** (*Moyen*) : la frise de la journée avec le rdv en cours et les
+  suivants. Même connexion Google que le point 1 ; un évènement lit le titre, l'heure et le
+  type (visio, appel).
+- **11.3 Derniers mails pro** (*Difficile*) : lecture des derniers messages par l'API Gmail
+  (portée `gmail.readonly`, « restreinte » chez Google : marche pour soi en mode test, mais
+  l'administrateur de l'entreprise peut l'interdire). Alternative sans autorisation : afficher
+  seulement le **nombre de non lus** si on trouve un moyen simple, sinon rien. À vérifier avant
+  tout.
+- **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
+  sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
+  elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
+  écrit la séance dans l'**agenda** (point 1.4) et la tablette la lit (l'agenda sert de
+  messager, sans serveur à nous, mais avec un petit retard) ; ou un petit serveur (à éviter).
+
+### Points d'attention
+- **Vie privée devant les collègues** (le plus important) : une tablette visible par les voisins
+  ne doit pas montrer des **titres de mails ni de réunions** à tout le monde. Proposition :
+  trois niveaux, au choix : *discret* (compteurs : « 3 mails », « rdv 14h »), *normal*
+  (expéditeur ou titre court), *complet* (sur toucher, puis se referme seul).
+- **L'âge de la tablette** : une très vieille version d'Android a un Chrome qui ne se met plus à
+  jour, donc des fonctions manquantes (installation de l'appli, plein écran). À vérifier : version
+  d'Android et de Chrome (Paramètres → À propos). Au pire, un navigateur récent installable.
+- **Écran allumé en permanence** : sur une tablette LCD, pas de souci de marquage ; réduire la
+  luminosité la nuit (le fond de la 2.0 devient noir pendant le focus, ce qui aide).
+- **Brouillage de l'attention** : une tablette qui affiche des mails dans son champ de vision
+  pendant le focus peut donner l'envie de les lire. À essayer : mails visibles **seulement
+  hors focus** (en pause, ou en mode « dérangeable »).
+- **Règles de l'entreprise** : un appareil perso branché au Wi-Fi du travail, affichant des
+  données pro (mails, agenda), est à vérifier avec la politique de sécurité.
+
+### À décider
+- Ce que la tablette doit montrer **en premier** (le focus ? l'agenda ? les mails ?).
+- La tablette sert **à lancer** le focus (tactile, à portée de main), ou seulement à
+  **afficher** ?
+- Version d'Android de la tablette.
+
+---
+
 ## Ordre de travail proposé (à valider)
 
 L'agenda détermine le chantier (point 0) : on commence par lui.
 
+0. **Tablette de bureau, écran-panneau** (11.1 + 10.1) : l'outil qui montre le focus, simple,
+   pour savoir si le principe plaît. Elle est déjà sur le bureau.
 1. **Agenda, lecture seule** (1.1), puis **libre → rdv** (1.10) et **blocs de focus dans
    l'agenda** (1.11). Avant : vérifier avec l'utilisateur que le compte pro accepte la
    connexion (voir 1.9).
