@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h15';
+const APP_VERSION = '15/11/2026 · 20h18';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -284,8 +284,7 @@ const wave = (() => {
   // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
-  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, prevB = -60, lastOn = 0;
-  const pulses = [];
+  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
   let histT = performance.now() / 1000;
@@ -312,35 +311,23 @@ const wave = (() => {
       for (let i = 1; i < 200; i++) top = Math.max(top, freq[i]);
       peak = Math.max(top, peak - 0.04 * df); // redescend doucement : une musique calme bouge aussi
       level = (i) => Math.min(1, Math.max(0, (freq[i] - (peak - 42)) / 42));
-      // Une seule vague à la fois, calée sur le rythme (15/11, demande de l'utilisateur : « avec la techno, ça ne passe pas
-      // bien » : des vagues tirées au hasard n'allaient pas avec les basses). Un coup de basse (la grosse caisse) est repéré
-      // quand le niveau des graves dépasse sa moyenne récente de plus d'un écart-type ; il lance une vague, au plus une
-      // toutes les 0,5 s, dont la hauteur suit la force du coup (avec un peu de hasard sur le sommet). Sans coup de basse
-      // pendant 2,5 s (musique calme), une petite vague est lancée quand même.
+      // Puissance du moment (15/11, demande de l'utilisateur : « 3 vagues sur la longueur, à la hauteur de la musique ») : le
+      // niveau des graves, comparé à sa moyenne récente (en écarts-types) : musique faible, 0,12 ; au niveau habituel, 0,45 ;
+      // gros coup de basse, 1. Il est mesuré en continu : chaque crête garde la hauteur qu'avait la musique quand elle est née.
       let b = 0;
       for (let i = 1; i < 6; i++) b += freq[i];
       b /= 5;
       bm += (b - bm) * Math.min(1, 0.03 * df);
       bv += (((b - bm) ** 2) - bv) * Math.min(1, 0.03 * df);
-      const z = (b - bm) / (Math.sqrt(bv) + 0.5), tn = performance.now() / 1000;
-      if ((z > 1 && b > prevB && tn - lastOn > 0.5) || tn - lastOn > 2) {
-        const strong = z > 1;
-        pulses.push({ tb: tn, h: (strong ? 0.4 + 0.6 * Math.min(1, z / 2.5) : 0.3 + 0.2 * Math.random()) * (0.75 + 0.25 * Math.random()) });
-        lastOn = tn;
-      }
-      prevB = b;
-      pNow = 0.05;
-      for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.45;
-        if (d > 4) { pulses.splice(q, 1); continue; }
-        pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
-      }
+      const z = (b - bm) / (Math.sqrt(bv) + 0.5);
+      pS += (Math.min(1, Math.max(0.12, 0.45 + 0.28 * z)) - pS) * Math.min(1, 0.6 * df);
+      pNow = pS;
     } else pNow = 0.05;
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
-    const tH = performance.now() / 1000, nH = Math.min(HM, Math.floor((tH - histT) * 60));
+    const tH = performance.now() / 1000, nRaw = Math.floor((tH - histT) * 60), nH = Math.min(HM, nRaw);
     for (let q = 0; q < nH; q++) { hist.copyWithin(0, 1); hist[HM - 1] = pNow; }
-    if (nH > 0) histT += nH / 60;
+    if (nRaw > HM) histT = tH; else if (nH > 0) histT += nH / 60; // longue absence (onglet caché) : on repart de maintenant
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
     // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
@@ -405,10 +392,13 @@ const wave = (() => {
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
       const lay = [['', 1, 0.76, 1, 0, 0]]; // une seule vague ; ses deux couleurs sont un dégradé vertical (azur en haut, bleu sombre en bas), sans bord décalé qui ferait un effet d'histogramme en relief
       lay.forEach(([col, al, lev, amp, sh, dy], j) => {
-        const ys = [];
+        const ys = [], crest = [];
         for (let i = 0; i <= N; i++) {
-          const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.02;
-          ys.push(H * lev - e * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
+          // Trois vagues sur la longueur : la forme (3 crêtes qui glissent vers la plage, à la même vitesse que l'histoire) est
+          // multipliée par la puissance de la musique au moment où la crête est née à droite.
+          const u = i / N, e = env(u, sh), ph = 6.2832 * (3 * u + t / 0.55), cr = Math.pow(0.5 + 0.5 * Math.sin(ph + 0.5 * Math.sin(ph)), 1.6), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
+          crest[i] = cr * e;
+          ys.push(H * lev - cr * e * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
         for (let pass = 0; pass < 1; pass++) { // vagues arrondies, sans dents de histogramme
           const o = ys.slice();
@@ -424,8 +414,8 @@ const wave = (() => {
         if (j === 0) {
           g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = '#eaf6fb'; g.lineWidth = Math.max(2, H / 34);
           for (let i = 0; i < N; i++) {
-            const e = env(i / N, sh);
-            if (e > 0.4 && i / N * W >= hx) { g.globalAlpha = Math.min(1, (e - 0.4) * 2); g.beginPath(); g.moveTo(i / N * W, ys[i]); g.lineTo((i + 1) / N * W, ys[i + 1]); g.stroke(); }
+            const e = crest[i];
+            if (e > 0.3 && i / N * W >= hx) { g.globalAlpha = Math.min(1, (e - 0.3) * 2.2); g.beginPath(); g.moveTo(i / N * W, ys[i]); g.lineTo((i + 1) / N * W, ys[i + 1]); g.stroke(); }
           }
         }
         if (j === 0) for (let i = 0; i <= N; i++) wetLine[i] = Math.min(ys[i], wetLine[i] === undefined ? H * 2 : wetLine[i] + H * 0.003);
@@ -445,7 +435,7 @@ const wave = (() => {
       }
       g.stroke();
       // Le petit bonhomme.
-      const hy = sand(hx) - 2 * k, near = env(hx / W, 4), jump = Math.max(0, near - 0.35) * H * 0.2, u = Math.max(k, H / 70);
+      const hy = sand(hx) - 2 * k, near = env(hx / W, 4), jump = Math.max(0, near - 0.55) * H * 0.3, u = Math.max(k, H / 70);
       g.fillStyle = '#14325c'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
       g.fillStyle = '#2f8fd6'; g.fillRect(hx - 3 * u, hy - jump - 4 * u, 2.4 * u, 4 * u); g.fillRect(hx + 0.6 * u, hy - jump - 4 * u, 2.4 * u, 4 * u);
       g.fillStyle = '#dfe7f5'; g.fillRect(hx + 3 * u, hy - jump - 12 * u, 1.2 * u, 8 * u);
