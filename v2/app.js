@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h09';
+const APP_VERSION = '15/11/2026 · 20h11';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -286,7 +286,7 @@ const wave = (() => {
   // l'adaptation de sensibilité gardent la même vitesse réelle.
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, prevB = -60, lastOn = 0;
   const pulses = [];
-  const HM = 260, hist = new Float32Array(HM).fill(0.05); // la puissance des ~8 dernières secondes (plage)
+  const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
   function frame(t) {
     raf = 0;
@@ -330,7 +330,7 @@ const wave = (() => {
       prevB = b;
       pNow = 0.05;
       for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.45;
+        const d = (tn - pulses[q].tb) / 0.35;
         if (d > 4) { pulses.splice(q, 1); continue; }
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
