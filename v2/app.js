@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h16';
+const APP_VERSION = '15/11/2026 · 14h19';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1056,40 +1056,68 @@ undoBtn.addEventListener('click', () => {
   note('Réglages d’avant remis sur cet appareil.');
 });
 
-// Mails (15/11) : les 10 derniers sur l'écran principal, une ligne chacun (expéditeur, objet),
-// sans lien, visibles aussi pendant le focus (demande de l'utilisateur). Mise à jour au toucher
-// de ↻ : l'accord Google dure environ une heure et son renouvellement demande un geste.
+// Agenda du jour et derniers mails (15/11), à droite de l'horloge, visibles aussi pendant le focus
+// (demande de l'utilisateur). Texte seulement, sans lien. Mise à jour au toucher de ↻ : l'accord
+// Google dure environ une heure et son renouvellement demande un geste.
 const mail = createMail({ getClientId: () => S.syncClientId });
-const mailList = $('#mail-list'), mailStatus = $('#mail-status'), mailBtn = $('#btn-mail');
+const mailList = $('#mail-list'), mailStatus = $('#mail-status');
+const agendaList = $('#agenda-list'), agendaStatus = $('#agenda-status'), mailBtn = $('#btn-mail');
+const hhmm = (d) => d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+const setStatus = (el, text, kind = '') => { el.textContent = text; el.dataset.kind = kind; };
+const line = (cls, ...cells) => {
+  const li = document.createElement('li');
+  if (cls) li.className = cls;
+  for (const [c, t] of cells) { const sp = document.createElement('span'); sp.className = c; sp.textContent = t; li.append(sp); }
+  return li;
+};
+const emptyNote = (el, text) => { el.textContent = ''; el.append(line('empty', ['title', text])); };
+
+let agendaItems = null;
+const AGENDA_MAX = 5;
+// L'agenda se redessine chaque minute sans rien demander à Google : ce qui est fini disparaît.
+function renderAgenda() {
+  if (!agendaItems) return;
+  const now = Date.now();
+  const left = agendaItems.filter((e) => e.allDay || e.end.getTime() > now);
+  if (!left.length) { emptyNote(agendaList, agendaItems.length ? 'Plus rien de prévu aujourd’hui.' : 'Rien de prévu aujourd’hui.'); return; }
+  agendaList.textContent = '';
+  for (const e of left.slice(0, AGENDA_MAX)) {
+    const cur = !e.allDay && e.start.getTime() <= now;
+    agendaList.append(line(cur ? 'now' : '', ['when', e.allDay ? 'jour' : hhmm(e.start)], ['title', e.title]));
+  }
+  if (left.length > AGENDA_MAX) agendaList.append(line('more', ['when', ''], ['title', `+ ${left.length - AGENDA_MAX} autres`]));
+}
+setInterval(renderAgenda, 60000);
+
+const problem = (e) => (e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`);
 let mailBusy = false;
-async function refreshMails() {
+async function refreshGoogle() {
   if (mailBusy) return;
   mailBusy = true;
   mailBtn.disabled = true;
-  mailStatus.textContent = 'connexion…';
-  mailStatus.dataset.kind = '';
+  setStatus(agendaStatus, 'connexion…');
+  setStatus(mailStatus, '');
   try {
-    const items = await mail.last10();
-    mailList.textContent = '';
-    for (const m of items) {
-      const li = document.createElement('li');
-      if (m.unread) li.className = 'unread';
-      const from = document.createElement('span'); from.className = 'from'; from.textContent = m.from;
-      const subject = document.createElement('span'); subject.className = 'subject'; subject.textContent = m.subject;
-      li.append(from, subject);
-      mailList.append(li);
-    }
-    if (!items.length) mailList.innerHTML = '<li class="empty">Boîte de réception vide.</li>';
-    mailStatus.textContent = 'à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    await mail.connect(); // une seule fenêtre Google pour les deux
   } catch (e) {
-    mailStatus.textContent = e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`;
-    mailStatus.dataset.kind = 'warn';
-  } finally {
-    mailBusy = false;
-    mailBtn.disabled = false;
+    setStatus(agendaStatus, problem(e), 'warn');
+    mailBusy = false; mailBtn.disabled = false;
+    return;
   }
+  const [mails, agenda] = await Promise.allSettled([mail.last10(), mail.today()]);
+  const at = hhmm(new Date());
+  if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); setStatus(agendaStatus, 'à jour à ' + at); }
+  else setStatus(agendaStatus, problem(agenda.reason), 'warn');
+  if (mails.status === 'fulfilled') {
+    mailList.textContent = '';
+    for (const m of mails.value) mailList.append(line(m.unread ? 'unread' : '', ['from', m.from], ['subject', m.subject]));
+    if (!mails.value.length) emptyNote(mailList, 'Boîte de réception vide.');
+    setStatus(mailStatus, 'à jour à ' + at);
+  } else setStatus(mailStatus, problem(mails.reason), 'warn');
+  mailBusy = false;
+  mailBtn.disabled = false;
 }
-mailBtn.addEventListener('click', refreshMails);
+mailBtn.addEventListener('click', refreshGoogle);
 
 // Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
 $('#btn-export').addEventListener('click', () => {

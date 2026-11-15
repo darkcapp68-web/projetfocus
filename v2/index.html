@@ -18,6 +18,7 @@
   </header>
 
   <main>
+    <div id="left">
     <div id="dial-row">
     <!-- Préréglages focus / pause, à gauche de l'horloge, seulement avant Démarrer. -->
     <div id="presets" aria-label="Préréglages">
@@ -49,16 +50,27 @@
     <button id="btn-break" type="button">Pause maintenant</button>
     <button id="btn-resume" type="button">Reprendre le focus</button>
     <button id="btn-start" type="button" class="primary">Démarrer</button>
-    <!-- Derniers mails (15/11) : une ligne chacun, visible aussi pendant le focus (demande de l'utilisateur). -->
-    <section id="mails" aria-label="Derniers mails">
-      <div id="mails-head">
-        <span>Mails</span>
-        <span id="mail-status" aria-live="polite"></span>
-        <button id="btn-mail" type="button" aria-label="Actualiser les mails">↻</button>
-      </div>
-      <ol id="mail-list"><li class="empty">Touche ↻ pour afficher tes derniers mails.</li></ol>
-    </section>
     </div>
+    </div>
+    <!-- À droite (15/11, demande de l'utilisateur) : l'agenda du jour au-dessus, les mails en dessous ;
+         visibles aussi pendant le focus. Une seule actualisation (↻) pour les deux. -->
+    <aside id="side">
+      <section id="agenda" aria-label="Agenda du jour">
+        <div class="sec-head">
+          <span class="sec-title">Agenda</span>
+          <button id="btn-mail" type="button" aria-label="Actualiser l'agenda et les mails">↻</button>
+          <span id="agenda-status" class="sec-status" aria-live="polite"></span>
+        </div>
+        <ol id="agenda-list"><li class="empty">Touche ↻ pour afficher ton agenda et tes mails.</li></ol>
+      </section>
+      <section id="mails" aria-label="Derniers mails">
+        <div class="sec-head">
+          <span class="sec-title">Mails</span>
+          <span id="mail-status" class="sec-status" aria-live="polite"></span>
+        </div>
+        <ol id="mail-list"></ol>
+      </section>
+    </aside>
   </main>
 
   <footer id="player">
