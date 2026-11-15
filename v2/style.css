@@ -636,3 +636,10 @@ body.test-mode #sub::after { content: " · essai 10 s"; }
   #controls { min-height: 48px; justify-content: center; }
 }
 @media (orientation: landscape) and (max-height: 600px) { #controls { min-height: 38px; } #ask button { min-height: 36px; padding: 0 14px; font-size: 13px; } }
+
+/* Focus concentré en paysage : seul le TEXTE du titre pulse (un <span>), pas la boîte qui remplit la partie droite ; avant, la boîte
+   grossissait de 50 % avec le titre, dépassait en bas de l'écran et faisait apparaître une barre de défilement (15/11). */
+@media (orientation: landscape) and (min-width: 900px), (orientation: landscape) and (max-height: 600px) {
+  body.absolute #dnd { animation: none; width: 100%; font-size: clamp(16px, 2.3vw, 24px); } /* le titre grossit de 50 % : à 24 px il reste dans la colonne (410 px) */
+  body.absolute #dnd span { display: inline-block; will-change: transform; animation: dnd-pulse-flow 3.2s ease-in-out infinite; }
+}
