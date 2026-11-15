@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h18';
+const APP_VERSION = '15/11/2026 · 20h19';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -315,12 +315,13 @@ const wave = (() => {
       // niveau des graves, comparé à sa moyenne récente (en écarts-types) : musique faible, 0,12 ; au niveau habituel, 0,45 ;
       // gros coup de basse, 1. Il est mesuré en continu : chaque crête garde la hauteur qu'avait la musique quand elle est née.
       let b = 0;
-      for (let i = 1; i < 6; i++) b += freq[i];
+      for (let i = 1; i < 6; i++) b += Math.max(-120, freq[i]); // le silence donne -Infinity : on borne
       b /= 5;
       bm += (b - bm) * Math.min(1, 0.03 * df);
       bv += (((b - bm) ** 2) - bv) * Math.min(1, 0.03 * df);
       const z = (b - bm) / (Math.sqrt(bv) + 0.5);
       pS += (Math.min(1, Math.max(0.12, 0.45 + 0.28 * z)) - pS) * Math.min(1, 0.6 * df);
+      if (!isFinite(pS) || !isFinite(bm) || !isFinite(bv)) { pS = 0.3; bm = b; bv = 25; }
       pNow = pS;
     } else pNow = 0.05;
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
