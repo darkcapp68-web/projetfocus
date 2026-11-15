@@ -286,6 +286,7 @@ const wave = (() => {
   // l'adaptation de sensibilité gardent la même vitesse réelle.
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
   let prevB = -60, lastOn = 0, spT = 1, spd = 1, spAcc = 0, lastT = 0, cphase = 0; // vitesse des vagues liée au tempo (plage)
+  let lz = []; // TEMP
   const iois = []; // les derniers écarts entre deux coups de basse (s)
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
@@ -328,6 +329,7 @@ const wave = (() => {
       // la techno, rapide ») : on mesure l'écart entre les coups de basse ; s'il est régulier, le tempo (ramené entre 70 et 170
       // BPM) règle la vitesse entre 0,85 (80 BPM) et 1,25 (150 BPM) ; sans battement net (classique), vitesse lente, 0,75.
       const tn = performance.now() / 1000;
+      lz = [+z.toFixed(2), +b.toFixed(1), +bm.toFixed(1), +Math.sqrt(bv).toFixed(2), live ? 1 : 0]; // TEMP
       if (z > 1 && b > prevB && tn - lastOn > 0.3) {
         if (lastOn && tn - lastOn < 1.5) { iois.push(tn - lastOn); if (iois.length > 14) iois.shift(); }
         lastOn = tn;
@@ -482,7 +484,7 @@ const wave = (() => {
 
   addEventListener('resize', () => { if (!raf) draw(false); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && wantOn) start(); });
-  return { listen, draw, settle, start, hist, dbg: () => ({ spd, spT, iois: iois.map((x) => +x.toFixed(2)) }) };
+  return { listen, draw, settle, start, hist, dbg: () => ({ lz, spd, spT, iois: iois.map((x) => +x.toFixed(2)) }) };
 })();
 wave.draw(false); window.__wave = wave; // TEMP
 
