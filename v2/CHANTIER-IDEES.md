@@ -498,6 +498,20 @@ soi-même.
   écrit la séance dans l'**agenda** (point 1.4) et la tablette la lit (l'agenda sert de
   messager, sans serveur à nous, mais avec un petit retard) ; ou un petit serveur (à éviter).
 
+### Constats sur la tablette (15/11, mesurés par adb)
+- Samsung SM-T550, Android 7.1.1, 1,4 Go de RAM, remise à zéro. **Chrome mis à jour de 64 à 101**
+  (maximum du Play Store pour cet Android) : **la 2.0 démarre et marche** (radio, onde,
+  décompte, « Arrêter » coupe la radio, installation proposée).
+- Fluidité : 60 images/s au repos, 46 avec la radio et l'onde, environ 30 pendant un focus
+  (mesure faussée par une fenêtre de notification) : un peu juste, onde à alléger pour un panneau.
+- Pas de `100dvh` ni `:has()` dans Chrome 101 : prévoir des valeurs de secours dans le CSS.
+- **Tablette forcée en paysage** par le réglage Android (rotation verrouillée, 1024×768),
+  réversible dans Paramètres → Affichage ; pas dans le manifeste de l'appli, qui servirait
+  aussi au téléphone. **La mise en page de la 2.0 n'est pas pensée pour le paysage** : le
+  bouton Démarrer chevauche la ligne d'onde. À refaire pour le panneau.
+- Écran de veille réglé à 10 min pour les tests ; l'écran toujours allumé du panneau viendra
+  du Wake Lock (disponible dans Chrome 101).
+
 ### Points d'attention
 - **Vie privée devant les collègues** (le plus important) : une tablette visible par les voisins
   ne doit pas montrer des **titres de mails ni de réunions** à tout le monde. Proposition :
