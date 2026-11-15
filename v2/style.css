@@ -610,3 +610,9 @@ body.absolute #agenda, body.absolute #mails { display: none; }
   body.absolute #rdv { position: static; width: 100%; margin: 0; }
   body.absolute #dnd { position: static; flex: 1; display: flex; align-items: center; justify-content: center; align-self: center; width: 60%; max-width: none; padding: 0; transform: none; font-size: clamp(18px, 2.4vw, 28px); animation-name: dnd-pulse-flow; }
 }
+
+/* Question de fin de focus (règle de la 1.0). */
+#ask { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+#ask[hidden] { display: none; }
+#ask button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--glass-strong); color: var(--fg); font: inherit; font-weight: 600; }
+#ask #ask-yes { background: var(--fg); color: var(--on-fg); }

@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h02';
+const APP_VERSION = '15/11/2026 · 21h05';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -687,6 +687,29 @@ const clock = (() => {
 // Généré par la page (Web Audio), repris de la 1.0 ; à revoir plus tard. Il démarre avec
 // « Démarrer » et s'arrête avec « Arrêter » (ou à la fin du focus).
 const noise = createNoise();
+
+const askBox = $('#ask'); // la question de fin de focus
+
+// Clochette de fin de focus (comme la 1.0) : deux notes douces qui s'éteignent en ~1,5 s, au volume du lecteur (jamais muet).
+let chimeCtx = null;
+function chime() {
+  try {
+    chimeCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+    if (chimeCtx.state === 'suspended') chimeCtx.resume();
+    const t0 = chimeCtx.currentTime, vol = 0.08 + 0.22 * (volume.value / 100);
+    for (const [f, d] of [[880, 0], [1320, 0.12]]) {
+      const o = chimeCtx.createOscillator(), g = chimeCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0 + d);
+      g.gain.exponentialRampToValueAtTime(vol, t0 + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 1.5);
+      o.connect(g).connect(chimeCtx.destination);
+      o.start(t0 + d);
+      o.stop(t0 + d + 1.6);
+    }
+  } catch { /* pas de son */ }
+}
 noise.setLevel(S.noiseVol / 100);
 
 /* ---------- Pause : respiration (son et écran), musique ---------- */
@@ -854,13 +877,18 @@ const timer = (() => {
     const rl = S.holdSeconds > 0 ? `Maintenir pour reprendre (${S.holdSeconds} s)` : 'Reprendre';
     if (rl !== resumeLabel) { resumeLabel = rl; btnResume.textContent = rl; }
     if (run) {
-      const left = run.ended ? 0 : Math.max(0, (run.endAt - Date.now()) / 1000);
+      const asking = ph === 'focus' && !!run.askAt;
+      b.classList.toggle('asking', asking);
+      askBox.hidden = !asking;
+      const left = asking ? Math.max(0, (run.askAt - Date.now()) / 1000) : run.ended ? 0 : Math.max(0, (run.endAt - Date.now()) / 1000);
       // Sous le temps : « focus », « pause », ou l'action de respiration en cours.
-      clock.label(ph, run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
-      clock.draw(left, run.total);
+      clock.label(ph, asking ? 'on fait une pause ?' : run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
+      clock.draw(left, asking ? 10 : run.total);
       paintBg();
       if (ph === 'break') applyGuide(); else resetVisual();
     } else {
+      b.classList.remove('asking');
+      askBox.hidden = true;
       clock.reset();
       paintBg();
       resetVisual();
@@ -951,9 +979,18 @@ const timer = (() => {
       if (run.resumeAt && Date.now() >= run.resumeAt) begin('focus');
       return;
     }
-    // Le focus enchaîne sur la pause, puis le focus reprend, et ainsi de suite jusqu'à « Arrêter » (15/11, demande de l'utilisateur).
-    notify('Focus terminé', 'Place à la pause.');
-    begin('break');
+    // Règle de la 1.0 (15/11, demande de l'utilisateur) : à la fin du focus, une clochette et la question « On fait une pause ? »
+    // pendant 10 s ; « Oui » ou pas de réponse : la pause commence ; « Non » : un nouveau focus de même durée. À la fin de la
+    // pause, le focus reprend tout seul, et ainsi de suite jusqu'à « Arrêter ».
+    if (!run.askAt) {
+      run.askAt = Date.now() + 10000;
+      store.set('run', run);
+      chime();
+      notify('On fait une pause ?', 'Sans réponse, la pause commence dans 10 s.');
+      render();
+      return;
+    }
+    if (Date.now() >= run.askAt) begin('break'); else render(); // le décompte des 10 s se met à jour chaque seconde
   }
 
   // Arc fluide tant que l'écran est visible ; le contrôle de fin tourne aussi en arrière-plan.
@@ -972,6 +1009,9 @@ const timer = (() => {
   btn.addEventListener('click', () => { if (!run) start(); });
   btnStop.addEventListener('click', () => { if (run) stop(); });
   btnBreak.addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
+  // La question de fin de focus : « Oui » lance la pause, « Non » refait un focus de même durée.
+  $('#ask-yes').addEventListener('click', () => { if (run?.phase === 'focus') begin('break'); });
+  $('#ask-no').addEventListener('click', () => { if (run?.phase === 'focus' && run.askAt) begin('focus'); });
 
   // « Reprendre le focus » : un simple toucher ou, si réglé, un toucher MAINTENU (geste
   // volontaire pour ne pas écourter la pause sans y penser, comme la 1.0).

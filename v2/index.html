@@ -69,6 +69,11 @@
       </div>
     </div>
     <div id="controls">
+      <!-- Fin du focus (règle de la 1.0) : « On fait une pause ? », 10 s, sans réponse la pause commence. -->
+      <div id="ask" hidden>
+        <button id="ask-yes" type="button">Oui, pause</button>
+        <button id="ask-no" type="button">Non, encore un focus</button>
+      </div>
       <button id="btn-go" type="button" aria-label="Démarrer ou arrêter"><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg class="i-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg></button>
       <button id="btn-resume" type="button">Reprendre</button>
     </div>
