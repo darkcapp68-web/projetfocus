@@ -538,7 +538,7 @@ body.phase-break #btn-go { display: none; }
   #controls { gap: 8px; }
   #side { gap: 8px; width: min(420px, 40vw); padding-top: 80px; } /* la place de l'encadré du rdv est réservée : rien ne bouge quand il apparaît */
   #rdv { top: 0; bottom: auto; }
-  #mail-list li:nth-child(n+4) { display: none; }
+  #mail-list li:nth-child(n+5) { display: none; }
   #player { padding: 2px 24px 8px; gap: 2px 20px; grid-template-columns: 1fr 300px; }
   #wave { height: 36px; }
   #btn-radio { width: 48px; height: 48px; }
