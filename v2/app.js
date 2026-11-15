@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 18h38';
+const APP_VERSION = '15/11/2026 · 19h00';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -36,7 +36,7 @@ addEventListener('resize', setAppH);
 // sont pas concernés. Si on sort du plein écran (geste retour), le toucher suivant recouche l'écran.
 try {
   const smallest = Math.min(screen.width, screen.height);
-  if (smallest < 600 && matchMedia('(display-mode: standalone)').matches && screen.orientation?.lock && document.documentElement.requestFullscreen) {
+  if (smallest < 600 && screen.orientation?.lock && document.documentElement.requestFullscreen) {
     const goLandscape = () => {
       removeEventListener('pointerup', goLandscape, true);
       document.documentElement.requestFullscreen().then(() => screen.orientation.lock('landscape')).catch(() => addEventListener('pointerup', goLandscape, true));
