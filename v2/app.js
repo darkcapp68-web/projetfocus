@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 17h34';
+const APP_VERSION = '15/11/2026 · 17h36';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1243,10 +1243,11 @@ async function refreshGoogle() {
   mailBtn.disabled = false;
 }
 mailBtn.addEventListener('click', refreshGoogle);
-// Quand on appuie sur ▶ (un vrai geste : la fenêtre Google a le droit de s'ouvrir), on actualise aussi,
-// si la connexion a déjà été accordée sur cet appareil et si les listes ont plus de 2 minutes.
+// Quand on appuie sur ▶, on actualise aussi, mais seulement si l'autorisation Google est encore valable et si les
+// listes ont plus de 2 minutes (15/11). Sans autorisation valable, ▶ ne doit rien ouvrir : la fenêtre Google fait
+// redémarrer l'appli sur la tablette (flash blanc au démarrage) ; le rappel « touche ↻ » prend le relais.
 $('#btn-start').addEventListener('click', () => {
-  if (!localStorage.getItem('projetfocus2.googleOk')) return; // jamais connecté : on ne surprend pas
+  if (!mail.tokenValid) return;
   if (Date.now() - Math.max(agendaAt, mailsAt) < 120000) return;
   refreshGoogle();
 });

@@ -110,6 +110,9 @@ export function createMail({ getClientId }) {
   };
 
   return {
+    // L'autorisation est-elle encore valable ? (alors on peut actualiser sans ouvrir de fenêtre Google)
+    get tokenValid() { return !!token && Date.now() < tokenExp - 60000; },
+
     // Une seule fenêtre Google pour les deux ; renvoie ce qui a été accordé.
     async connect() { await getToken(); return { ...granted }; },
 

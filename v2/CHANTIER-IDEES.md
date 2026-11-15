@@ -612,7 +612,7 @@ soi-même.
   besoins » ; l'écran est plus léger. Constantes `AGENDA_MAX` (app.js) et `maxResults` (mail.js).
   **Actualisation (15/11)** : Google n'ouvre sa fenêtre de connexion que sur un vrai toucher
   (vérifié sur la tablette : sans geste, « popup_failed_to_open »), donc pas de mise à jour
-  vraiment automatique avec cette méthode. Fait : l'appui sur ▶ actualise l'agenda et les mails
+  vraiment automatique avec cette méthode. Fait (puis restreint le 15/11 : ▶ n'actualise que si l'autorisation est encore valable, car la fenêtre Google faisait redémarrer l'appli sur la tablette, avec un flash blanc au démarrage) : l'appui sur ▶ actualise l'agenda et les mails
   (si la connexion a déjà été accordée sur l'appareil et si les listes ont plus de 2 minutes) ; le
   texte devient « il y a N min » (mis à jour toutes les 20 s) et, après 10 minutes, « · touche ↻ »
   en gras. Pour du vraiment automatique : un relais Apps Script à l'utilisateur (option B, pas
