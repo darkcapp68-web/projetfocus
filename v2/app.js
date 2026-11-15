@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 15h13';
+const APP_VERSION = '15/11/2026 · 15h23';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -69,7 +69,11 @@ const DEFAULTS = {
   // Les 4 couleurs de fond (15/11, demande de l'utilisateur) : pastel, texte noir.
   // Un seul fond (15/11, demande de l'utilisateur : « on revient sur un fond plutôt bleu pastel ») :
   // un bleu pastel doux (les premiers pastels, plus clairs, éblouissaient sur la tablette), texte noir.
-  colorDefault: '#86a9c9',
+  colorDefault: '#86a9c9', // fond : bleu pastel doux (réglable)
+  // Dégradés vers le fond (15/11, demande de l'utilisateur) : focus concentré en rouge, focus rdv en orange
+  // (tons doux, pour les yeux). Focus normal : le fond tel quel.
+  colorAbsolute: '#c98686',
+  colorRdv: '#d4a373',
   syncClientId: CLIENT_ID,
 };
 
@@ -115,7 +119,11 @@ function sanitize(raw0) {
   // trop clair, est remplacé par le doux ; un choix personnel est gardé.
   r.colorDefault = color(r.colorDefault, DEFAULTS.colorDefault);
   if (r.colorDefault === '#a8d1f5') r.colorDefault = DEFAULTS.colorDefault;
-  delete r.colorFocus; delete r.colorRdv; delete r.colorAbsolute;
+  delete r.colorFocus;
+  r.colorAbsolute = color(r.colorAbsolute, DEFAULTS.colorAbsolute);
+  r.colorRdv = color(r.colorRdv, DEFAULTS.colorRdv);
+  if (r.colorAbsolute === '#f4a6a6') r.colorAbsolute = DEFAULTS.colorAbsolute; // les premiers pastels, trop clairs
+  if (r.colorRdv === '#ffcf9e') r.colorRdv = DEFAULTS.colorRdv;
   r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
   r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
   r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);
@@ -701,9 +709,17 @@ const timer = (() => {
   // Fond (15/11, demande de l'utilisateur) : un seul bleu pastel doux, texte noir. Le mode du
   // focus (normal, concentré) se lit sur les boutons ; la classe « absolute » reste sur la page.
   const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const tintEl = $('#tint');
   let lastBg = '';
   function paintBg() {
     document.body.classList.toggle('absolute', !!run && run.phase !== 'break' && absolute);
+    // Dégradé (15/11) : focus concentré = rouge, focus rdv = orange (concentré l'emporte) ; focus normal,
+    // pause et repos : rien, le fond tel quel.
+    const cl = document.body.classList;
+    const inFocus = !!run && run.phase !== 'break';
+    const tint = !inFocus ? '' : absolute ? S.colorAbsolute : (cl.contains('rdv-now') || cl.contains('rdv-soon')) ? S.colorRdv : '';
+    if (tint) tintEl.style.setProperty('--tint', tint);
+    tintEl.style.opacity = tint ? 1 : 0;
     const c = S.colorDefault;
     if (c === lastBg) return;
     lastBg = c;
@@ -1066,9 +1082,9 @@ const sync = createSync({
 });
 
 $('#btn-colors-reset').addEventListener('click', () => {
-  S.colorDefault = DEFAULTS.colorDefault;
+  for (const k of ['colorDefault', 'colorAbsolute', 'colorRdv']) S[k] = DEFAULTS[k];
   saveS();
-  for (const el of pauseFields) if (el.dataset.k === 'colorDefault') writeField(el, S.colorDefault);
+  for (const el of pauseFields) if (el.dataset.k?.startsWith('color')) writeField(el, S[el.dataset.k]);
   timer.render();
 });
 $('#btn-sync-save').addEventListener('click', () => sync.save());
@@ -1143,6 +1159,7 @@ function updateRdv() {
   b.classList.toggle('rdv-soon', m?.state === 'soon');
   for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind === k);
   rdvBox.hidden = !m;
+  timer.paint(); // le dégradé orange apparaît (ou disparaît) avec le rdv
   if (!m) return;
   const min = Math.max(1, Math.round((m.e.start.getTime() - Date.now()) / 60000));
   const left = Math.max(1, Math.round((m.e.end.getTime() - Date.now()) / 60000));

@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Dégradé du focus concentré (rouge) ou du focus rdv (orange) vers le fond, jusqu'aux 2/3 de l'écran (15/11). -->
+  <div id="tint" aria-hidden="true"></div>
   <div id="pulse" aria-hidden="true"></div>
   <header>
     <button id="btn-settings" type="button" aria-haspopup="dialog" aria-label="Paramètres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span id="update-dot" hidden></span></button>
@@ -152,10 +154,12 @@
       </details>
 
       <details class="sec">
-        <summary>Couleurs <small>fond</small></summary>
-        <p class="note">Un seul fond, en bleu pastel doux (15/11). Le texte est noir : choisis une couleur plutôt claire, mais pas éblouissante.</p>
-        <label class="swatch">Couleur du fond<input type="color" data-k="colorDefault"></label>
-        <div class="buttons"><button type="button" id="btn-colors-reset">Remettre le bleu doux</button></div>
+        <summary>Couleurs <small>fond et dégradés</small></summary>
+        <p class="note">Le fond est un bleu pastel doux par défaut ; le texte est noir, choisis des couleurs plutôt claires. En focus normal, le fond reste tel quel. En focus concentré, un dégradé de la couleur « concentré » vers le fond couvre les 2/3 du haut de l'écran ; en focus rdv, pareil avec la couleur « rdv ».</p>
+        <label class="swatch">Fond<input type="color" data-k="colorDefault"></label>
+        <label class="swatch">Dégradé du focus concentré (rouge)<input type="color" data-k="colorAbsolute"></label>
+        <label class="swatch">Dégradé du focus rdv (orange)<input type="color" data-k="colorRdv"></label>
+        <div class="buttons"><button type="button" id="btn-colors-reset">Remettre les couleurs d'origine</button></div>
       </details>
 
       <details class="sec">

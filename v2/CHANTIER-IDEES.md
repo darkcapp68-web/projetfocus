@@ -571,6 +571,13 @@ et **Pause maintenant** (grisé au repos). **En pause, seulement « Reprendre »
 Paramètres est une icône à trois lignes (menu « hamburger ») en haut à droite. **Le rdv correspondant s'affiche au-dessus de
 l'agenda**, dans la colonne de droite.
 
+**Dégradés (15/11, demande de l'utilisateur)** : le fond reste le bleu pastel doux, réglable. En
+**focus normal** : le fond tel quel. En **focus concentré** : un dégradé **rouge** vers le fond ; en
+**focus rdv** : un dégradé **orange** vers le fond ; le dégradé va du haut de l'écran jusqu'aux
+**2/3** (puis le fond tel quel). Concentré l'emporte sur rdv ; rien en pause ni au repos. Les trois
+couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *À juger à l'œil : le
+« jusqu'aux 2/3 bas » a été compris comme « du haut jusqu'aux 2/3 de la hauteur » ; changeable.*
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |
