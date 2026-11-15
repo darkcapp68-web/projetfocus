@@ -26,6 +26,25 @@ Pistes, à choisir avec l'utilisateur :
 *Moyen* : une seule connexion à prévoir (la ville choisie ou la position), sans compte ni serveur ; la page actualise la météo de
 temps en temps et garde la dernière valeur si elle est hors ligne. Statut : **idée**, rien n'est décidé.
 
+## Autres idées gardées (détail dans `CHANTIER-1.md`)
+
+### 6.4 Playlist « Mes musiques » *(idée en réserve de la 1.0)*
+
+Une entrée « Mes musiques » dans le menu de la radio : les MP3 de l'utilisateur (achetés ou tirés de ses CD), jouée au hasard ou dans
+l'ordre, en boucle, **hors ligne** une fois récupérée, sans publicité. Utilisable aussi comme musique de la pause. Trois façons d'y
+mettre ses MP3, de la plus simple à la plus complète : **choisir des fichiers sur l'appareil** (bouton « Ajouter mes MP3 », aucun compte
+Google, *Moyen*) ; **choisir dans le Drive** par le sélecteur Google, portée `drive.file` (*Difficile* : clé d'API publique en plus de
+l'ID client) ; un dossier du Drive récupéré une fois. Les MP3 ne vont jamais dans le dépôt public. Statut : **idée**.
+
+### Les sons attendus pour la pause *(en attente de l'utilisateur)*
+
+- **La musique calme de la pause** : un fichier `v2/audio/pause/calme.mp3` (pistes à fabriquer avec Suno, voir `SUNO.md`). L'appli la
+  détecte toute seule ; elle se choisit dans Paramètres → Pause → « Musique de la pause ».
+- **Les trois sons de respiration** (inspire, retiens, expire), selon les rythmes de respiration (voir `SUNO.md` pour les noms de
+  fichiers et le style). Tant que rien n'est fourni, l'appli joue de simples notes de cloche et la radio continue.
+
+Statut : **en attente des fichiers** ; rien à coder de plus.
+
 ## Ce qui est déjà fait (en bref, détail dans `CHANTIER-1.md`)
 
 Dock des modes et des durées, fonds en bleu pastel avec dégradés rouge et orange, focus concentré épuré, agenda et mails pro,
