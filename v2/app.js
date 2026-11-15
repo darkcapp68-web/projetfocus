@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h39';
+const APP_VERSION = '15/11/2026 · 20h41';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -286,8 +286,9 @@ const wave = (() => {
   // l'adaptation de sensibilité gardent la même vitesse réelle.
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
   let prevB = -60, lastOn = 0, spT = 1, spd = 1, spAcc = 0, lastT = 0, cphase = 0; // vitesse des vagues liée au tempo (plage)
-  const onsT = []; // les instants des derniers coups de basse (s)
-  let rate = 0;
+  const onsT = []; // les instants des derniers coups de basse (s), sur 12 s
+  let rate = 0, bpmAt = 0, bpmTxt = '';
+  const bpmEl = $('#bpm');
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
   function frame(t) {
@@ -332,10 +333,26 @@ const wave = (() => {
       const tn = performance.now() / 1000;
       if (z > 1 && b > prevB && tn - lastOn > 0.3) { onsT.push(tn); lastOn = tn; }
       prevB = b;
-      while (onsT.length && tn - onsT[0] > 8) onsT.shift();
-      rate = onsT.length / 8;
+      while (onsT.length && tn - onsT[0] > 12) onsT.shift();
+      rate = onsT.filter((x) => tn - x <= 8).length / 8;
+      // Tempo estimé, affiché pour les essais (15/11, demande de l'utilisateur) : parmi les périodes de 0,33 à 0,9 s (67 à 180
+      // BPM), celle sur laquelle les coups de basse se calent le mieux (même phase d'un coup à l'autre, même si certains manquent).
+      if (tn - bpmAt > 1) {
+        bpmAt = tn;
+        let best = 0, bp = 0;
+        if (onsT.length >= 8) {
+          for (let p = 0.33; p <= 0.9; p += 0.005) {
+            let sx = 0, sy = 0;
+            for (const x of onsT) { sx += Math.cos(6.2832 * x / p); sy += Math.sin(6.2832 * x / p); }
+            const r = Math.hypot(sx, sy) / onsT.length;
+            if (r > best) { best = r; bp = p; }
+          }
+        }
+        bpmTxt = (best > 0.45 ? '≈ ' + Math.round(60 / bp) + ' BPM' : '— BPM') + ' · ' + rate.toFixed(1).replace('.', ',') + ' coups/s · vague ×' + spd.toFixed(2).replace('.', ',');
+        bpmEl.textContent = bpmTxt;
+      }
       spT = 0.75 + 0.5 * Math.min(1, Math.max(0, (rate - 0.3) / 1.2));
-    } else { pNow = 0.05; spT = 1; }
+    } else { pNow = 0.05; spT = 1; if (bpmTxt) { bpmTxt = ''; bpmEl.textContent = ''; } }
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
     // La vitesse (1 = 60 échantillons par seconde) suit le tempo, adoucie ; la forme des crêtes avance à la même vitesse.
