@@ -437,7 +437,7 @@ header, main, footer { position: relative; z-index: 1; }
 }
 
 /* Rdv de l'agenda qui correspond au focus (15/11), à gauche sous l'horloge. */
-#rdv { width: 100%; padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
+#rdv { position: absolute; left: 0; right: 0; bottom: calc(100% + 12px); width: 100%; padding: 8px 14px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--glass); }
 #rdv[hidden] { display: none; }
 #rdv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
 #rdv-kind { padding: 0 8px; border-radius: 999px; background: var(--glass-strong); color: var(--fg); letter-spacing: 0; text-transform: none; }
@@ -476,16 +476,17 @@ body.absolute #dnd { display: block; will-change: transform; animation: dnd-puls
 .dock-btn[aria-pressed="true"] .ico { background: var(--fg); color: var(--on-fg); }
 .dock-btn:active:not(:disabled) .ico { transform: scale(0.94); }
 .dock-btn:disabled { opacity: 0.4; }
-body.phase-break #rail-modes { display: none; }
+#rail-modes { transition: opacity 0.3s ease, visibility 0.3s; }
+body.phase-break #rail-modes { opacity: 0; visibility: hidden; pointer-events: none; }
 
-#durations { width: 46px; overflow: hidden; transition: width 0.5s ease, margin 0.5s ease, opacity 0.4s ease; }
+#durations { width: 46px; transition: opacity 0.3s ease, visibility 0.3s; }
 .rail-cap { border: 0; background: none; padding: 0; min-height: 22px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
 .rail-cap:not(:first-child) { margin-top: 8px; }
 .rail-cap.on { color: var(--fg); font-weight: 700; }
 .dur { width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--glass); color: var(--fg); font-size: 15px; font-weight: 600; }
 .dur.on { background: var(--fg); color: var(--on-fg); }
 .dur:active { transform: scale(0.94); }
-body.running #durations, body.phase-break #durations { width: 0; margin-left: -14px; opacity: 0; pointer-events: none; }
+body.running #durations, body.phase-break #durations { opacity: 0; visibility: hidden; pointer-events: none; } /* la place reste : l'anneau ne bouge pas au démarrage */
 
 #btn-go { width: 64px; height: 64px; border: 0; border-radius: 50%; background: var(--fg); color: var(--on-fg); display: grid; place-items: center; }
 #btn-go svg { width: 28px; height: 28px; fill: currentColor; stroke: none; }
@@ -494,3 +495,9 @@ body.running #btn-go .i-play { display: none; }
 body.running #btn-go .i-stop { display: block; }
 body.phase-break #btn-go { display: none; }
 #btn-go:active { transform: scale(0.95); }
+
+/* Colonne de droite : repère pour l'encadré du rdv, posé au-dessus sans rien décaler (15/11). */
+#side { position: relative; }
+/* Les icônes ✕ et ▶ du coin sont retirées (15/11, demande de l'utilisateur) : le grand bouton sous l'anneau suffit.
+   Les boutons restent dans la page, cachés, car le grand bouton les actionne. */
+#toolbar { display: none; }

@@ -680,7 +680,7 @@ adaptations du focus concentré restent à décider (question 2 de l'audit).
 pendant la séance) ; « Focus » et « Pause » au-dessus des boutons choisissent ce que règle l'anneau, qui se
 règle toujours au geste (une durée hors préréglage se règle à l'anneau, aucun bouton n'est alors plein) ;
 **sous l'anneau** un grand bouton rond : ▶ au repos, ■ (arrêter) pendant la séance ; en pause, seulement
-« Reprendre ». Les icônes ✕ et ▶ du coin restent (doublon voulu avec le grand bouton : à retirer si inutile).
+« Reprendre ». Les icônes ✕ et ▶ du coin sont retirées (15/11). La mise en page ne bouge plus au démarrage : les durées et les modes se masquent sans libérer leur place, et l'encadré du rdv se pose au-dessus de l'agenda sans le pousser.
 
 **Adaptations possibles (à choisir)**
 
