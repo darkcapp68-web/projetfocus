@@ -113,11 +113,11 @@ export function createMail({ getClientId }) {
     // Une seule fenêtre Google pour les deux ; renvoie ce qui a été accordé.
     async connect() { await getToken(); return { ...granted }; },
 
-    // Les 10 derniers mails de la boîte de réception : [{ from, subject, unread }].
-    async last10() {
+    // Les derniers mails de la boîte de réception (7 : choix de l'utilisateur, 15/11) : [{ from, subject, unread }].
+    async lastMails() {
       await getToken();
       if (!granted.mail) throw new Error('accès aux mails non accordé : reconnecte-toi et coche la case');
-      const list = await api(`${MAIL_API}?labelIds=INBOX&maxResults=10`, 'Gmail');
+      const list = await api(`${MAIL_API}?labelIds=INBOX&maxResults=7`, 'Gmail');
       const ids = (list.messages || []).map((m) => m.id);
       const hdr = 'metadataHeaders=From&metadataHeaders=Subject';
       const msgs = await Promise.all(ids.map((id) => api(`${MAIL_API}/${id}?format=metadata&${hdr}`, 'Gmail')));

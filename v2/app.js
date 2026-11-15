@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h40';
+const APP_VERSION = '15/11/2026 · 14h42';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1074,7 +1074,7 @@ const line = (cls, ...cells) => {
 const emptyNote = (el, text) => { el.textContent = ''; el.append(line('empty', ['title', text])); };
 
 let agendaItems = null;
-const AGENDA_MAX = 5;
+const AGENDA_MAX = 3; // les 3 prochains rdv (15/11, choix de l'utilisateur)
 // L'agenda se redessine chaque minute sans rien demander à Google : ce qui est fini disparaît.
 function renderAgenda() {
   if (!agendaItems) return;
@@ -1143,7 +1143,7 @@ async function refreshGoogle() {
     mailBusy = false; mailBtn.disabled = false;
     return;
   }
-  const [mails, agenda] = await Promise.allSettled([mail.last10(), mail.today()]);
+  const [mails, agenda] = await Promise.allSettled([mail.lastMails(), mail.today()]);
   const at = hhmm(new Date());
   if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); updateRdv(); setStatus(agendaStatus, 'à jour à ' + at); }
   else setStatus(agendaStatus, problem(agenda.reason), 'warn');

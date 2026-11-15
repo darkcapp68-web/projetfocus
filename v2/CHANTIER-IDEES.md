@@ -517,6 +517,8 @@ soi-même.
   (« Rdv » à 18:00, champ de visio de Google) ; les évènements sans visio n'ont pas d'étiquette.
   Pas encore vu avec un vrai évènement Teams ou Zoom (la règle cherche leur lien dans le lieu ou la
   description). Prochaine étape : couper la musique selon le type (règles du point 0).
+  **Décision du 15/11 : 3 prochains rdv et 7 mails** (au lieu de 5 et 10) : « l'idéal, ça règle les
+  besoins » ; l'écran est plus léger. Constantes `AGENDA_MAX` (app.js) et `maxResults` (mail.js).
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
