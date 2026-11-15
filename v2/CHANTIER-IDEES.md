@@ -360,6 +360,12 @@ l'APK est repris, le bouton dans la notification s'ajoute.
     seule playlist ou plusieurs (« focus », « pause ») ? Veut-il passer d'abord par le choix de
     fichiers (plus simple) avant le Drive ?
 - Musique calme de pause et sons de respiration : en attente de l'utilisateur (`SUNO.md`).
+- **Suno et les droits** (15/11, l'utilisateur envisage un compte payant) : l'appli ne lit pas Suno
+  directement, elle lit les **fichiers MP3 téléchargés**. Un abonnement payant (Pro ou Premier,
+  à vérifier sur la page de Suno, les conditions changent) donne en principe le droit d'usage
+  commercial des titres créés pendant l'abonnement ; ceux du compte gratuit restent à usage
+  personnel. Pour écouter chez soi, rien ne change ; la question ne se pose que pour **publier**
+  un titre dans le dépôt public (à éviter, sauf `audio/pause/calme.mp3`).
 
 ## 7. Confort sur Android
 
@@ -474,14 +480,18 @@ soi-même.
   toujours allumé (Wake Lock), tablette sur le chargeur. Couleur franche et mot lisible de
   loin (« Focus jusqu'à 15h10 », « Dérangeable », « Urgence seulement »). Mode « bureau » avec
   grosse horloge quand rien ne tourne.
-- **11.2 Agenda pro du jour** (*Moyen*) : la frise de la journée avec le rdv en cours et les
-  suivants. Même connexion Google que le point 1 ; un évènement lit le titre, l'heure et le
-  type (visio, appel).
-- **11.3 Derniers mails pro** (*Difficile*) : lecture des derniers messages par l'API Gmail
-  (portée `gmail.readonly`, « restreinte » chez Google : marche pour soi en mode test, mais
-  l'administrateur de l'entreprise peut l'interdire). Alternative sans autorisation : afficher
-  seulement le **nombre de non lus** si on trouve un moyen simple, sinon rien. À vérifier avant
-  tout.
+- **11.2 Agenda pro du jour** (*Moyen*) : la liste de la journée (intitulés, jours, heures :
+  c'est tout ce qu'il faut, précisé le 15/11) avec le rdv en cours et les suivants. Portée
+  `calendar.readonly` (même connexion Google que le point 1) ; le type (visio, appel) se devine
+  du lien et du lieu.
+- **11.3 Derniers mails pro : seulement les expéditeurs et les objets** (*Moyen à Difficile*,
+  précisé le 15/11 : pas besoin du contenu). Lecture des **en-têtes** par l'API Gmail (portée
+  `gmail.metadata` : expéditeur, objet, date, jamais le texte des mails ; Google la classe
+  « restreinte », mais pour un usage personnel en mode test ça marche). **Le vrai risque** : la
+  connexion d'un compte **pro** à une appli extérieure peut être refusée par l'administrateur
+  Google de l'entreprise. Le seul moyen sûr de le savoir : **essayer** une connexion avec le
+  compte pro (test à faire avec l'utilisateur). Sans cette autorisation, retour à la solution
+  sans code : le widget Gmail de la tablette.
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
