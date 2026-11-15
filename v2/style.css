@@ -240,16 +240,16 @@ dialog::backdrop { background: rgba(28, 44, 80, 0.45); -webkit-backdrop-filter: 
 #toolbar button:active:not(:disabled) { transform: scale(0.94); }
 #toolbar button:disabled { opacity: 0.32; }
 
-/* Après Démarrer, l'heure (temps et « focus ») s'efface jusqu'à l'invisible en 10 s, reste
-   invisible 10 s, revient en 10 s, puis repart aussitôt (07/11, demande de l'utilisateur ;
+/* Après Démarrer, l'heure (temps et « focus ») s'efface jusqu'à 10 % en 10 s, reste
+   à 10 % 10 s, revient en 10 s, puis repart aussitôt (07/11, demande de l'utilisateur ;
    la 1.0 descendait à 12 % sans pause). Le cercle et l'arc restent toujours visibles pour
    suivre le décompte. Un toucher rend l'heure entièrement visible quelques secondes. */
 #center { transition: opacity 0.8s ease; }
 body.running:not(.awake) #center { animation: time-fade 31s ease-in-out infinite; }
 @keyframes time-fade {
   0% { opacity: 1; }
-  32.26% { opacity: 0; } /* 10 s pour disparaître */
-  64.52% { opacity: 0; } /* 10 s invisible */
+  32.26% { opacity: 0.1; } /* 10 s pour s'effacer jusqu'à 10 % (demande de l'utilisateur, 15/11 : plus jamais invisible) */
+  64.52% { opacity: 0.1; } /* 10 s à 10 % */
   96.77% { opacity: 1; } /* 10 s pour revenir */
   100% { opacity: 1; } /* 1 s visible, puis on repart */
 }
