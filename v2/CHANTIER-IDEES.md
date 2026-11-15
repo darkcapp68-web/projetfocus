@@ -561,7 +561,7 @@ Paramètres → Couleurs). Le mode se lit sur les boutons, sous l'horloge : **Fo
 **Focus concentré** (= absolu : il ne fait pour l'instant rien de plus que se mémoriser, à définir)
 et **Pause maintenant** (grisé au repos). **En pause, seulement « Reprendre ».** **✕ Arrêter** et
 **▶ Démarrer** sont des icônes en haut à gauche (Démarrer au repos, Arrêter pendant une séance) ;
-Paramètres est une roue crantée en haut à droite. **Le rdv correspondant s'affiche au-dessus de
+Paramètres est une icône à trois lignes (menu « hamburger ») en haut à droite. **Le rdv correspondant s'affiche au-dessus de
 l'agenda**, dans la colonne de droite.
 
 **Adaptations possibles (à choisir)**

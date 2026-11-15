@@ -55,7 +55,7 @@ header {
   display: grid;
   place-items: center;
 }
-#btn-settings svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+#btn-settings svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 #btn-settings:active { background: var(--glass-strong); }
 #update-dot {
   position: absolute;
