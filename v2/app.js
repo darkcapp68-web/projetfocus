@@ -4,7 +4,30 @@ import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '07/11/2026 · 08h56';
+const APP_VERSION = '15/11/2026 · 13h57';
+
+// Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
+let wakeLock = null, wakeBusy = false;
+async function keepAwake(on) {
+  try {
+    if (on && !wakeLock && !wakeBusy && navigator.wakeLock) {
+      wakeBusy = true;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } else if (!on && wakeLock) {
+      await wakeLock.release();
+      wakeLock = null;
+    }
+  } catch { /* refusé (économie d'énergie) : tant pis */ } finally { wakeBusy = false; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && document.body.classList.contains('running')) keepAwake(true);
+});
+
+// Vraie hauteur visible (Chrome 101 sur la tablette ne connaît pas 100dvh).
+const setAppH = () => document.documentElement.style.setProperty('--app-h', innerHeight + 'px');
+setAppH();
+addEventListener('resize', setAppH);
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
@@ -41,7 +64,7 @@ const DEFAULTS = {
   breakMusic: 'radio', // musique de la pause : radio | silence | calme
   fullscreenOnBreak: false, // plein écran au début de la pause
   holdSeconds: 0, // « Reprendre le focus » : 0 = un toucher ; sinon, toucher maintenu N secondes
-  notifyOn: true, // notification si la fenêtre est cachée
+  notifyOn: false, // notifications mises de côté (15/11, demande de l'utilisateur : elles n'ont pas bien marché selon les versions)
   syncClientId: CLIENT_ID,
 };
 
@@ -75,7 +98,7 @@ function sanitize(raw0) {
   r.breathLabels = !!r.breathLabels;
   r.autoChain = !!r.autoChain;
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
-  r.notifyOn = !!r.notifyOn;
+  r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
   r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
   r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
@@ -632,6 +655,7 @@ const timer = (() => {
     const b = document.body;
     const ph = run?.phase;
     b.classList.toggle('running', !!run);
+    keepAwake(!!run);
     b.classList.toggle('phase-focus', ph === 'focus');
     b.classList.toggle('phase-break', ph === 'break');
     b.classList.toggle('break-ended', !!run?.ended);

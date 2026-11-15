@@ -1,4 +1,5 @@
-/* projetfocus 2.0 — pensé d'abord pour le téléphone : gros boutons, peu de choses. */
+/* projetfocus 2.0 — pensé pour la tablette posée en paysage sur le bureau (décision du 15/11),
+   mais le portrait reste utilisable : gros boutons, peu de choses. */
 :root {
   --bg: #1c1a4d;
   --fg: #ffffff;
@@ -18,7 +19,11 @@ body {
   font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   min-height: 100dvh;
+  /* Chrome 101 (tablette) ne connaît pas dvh, et 100vh y compte la barre d'adresse cachée :
+     app.js mesure la vraie hauteur (--app-h). */
+  min-height: var(--app-h, 100dvh);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -177,6 +182,7 @@ body.adjusting #ticks, body.show-ticks #ticks { opacity: 1; }
 
 /* Paramètres : un panneau qui monte du bas. */
 dialog {
+  max-height: 90vh;
   max-height: 90dvh;
   margin: auto auto 0;
   width: 100%;
@@ -362,8 +368,30 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
 
 /* Réglages : un champ « caché » (data-if) ne prend pas de place ; une case à cocher se place à droite. */
 .sheet [hidden] { display: none !important; }
-.sheet label:has(> input[type="checkbox"]) { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.sheet label.chk { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
 .sheet label > input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--accent); }
 .sheet input[type="number"], .sheet textarea { min-height: 48px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--glass); color: var(--fg); font: inherit; }
 .sheet input[type="color"] { width: 64px; height: 44px; padding: 2px; border: 0; border-radius: 12px; background: var(--glass); }
 .sheet textarea { width: 100%; resize: vertical; }
+
+/* Commandes sous l'horloge (focus / pause, Démarrer…) : une colonne. */
+#controls { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+/* Tablette en paysage (15/11) : l'horloge à gauche, les commandes à droite ; le lecteur en bas
+   sur deux lignes (onde en largeur, puis radio et volume côte à côte). */
+@media (orientation: landscape) and (min-width: 900px) {
+  main { flex-direction: row; gap: 56px; padding: 0 32px; }
+  #dial-wrap { --dial-size: min(calc(var(--app-h, 100vh) - 290px), 46vw, 460px); }
+  #controls { flex: none; min-width: 240px; }
+  #player {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-areas: "wave wave" "radio vol";
+    align-items: center;
+    gap: 6px 28px;
+    padding: 4px 32px 18px;
+  }
+  #wave { grid-area: wave; height: 72px; }
+  #player .radio { grid-area: radio; }
+  #volume { grid-area: vol; }
+}

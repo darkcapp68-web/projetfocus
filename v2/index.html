@@ -41,6 +41,7 @@
     </div>
     </div>
     <!-- Au repos : ce que règle l'horloge (comme la 1.0). Pendant le focus : « Pause maintenant ». -->
+    <div id="controls">
     <div id="setup">
       <button type="button" id="edit-focus" class="seg on">focus <b id="v-focus">25</b> min</button>
       <button type="button" id="edit-break" class="seg">pause <b id="v-break">5</b> min</button>
@@ -48,6 +49,7 @@
     <button id="btn-break" type="button">Pause maintenant</button>
     <button id="btn-resume" type="button">Reprendre le focus</button>
     <button id="btn-start" type="button" class="primary">Démarrer</button>
+    </div>
   </main>
 
   <footer id="player">
@@ -87,7 +89,7 @@
       <details class="sec">
         <summary>Pause <small>respiration, reprise</small></summary>
         <label>Rythme<select data-k="breathPattern" id="sel-breath"></select></label>
-        <label data-if="breathPattern!=aucun">Sons de respiration <small>aigu = inspire, moyen = retiens, grave = expire</small><input type="checkbox" data-k="breathSound"></label>
+        <label class="chk" data-if="breathPattern!=aucun">Sons de respiration <small>aigu = inspire, moyen = retiens, grave = expire</small><input type="checkbox" data-k="breathSound"></label>
         <label data-if="breathPattern!=aucun breathSound">Volume des sons (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="breathVol"><output></output></span></label>
         <div class="buttons" data-if="breathPattern!=aucun breathSound"><button type="button" id="btn-test-breath">Écouter les trois sons</button></div>
         <label data-if="breathPattern!=aucun">La respiration se voit par<select data-k="breathShow"><option value="none">rien (l'écran ne bouge pas : on écoute)</option><option value="word">le mot (il grandit, l'écran ne bouge pas)</option><option value="colors">les couleurs (le mot garde sa taille)</option><option value="both">le mot et les couleurs</option><option value="veil">un voile sombre (sans couleurs)</option></select></label>
@@ -95,15 +97,15 @@
         <label data-if="breathPattern!=aucun breathShow=colors|breathShow=both">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
         <label data-if="breathPattern!=aucun breathShow=colors|breathShow=both">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
         <label>Musique de la pause<select data-k="breakMusic" id="sel-break-music"></select></label>
-        <label>Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
+        <label class="chk">Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
         <label data-if="autoChain">… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>
         <details class="more">
           <summary>Réglages avancés <small>consignes, plein écran, notification</small></summary>
-          <label data-if="breathPattern!=aucun breathShow!=word">Écrire « inspire / retiens / expire » sous le temps<input type="checkbox" data-k="breathLabels"></label>
+          <label class="chk" data-if="breathPattern!=aucun breathShow!=word">Écrire « inspire / retiens / expire » sous le temps<input type="checkbox" data-k="breathLabels"></label>
           <label data-if="breathPattern!=aucun breathShow=veil">Assombrissement du voile (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
-          <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
+          <label class="chk">Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
           <label>Maintenir pour reprendre (secondes) <small>0 = un simple toucher</small><input type="number" min="0" max="10" data-k="holdSeconds"></label>
-          <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
+          <label class="chk" hidden>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
         </details>
       </details>
 
