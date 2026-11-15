@@ -403,12 +403,12 @@ const wave = (() => {
       const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
       const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
-      const lay = [['', 1, 0.6, 1, 0, 0]]; // une seule vague ; ses deux couleurs sont un dégradé vertical (azur en haut, bleu sombre en bas), sans bord décalé qui ferait un effet d'histogramme en relief
+      const lay = [['', 1, 0.76, 1, 0, 0]]; // une seule vague ; ses deux couleurs sont un dégradé vertical (azur en haut, bleu sombre en bas), sans bord décalé qui ferait un effet d'histogramme en relief
       lay.forEach(([col, al, lev, amp, sh, dy], j) => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
           const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.02;
-          ys.push(H * lev - e * amp * H * 0.58 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
+          ys.push(H * lev - e * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
         for (let pass = 0; pass < 1; pass++) { // vagues arrondies, sans dents de histogramme
           const o = ys.slice();
