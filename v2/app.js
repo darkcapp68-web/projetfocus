@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h05';
+const APP_VERSION = '15/11/2026 · 21h09';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -77,6 +77,7 @@ const DEFAULTS = {
   breathHoldColor: '#ffd36e', // doré
   breathExpireColor: '#000000', // noir
   pulseIntensity: 30, // assombrissement du voile (%)
+  countdown: true, // dings de plus en plus rapprochés dans les 10 dernières secondes du focus et de la pause (comme la 1.0)
   meetingMute: true, // la radio se coupe pendant un rdv Meet / Teams / Zoom (et revient après)
   autoChain: true, // le focus reprend tout seul à la fin de la pause
   autoChainDelay: 0, // … après N secondes
@@ -125,6 +126,7 @@ function sanitize(raw0) {
   r.breathLabels = !!r.breathLabels;
   r.autoChain = !!r.autoChain;
   r.meetingMute = r.meetingMute !== false;
+  r.countdown = r.countdown !== false;
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
   r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
@@ -690,8 +692,29 @@ const noise = createNoise();
 
 const askBox = $('#ask'); // la question de fin de focus
 
-// Clochette de fin de focus (comme la 1.0) : deux notes douces qui s'éteignent en ~1,5 s, au volume du lecteur (jamais muet).
+// Compte à rebours sonore (comme la 1.0, demande de l'utilisateur : aussi de la pause vers le focus) : dans les 10 dernières
+// secondes, un ding à 10, 8, 6 s puis chaque seconde de 5 à 1, de plus en plus aigu.
+const COUNT_AT = [10, 8, 6, 5, 4, 3, 2, 1];
+let lastCount = null;
+function countdownDing(sec) {
+  try {
+    chimeCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+    if (chimeCtx.state === 'suspended') chimeCtx.resume();
+    const t0 = chimeCtx.currentTime, vol = 0.06 + 0.2 * (volume.value / 100), p = (10 - sec) / 9;
+    const o = chimeCtx.createOscillator(), g = chimeCtx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 660 + 660 * p;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
+    o.connect(g).connect(chimeCtx.destination);
+    o.start(t0);
+    o.stop(t0 + 0.25);
+  } catch { /* pas de son */ }
+}
+
 let chimeCtx = null;
+// Clochette de fin de focus (comme la 1.0) : deux notes douces qui s'éteignent en ~1,5 s, au volume du lecteur (jamais muet).
 function chime() {
   try {
     chimeCtx ||= new (window.AudioContext || window.webkitAudioContext)();
@@ -884,6 +907,10 @@ const timer = (() => {
       // Sous le temps : « focus », « pause », ou l'action de respiration en cours.
       clock.label(ph, asking ? 'on fait une pause ?' : run.ended ? 'pause terminée' : ph === 'break' ? guideWord() : '');
       clock.draw(left, asking ? 10 : run.total);
+      if (S.countdown && !asking && !run.ended) {
+        const sec = Math.ceil(left);
+        if (COUNT_AT.includes(sec) && sec !== lastCount) { lastCount = sec; countdownDing(sec); }
+      }
       paintBg();
       if (ph === 'break') applyGuide(); else resetVisual();
     } else {
@@ -918,6 +945,7 @@ const timer = (() => {
 
   function begin(phase) {
     holdEnd();
+    lastCount = null;
     const total = clock.minutes(phase) * 60;
     run = { phase, endAt: Date.now() + total * 1000, total };
     store.set('run', run);
@@ -974,6 +1002,7 @@ const timer = (() => {
         run.resumeAt = S.autoChain ? Date.now() + S.autoChainDelay * 1000 : 0;
         store.set('run', run);
         stopGuide(); // plus de sons de respiration
+        chime(); // fin de pause (comme la 1.0)
         notify(S.autoChain ? 'On reprend' : 'La pause est finie', S.autoChain ? 'Le focus repart.' : 'Reviens quand tu veux.');
       }
       if (run.resumeAt && Date.now() >= run.resumeAt) begin('focus');
