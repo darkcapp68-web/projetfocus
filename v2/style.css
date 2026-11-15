@@ -192,25 +192,30 @@ body.ink-light #sel-player-radio { background-image: url("data:image/svg+xml,%3C
 }
 #volume::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--fg); border: 0; }
 
-/* Paramètres : un panneau qui monte du bas. */
+/* Paramètres (15/11, « ça fait cheap ») : une carte claire, en verre dépoli, au même style que l'appli (bleu pastel,
+   encre foncée, indigo comme accent), centrée, au lieu du panneau sombre de la 1.0. */
 dialog {
-  max-height: 90vh;
-  max-height: 90dvh;
-  margin: auto auto 0;
-  width: 100%;
-  max-width: 560px;
+  max-height: 88vh;
+  max-height: 88dvh;
+  margin: auto;
+  width: calc(100% - 32px);
+  max-width: 520px;
   border: 0;
   padding: 0;
-  border-radius: 20px 20px 0 0;
-  background: #26245e;
+  border-radius: 24px;
+  background: rgba(236, 243, 250, 0.9);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px rgba(20, 30, 60, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
   color: var(--fg);
 }
-dialog { --fg: #ffffff; --on-fg: #1c1a4d; --soft: rgba(255, 255, 255, 0.65); --glass: rgba(255, 255, 255, 0.12); --glass-strong: rgba(255, 255, 255, 0.22); --accent: #8fd3ff; }
-dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
-.sheet { padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
+dialog { --fg: #14213d; --on-fg: #ffffff; --soft: rgba(20, 33, 61, 0.62); --glass: rgba(20, 33, 61, 0.07); --glass-strong: rgba(20, 33, 61, 0.14); --accent: #2c3f8f; }
+dialog::backdrop { background: rgba(28, 44, 80, 0.45); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.sheet { padding: 20px 22px calc(22px + env(safe-area-inset-bottom)); }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; }
-.sheet-head h2 { margin: 0; font-size: 20px; font-weight: 600; }
-#btn-close { width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--glass); font-size: 18px; }
+.sheet-head { margin-bottom: 10px; }
+.sheet-head h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.01em; }
+#btn-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--glass); color: var(--fg); font-size: 16px; }
 .version { margin: 20px 0 4px; }
 .hint { margin: 0 0 16px; color: var(--soft); font-size: 14px; min-height: 1em; }
 .wide {
@@ -316,7 +321,8 @@ body { transition: background-color 2s linear; }
 body.phase-break #btn-resume { display: block; }
 
 /* Paramètres : sections repliables (une seule ouverte à la fois). */
-details.sec { border-top: 1px solid var(--glass-strong); }
+details.sec { margin: 8px 0; border-radius: 16px; background: rgba(255, 255, 255, 0.55); box-shadow: 0 0 0 1px rgba(20, 33, 61, 0.06); padding: 0 16px; transition: background 0.2s ease; }
+details.sec[open] { background: rgba(255, 255, 255, 0.85); }
 details.sec > summary, details.more > summary {
   display: flex;
   align-items: baseline;
@@ -332,19 +338,23 @@ details > summary::-webkit-details-marker { display: none; }
 details.sec > summary { align-items: center; }
 details > summary small { color: var(--soft); font-weight: 400; font-size: 13px; }
 details.sec[open] > summary { color: var(--accent); }
-details.sec[open] > :not(summary) { margin-left: 8px; padding-left: 12px; border-left: 2px solid var(--accent); }
+details.sec[open] > :not(summary) { margin-left: 0; padding-left: 0; border-left: 0; }
+details.sec[open] { padding-bottom: 12px; }
+details.sec > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--soft); border-bottom: 2px solid var(--soft); transform: rotate(45deg) translateY(-2px); transition: transform 0.2s ease; }
+details.sec[open] > summary::after { transform: rotate(-135deg); }
 details.more > summary { font-weight: 500; color: var(--soft); min-height: 44px; }
 .sheet label { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; font-size: 15px; }
 .sheet label small { color: var(--soft); }
 .sheet select, .sheet input[type="text"] {
-  min-height: 48px;
-  padding: 0 12px;
+  min-height: 46px;
+  padding: 0 14px;
   border: 0;
   border-radius: 12px;
   background: var(--glass);
   color: var(--fg);
   font: inherit;
 }
+.sheet select { -webkit-appearance: none; appearance: none; padding-right: 38px; background-image: linear-gradient(45deg, transparent 50%, var(--soft) 50%), linear-gradient(135deg, var(--soft) 50%, transparent 50%); background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%; background-size: 6px 6px; background-repeat: no-repeat; }
 .sheet select option, .sheet select optgroup { color: #111; }
 .rng { display: flex; align-items: center; gap: 10px; }
 .rng input { flex: 1; min-height: 44px; accent-color: var(--accent); }
@@ -353,7 +363,7 @@ details.more > summary { font-weight: 500; color: var(--soft); min-height: 44px;
 .sheet label.pick { flex-direction: row; align-items: center; gap: 10px; min-height: 44px; margin: 0; }
 .pick input { width: 22px; height: 22px; accent-color: var(--accent); }
 .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
-.buttons button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--glass); }
+.buttons button { min-height: 46px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--glass-strong); color: var(--fg); }
 .buttons button.link { background: none; text-decoration: underline; color: var(--soft); padding: 0 4px; }
 .buttons button[hidden] { display: none; }
 .note { margin: 8px 0; color: var(--soft); font-size: 14px; }
