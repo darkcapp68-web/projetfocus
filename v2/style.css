@@ -400,13 +400,14 @@ header, main, footer { position: relative; z-index: 1; }
   #controls { flex: none; }
   #player {
     display: grid;
-    grid-template-columns: 1fr 340px;
-    grid-template-areas: "wave wave" "radio vol";
+    /* La plage à gauche, la radio et le volume à droite : l'eau est moins large (demande de l'utilisateur, 15/11). */
+    grid-template-columns: minmax(0, 46%) 1fr;
+    grid-template-areas: "wave radio" "wave vol";
     align-items: center;
     gap: 6px 28px;
     padding: 4px 32px 18px;
   }
-  #wave { grid-area: wave; height: 104px; }
+  #wave { grid-area: wave; height: 104px; align-self: end; }
   #player .radio { grid-area: radio; }
   #volume { grid-area: vol; }
 }
