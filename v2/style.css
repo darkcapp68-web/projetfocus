@@ -454,3 +454,7 @@ header, main, footer { position: relative; z-index: 1; }
   /* La couleur s'estompe par paliers : elle reste visible jusqu'aux 2/3 de l'écran (un dégradé linéaire jusqu'à 2/3 paraissait s'arrêter à la moitié). */
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%);
   mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%); }
+
+/* Focus concentré : grand titre « Ne pas déranger » au centre en haut, entre les icônes (15/11). */
+#dnd { display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 3; max-width: calc(100vw - 300px); padding: 4px 8px; text-align: center; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.15; font-weight: 700; letter-spacing: 0.03em; color: var(--fg); pointer-events: none; white-space: nowrap; }
+body.absolute #dnd { display: block; }

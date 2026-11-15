@@ -668,6 +668,10 @@ l'agenda**, dans la colonne de droite.
 **2/3** de l'écran, **visible** jusque-là (puis le fond tel quel). Concentré l'emporte sur rdv ; rien en pause ni au repos. Les trois
 couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *Malentendu du 15/11 : un dégradé linéaire jusqu'à 2/3 paraissait s'arrêter à la moitié (la couleur devient invisible avant son bord) ; il s'estompe maintenant par paliers (masque) et reste visible jusqu'aux 2/3.*
 
+**Focus concentré (15/11, demande de l'utilisateur) : un grand titre « Ne pas déranger »** s'affiche au
+centre en haut de l'écran pendant le focus concentré (pas en pause, pas au repos). Les autres
+adaptations du focus concentré restent à décider (question 2 de l'audit).
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |
