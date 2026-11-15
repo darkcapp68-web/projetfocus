@@ -33,6 +33,10 @@ export function meetingKind(e) {
   if (e.hangoutLink || /meet\.google\.com/i.test(text) || /meet/i.test(solution)) kind = 'Meet';
   else if (/teams\.microsoft\.com|teams\.live\.com|\/l\/meetup-join/i.test(text)) kind = 'Teams';
   else if (/zoom\.us|zoomgov\.com/i.test(text)) kind = 'Zoom';
+  // Mot-clé dans le titre (demande de l'utilisateur, 15/11) : un rdv marqué « meet », « teams » ou « zoom » compte comme une visio.
+  else if (/(^|[^\p{L}])meet([^\p{L}]|$)/iu.test(e.summary || '')) kind = 'Meet';
+  else if (/(^|[^\p{L}])teams([^\p{L}]|$)/iu.test(e.summary || '')) kind = 'Teams';
+  else if (/(^|[^\p{L}])zoom([^\p{L}]|$)/iu.test(e.summary || '')) kind = 'Zoom';
   else if (entry.some((x) => x.entryPointType === 'phone') || /(^|[^\p{L}])(appel|tél|tel|call|phone)([^\p{L}]|$)/iu.test(e.summary || '')) kind = 'appel';
   else if (diag.location) kind = 'lieu';
   return { kind, diag };

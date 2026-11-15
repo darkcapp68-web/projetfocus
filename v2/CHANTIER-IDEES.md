@@ -58,7 +58,7 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 ### À régler / à décider (les questions)
 
 **Comportement du minuteur**
-1. **Fin de focus.** Aujourd'hui : retour silencieux au repos, rien ne sonne. Le cahier des charges
+1. **Fin de focus.** *Décidé le 15/11 : le focus enchaîne sur une pause, puis le focus reprend, sans fin jusqu'à Arrêter (fait). Reste : un signal sonore ?* Avant : retour silencieux au repos, rien ne sonnait. Le cahier des charges
    voulait un signal les 10 dernières secondes, puis « On fait une pause ? » (pause si tu réponds ;
    si pas de réponse en 15 s, le focus repart). **On le fait ? Quel son ? 10 ou 15 secondes ?**
 2. **Focus concentré** ne fait que changer le dégradé. **Que doit-il faire de plus ?** Masquer les
@@ -140,7 +140,7 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 | 1.5 | Agenda : lien « ajouter à l'agenda » (une séance à la fois) | Facile | à définir |
 | 1.6 | Agenda : réserver des blocs de focus à l'avance | Difficile | à définir |
 | 1.7 | Agenda : choisir plusieurs agendas | Moyen | écarté pour l'instant (pro seulement) |
-| 1.8 | Agenda : mode réunion (musique coupée selon le type de rdv : visio, appel…, reprise ensuite) | Moyen | choisi (voir point 0) |
+| 1.8 | Agenda : mode réunion (musique coupée selon le type de rdv : visio, appel…, reprise ensuite) | Moyen | **fait (15/11, minimum)** : la radio se coupe pendant un rdv Meet / Teams / Zoom (lien ou mot-clé dans le titre) et revient après ; à vérifier avec un vrai rdv |
 | 1.9 | **Agenda pro (Google) : me mettre « Absent » en un geste** (refus auto des invitations) | Moyen | à définir |
 | 2.1 | **Rappel d'heure fixe (9h, 14h) avec bouton « Démarrer »** | **Facile via l'agenda / Difficile seul** | à définir |
 | 2.2 | « Juste 5 minutes » | Facile | à définir |

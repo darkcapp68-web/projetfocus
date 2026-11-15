@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h55';
+const APP_VERSION = '15/11/2026 · 21h02';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -77,6 +77,7 @@ const DEFAULTS = {
   breathHoldColor: '#ffd36e', // doré
   breathExpireColor: '#000000', // noir
   pulseIntensity: 30, // assombrissement du voile (%)
+  meetingMute: true, // la radio se coupe pendant un rdv Meet / Teams / Zoom (et revient après)
   autoChain: true, // le focus reprend tout seul à la fin de la pause
   autoChainDelay: 0, // … après N secondes
   breakMusic: 'radio', // musique de la pause : radio | silence | calme
@@ -123,6 +124,7 @@ function sanitize(raw0) {
   r.breathSound = !!r.breathSound;
   r.breathLabels = !!r.breathLabels;
   r.autoChain = !!r.autoChain;
+  r.meetingMute = r.meetingMute !== false;
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
   r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
@@ -935,7 +937,7 @@ const timer = (() => {
   }
 
   // Fin d'un décompte. Pause finie : le focus reprend tout seul après le délai réglé
-  // (Paramètres → Pause), ou on attend « Reprendre le focus ». Focus fini : retour au réglage.
+  // (Paramètres → Pause), ou on attend « Reprendre le focus ». Focus fini : la pause commence aussitôt.
   function finish() {
     if (!run) return;
     if (run.phase === 'break') {
@@ -949,8 +951,9 @@ const timer = (() => {
       if (run.resumeAt && Date.now() >= run.resumeAt) begin('focus');
       return;
     }
-    notify('Focus terminé', 'Prends une vraie pause.');
-    stop();
+    // Le focus enchaîne sur la pause, puis le focus reprend, et ainsi de suite jusqu'à « Arrêter » (15/11, demande de l'utilisateur).
+    notify('Focus terminé', 'Place à la pause.');
+    begin('break');
   }
 
   // Arc fluide tant que l'écran est visible ; le contrôle de fin tourne aussi en arrière-plan.
@@ -1348,6 +1351,26 @@ matchMedia('(orientation: landscape) and (max-height: 600px)').addEventListener?
 // (voir CHANTIER-IDEES.md). Le focus ne s'arrête jamais tout seul.
 const rdvBox = $('#rdv');
 const KIND_CLASSES = ['meet', 'teams', 'zoom', 'appel', 'lieu'];
+// Rdv en visio (Meet, Teams, Zoom : lien, ou mot-clé dans le titre) en cours : la radio se coupe, et revient à la fin du rdv si
+// elle jouait (15/11, demande de l'utilisateur). Vérifié même sans focus en cours. Si tu relances la radio pendant le rdv, on
+// ne la recoupe pas.
+let meetCut = { key: '', wasOn: false };
+function checkMeetingMusic() {
+  let key = '';
+  if (S.meetingMute && agendaItems) {
+    const now = Date.now();
+    const cur = agendaItems.find((e) => !e.allDay && e.start.getTime() <= now && e.end.getTime() > now && ['Meet', 'Teams', 'Zoom'].includes(e.kind));
+    if (cur) key = cur.title + '|' + cur.start.getTime();
+  }
+  if (key && key !== meetCut.key) {
+    meetCut = { key, wasOn: wantOn };
+    if (wantOn) { radioStop(false); setState('En visio : radio coupée'); }
+  } else if (!key && meetCut.key) {
+    const back = meetCut.wasOn && !wantOn;
+    meetCut = { key: '', wasOn: false };
+    if (back) radioOn();
+  }
+}
 function rdvMatch() {
   if (!agendaItems || !timer.running) return null;
   const now = Date.now(), end = timer.endAt || now;
@@ -1358,11 +1381,12 @@ function rdvMatch() {
   return soon ? { e: soon, state: 'soon' } : null;
 }
 function updateRdv() {
+  checkMeetingMusic();
   const m = rdvMatch();
   const b = document.body;
   b.classList.toggle('rdv-now', m?.state === 'now');
   b.classList.toggle('rdv-soon', m?.state === 'soon');
-  for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind === k);
+  for (const k of KIND_CLASSES) b.classList.toggle('rdv-' + k, !!m && m.e.kind.toLowerCase() === k);
   rdvBox.hidden = !m;
   timer.paint(); // le dégradé orange apparaît (ou disparaît) avec le rdv
   if (!m) return;
