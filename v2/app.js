@@ -330,7 +330,7 @@ const wave = (() => {
       prevB = b;
       pNow = 0.05;
       for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.35;
+        const d = (tn - pulses[q].tb) / 0.6;
         if (d > 4) { pulses.splice(q, 1); continue; }
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
@@ -398,14 +398,21 @@ const wave = (() => {
       const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
       const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
-      const lay = [['#2f8fd6', 1, 0.6, 1, 0, 0], ['#14325c', 1, 0.6, 1, 0, H * 0.1]]; // azur dessus, bleu sombre dessous : une vague en deux couleurs
+      const lay = [['', 1, 0.6, 1, 0, 0]]; // une seule vague ; ses deux couleurs sont un dégradé vertical (azur en haut, bleu sombre en bas), sans bord décalé qui ferait un effet d'histogramme en relief
       lay.forEach(([col, al, lev, amp, sh, dy], j) => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
           const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
           ys.push(H * lev - e * amp * H * 0.31 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
-        g.globalAlpha = al; g.fillStyle = col;
+        for (let pass = 0; pass < 2; pass++) { // vagues arrondies, sans dents de histogramme
+          const o = ys.slice();
+          for (let i = 1; i < N; i++) o[i] = 0.25 * ys[i - 1] + 0.5 * ys[i] + 0.25 * ys[i + 1];
+          for (let i = 0; i <= N; i++) ys[i] = o[i];
+        }
+        const gr = g.createLinearGradient(0, H * 0.25, 0, H);
+        gr.addColorStop(0, '#2f8fd6'); gr.addColorStop(0.55, '#1c5a96'); gr.addColorStop(1, '#14325c');
+        g.globalAlpha = al; g.fillStyle = gr;
         g.beginPath(); g.moveTo(hx, H);
         for (let i = 0; i <= N; i++) if (i / N * W >= hx) g.lineTo(i / N * W, ys[i]);
         g.lineTo(W, H); g.closePath(); g.fill();
