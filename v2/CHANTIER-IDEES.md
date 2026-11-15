@@ -511,6 +511,12 @@ soi-même.
   `gmail.metadata` et `calendar.readonly`, API Agenda activée dans Google Cloud), un seul ↻.
   Vu sur la tablette avec l'agenda **principal du compte perso**. Reste : compte pro, type de
   rdv (visio, appel), l'écran-panneau de disponibilité.
+  **Type de rdv détecté dans l'agenda (15/11)** : une étiquette (Meet, Teams, Zoom, appel, lieu) à
+  côté du titre, devinée à partir de l'évènement Google (lien de visio, lieu, description, titre ;
+  rien du texte n'est gardé). **Vu sur la tablette : un évènement Google Meet est bien reconnu**
+  (« Rdv » à 18:00, champ de visio de Google) ; les évènements sans visio n'ont pas d'étiquette.
+  Pas encore vu avec un vrai évènement Teams ou Zoom (la règle cherche leur lien dans le lieu ou la
+  description). Prochaine étape : couper la musique selon le type (règles du point 0).
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil
