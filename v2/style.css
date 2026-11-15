@@ -4,10 +4,10 @@
   /* Fond en pastel (15/11, demande de l'utilisateur : 4 couleurs, texte noir) : le fond est posé par
      app.js selon l'état (défaut, focus perso, focus rdv, focus absolu). Texte sombre par défaut ;
      la classe « ink-light » (voile sombre de la respiration) remet le texte clair. */
-  --bg: #a8d1f5;
+  --bg: #86a9c9;
   --fg: #111111;
   --on-fg: #ffffff;
-  --soft: rgba(17, 17, 17, 0.72);
+  --soft: rgba(17, 17, 17, 0.8);
   --glass: rgba(0, 0, 0, 0.08);
   --glass-strong: rgba(0, 0, 0, 0.16);
   --accent: #0b4f8a;

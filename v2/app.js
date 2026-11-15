@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 14h48';
+const APP_VERSION = '15/11/2026 · 14h55';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -67,10 +67,12 @@ const DEFAULTS = {
   holdSeconds: 0, // « Reprendre le focus » : 0 = un toucher ; sinon, toucher maintenu N secondes
   notifyOn: false, // notifications mises de côté (15/11, demande de l'utilisateur : elles n'ont pas bien marché selon les versions)
   // Les 4 couleurs de fond (15/11, demande de l'utilisateur) : pastel, texte noir.
-  colorDefault: '#a8d1f5', // bleu : au repos et en pause
-  colorFocus: '#a9e2b7', // vert : focus perso
-  colorRdv: '#ffcf9e', // orange : le focus tombe sur un rdv de l'agenda
-  colorAbsolute: '#f4a6a6', // rouge : focus absolu
+  // Pastels « doux » (15/11 : les premiers, plus clairs, éblouissaient sur la tablette) : tons
+  // moyens, moins vifs, texte noir toujours lisible.
+  colorDefault: '#86a9c9', // bleu : au repos et en pause
+  colorFocus: '#8dba9a', // vert : focus perso
+  colorRdv: '#d4a373', // orange : le focus tombe sur un rdv de l'agenda
+  colorAbsolute: '#c98686', // rouge : focus absolu
   syncClientId: CLIENT_ID,
 };
 
@@ -112,7 +114,12 @@ function sanitize(raw0) {
   r.pulseIntensity = num(r.pulseIntensity, 5, 70, DEFAULTS.pulseIntensity, 5);
   r.autoChainDelay = num(r.autoChainDelay, 0, 60, DEFAULTS.autoChainDelay);
   r.holdSeconds = num(r.holdSeconds, 0, 10, DEFAULTS.holdSeconds);
-  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) r[k] = color(r[k], DEFAULTS[k]);
+  // Les premiers pastels (plus clairs) sont remplacés par les doux ; un choix personnel est gardé.
+  const OLD_PASTELS = { colorDefault: '#a8d1f5', colorFocus: '#a9e2b7', colorRdv: '#ffcf9e', colorAbsolute: '#f4a6a6' };
+  for (const k of ['colorDefault', 'colorFocus', 'colorRdv', 'colorAbsolute']) {
+    r[k] = color(r[k], DEFAULTS[k]);
+    if (r[k] === OLD_PASTELS[k]) r[k] = DEFAULTS[k];
+  }
   r.breathInspireColor = color(r.breathInspireColor, DEFAULTS.breathInspireColor);
   r.breathHoldColor = color(r.breathHoldColor, DEFAULTS.breathHoldColor);
   r.breathExpireColor = color(r.breathExpireColor, DEFAULTS.breathExpireColor);

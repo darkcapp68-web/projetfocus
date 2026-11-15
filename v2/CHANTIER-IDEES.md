@@ -549,6 +549,12 @@ retombe quand la séance s'arrête. Pour l'instant il ne fait **que changer la c
 qu'il doit faire de plus est à définir (par ex. masquer les mails, indicateur « pas
 dérangeable » du point 10, couper les autres sons).
 
+**Pastels plus doux (15/11)** : les premiers pastels (clairs) éblouissaient sur la tablette ; les
+4 couleurs sont maintenant des tons moyens, moins vifs (`#86a9c9` bleu, `#8dba9a` vert,
+`#d4a373` orange, `#c98686` rouge), texte noir toujours lisible. Les réglages enregistrés avec les
+premiers pastels passent aux doux ; un choix personnel est gardé. Si c'est encore trop clair :
+fond sombre teinté avec texte blanc, ou pastel le jour et sombre le soir (à décider).
+
 **Adaptations possibles (à choisir)**
 
 | # | Adaptation | Facilité | Choix |
