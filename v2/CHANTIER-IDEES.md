@@ -664,10 +664,9 @@ l'agenda**, dans la colonne de droite.
 
 **Dégradés (15/11, demande de l'utilisateur)** : le fond reste le bleu pastel doux, réglable. En
 **focus normal** : le fond tel quel. En **focus concentré** : un dégradé **rouge** vers le fond ; en
-**focus rdv** : un dégradé **orange** vers le fond ; le dégradé va du haut de l'écran jusqu'aux
-**2/3** (puis le fond tel quel). Concentré l'emporte sur rdv ; rien en pause ni au repos. Les trois
-couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *À juger à l'œil : le
-« jusqu'aux 2/3 bas » a été compris comme « du haut jusqu'aux 2/3 de la hauteur » ; changeable.*
+**focus rdv** : un dégradé **orange** vers le fond ; le dégradé va du haut de l'écran jusqu'à la
+**moitié** de l'écran (puis le fond tel quel ; changé le 15/11 : c'était les 2/3). Concentré l'emporte sur rdv ; rien en pause ni au repos. Les trois
+couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *Corrigé : l'utilisateur voulait la moitié, pas les 2/3.*
 
 **Adaptations possibles (à choisir)**
 
