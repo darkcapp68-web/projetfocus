@@ -402,7 +402,7 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
 #left { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 #side { display: none; }
 @media (orientation: landscape) and (min-width: 900px) {
-  header { position: absolute; top: 0; right: 0; }
+  header { position: absolute; top: 0; right: 0; z-index: 3; } /* au-dessus de main, sinon main reçoit les touchers du bouton Paramètres */
   main { align-items: center; padding: 56px 32px 0; }
   #left { flex: none; gap: 14px; }
   #controls { gap: 12px; }
