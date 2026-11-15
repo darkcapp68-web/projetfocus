@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h12';
+const APP_VERSION = '15/11/2026 · 20h14';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -408,7 +408,7 @@ const wave = (() => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
           const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.02;
-          ys.push(H * lev - e * amp * H * 0.46 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
+          ys.push(H * lev - e * amp * H * 0.58 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
         for (let pass = 0; pass < 1; pass++) { // vagues arrondies, sans dents de histogramme
           const o = ys.slice();
