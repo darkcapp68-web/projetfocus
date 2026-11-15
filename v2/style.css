@@ -448,6 +448,9 @@ header, main, footer { position: relative; z-index: 1; }
 /* Couleur du fond (Paramètres → Couleurs). */
 .sheet label.swatch { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
 
-/* Dégradé du focus concentré (rouge) ou du focus rdv (orange) vers le fond : de la couleur en haut jusqu'à
-   la moitié de l'écran, puis le fond tel quel. Calque fixe derrière le contenu, qui apparaît en fondu (15/11). */
-#tint { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2s linear; background: linear-gradient(to bottom, var(--tint, transparent) 0%, transparent 50%); }
+/* Dégradé du focus concentré (rouge) ou du focus rdv (orange) vers le fond : de la couleur en haut jusqu'aux
+   2/3 de l'écran (visible), puis le fond tel quel. Calque fixe derrière le contenu, qui apparaît en fondu (15/11). */
+#tint { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2s linear; background: var(--tint, transparent);
+  /* La couleur s'estompe par paliers : elle reste visible jusqu'aux 2/3 de l'écran (un dégradé linéaire jusqu'à 2/3 paraissait s'arrêter à la moitié). */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%); }
