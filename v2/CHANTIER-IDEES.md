@@ -171,6 +171,7 @@ installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans
 | 8.2 | Coach qui s'appuie sur l'agenda et le journal (phrases à modèles, puis vraie IA) | Moyen (modèles) / Difficile (IA) | à définir |
 | 8.3 | Fond lié à la météo / au soleil | Moyen | à définir |
 | 8.4 | Fond coloré selon la charge de l'agenda | Moyen | à définir |
+| 8.5 | **La plage selon la météo** (idée de l'utilisateur, 15/11) : faire évoluer légèrement le « idle » (la mer, le ciel, le petit personnage, le parasol) selon la météo | Moyen | idée |
 | 9.1 | Installer la 2.0 sur le poste pro | Facile (sauf blocage de l'entreprise) | à définir |
 | 9.2 | Mêmes réglages sur les deux postes (Drive à la main) | Facile (déjà là) | à définir |
 | 9.3 | Petite fenêtre toujours visible au-dessus du travail | Moyen | à définir |
@@ -518,6 +519,7 @@ l'APK est repris, le bouton dans la notification s'ajoute.
     avec un bouton, ou seulement parler ?
 - **8.3 Fond lié au réel** : météo de la ville, lever et coucher du soleil. *Moyen*.
 - **8.4 Fond coloré selon la charge de l'agenda** (point 1). *Moyen*.
+- **8.5 La plage selon la météo** *(idée de l'utilisateur, 15/11)* : faire évoluer **légèrement** le « idle » de la plage (celle de l'onde, avec le petit personnage et son parasol) selon la météo de la ville : par exemple vent plus fort (le parasol se balance davantage), pluie (le personnage se met à l'abri, la mer plus sombre), soleil (ciel plus clair, ombre), nuit (étoiles). Même source que 8.3 (météo, lever et coucher du soleil) ; une seule autorisation à prévoir (position ou ville choisie). *Moyen*. Statut : **idée**, rien n'est décidé.
 
 ## 9. Sur le poste pro (demande de l'utilisateur, 15/11)
 

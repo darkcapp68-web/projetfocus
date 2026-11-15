@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h18';
+const APP_VERSION = '15/11/2026 · 21h20';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -482,6 +482,23 @@ const wave = (() => {
         if (wetLine[i] !== undefined && wetLine[i] < y + H * 0.03) { on ? g.lineTo(x, y + 2 * k) : g.moveTo(x, y + 2 * k); on = true; } else on = false;
       }
       g.stroke();
+      // Un petit parasol à côté du bonhomme (demande de l'utilisateur, 15/11) : blanc et bleu-vert, qui se balance doucement dans le
+      // vent, un peu plus quand les vagues arrivent.
+      {
+        const pu = Math.max(k, H / 70), px = hx - 10 * pu, py = sand(px) + k;
+        const sway = 0.07 * Math.sin(t * 1.1) + 0.05 * env(hx / W, 4) * vg * Math.sin(t * 5);
+        g.save();
+        g.translate(px, py);
+        g.rotate(sway);
+        g.fillStyle = '#dfe7f5';
+        g.fillRect(-0.5 * pu, -18 * pu, pu, 18 * pu);
+        const segs = [[Math.PI, 4 * Math.PI / 3, '#eaf6fb'], [4 * Math.PI / 3, 5 * Math.PI / 3, '#1f9d9a'], [5 * Math.PI / 3, 2 * Math.PI, '#eaf6fb']];
+        for (const [a0, a1, col] of segs) {
+          g.fillStyle = col;
+          g.beginPath(); g.moveTo(0, -18 * pu); g.arc(0, -18 * pu, 9 * pu, a0, a1); g.closePath(); g.fill();
+        }
+        g.restore();
+      }
       // Le petit bonhomme.
       const hy = sand(hx) - 2 * k, near = env(hx / W, 4) * vg, jump = Math.max(0, near - 0.55) * H * 0.3, u = Math.max(k, H / 70);
       g.fillStyle = '#14325c'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
