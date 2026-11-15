@@ -671,6 +671,7 @@ couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *Malen
 **Focus concentré (15/11, demande de l'utilisateur) : un grand titre « Ne pas déranger »** s'affiche au
 centre en haut de l'écran pendant le focus concentré (pas en pause, pas au repos). Les autres
 adaptations du focus concentré restent à décider (question 2 de l'audit).
+**Style du titre : « B », capitales espacées** (choisi par l'utilisateur le 15/11 parmi 6 propositions : A gras, B capitales espacées, C plaque noire, D cadre, E cloche barrée + texte, F fin et grand). Un choix de style dans les Paramètres reste possible.
 
 **Adaptations possibles (à choisir)**
 

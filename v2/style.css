@@ -455,6 +455,6 @@ header, main, footer { position: relative; z-index: 1; }
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%);
   mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.88) 18%, rgba(0,0,0,.68) 36%, rgba(0,0,0,.42) 52%, rgba(0,0,0,.16) 64%, rgba(0,0,0,.04) 70%, rgba(0,0,0,0) 76%); }
 
-/* Focus concentré : grand titre « Ne pas déranger » au centre en haut, entre les icônes (15/11). */
-#dnd { display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 3; max-width: calc(100vw - 300px); padding: 4px 8px; text-align: center; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.15; font-weight: 700; letter-spacing: 0.03em; color: var(--fg); pointer-events: none; white-space: nowrap; }
+/* Focus concentré : titre « Ne pas déranger » au centre en haut, entre les icônes ; style B choisi le 15/11 : capitales espacées (15/11). */
+#dnd { display: none; position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 3; max-width: calc(100vw - 300px); padding: 4px 8px; text-align: center; font-size: clamp(20px, 3vw, 32px); line-height: 1.2; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg); pointer-events: none; white-space: nowrap; }
 body.absolute #dnd { display: block; }
