@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h19';
+const APP_VERSION = '15/11/2026 · 20h22';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -389,6 +389,8 @@ const wave = (() => {
       // s'arrêtent au bonhomme, qui saute quand l'une d'elles lui arrive aux pieds. Écume corail sur les crêtes, sable
       // mouillé là où l'eau est montée. Couleurs (demande de l'utilisateur) : bleu sombre, azur, bleu-vert, écume claire ; pas de corail.
       const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
+      // Le curseur de volume règle le « calme » (demande de l'utilisateur, 15/11) : volume bas, mer calme ; volume haut, grosses vagues.
+      const vg = 0.15 + 0.85 * Math.pow((Number(volume.value) || 0) / 100, 1.2);
       const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
       const lay = [['', 1, 0.76, 1, 0, 0]]; // une seule vague ; ses deux couleurs sont un dégradé vertical (azur en haut, bleu sombre en bas), sans bord décalé qui ferait un effet d'histogramme en relief
@@ -398,8 +400,8 @@ const wave = (() => {
           // Trois vagues sur la longueur : la forme (3 crêtes qui glissent vers la plage, à la même vitesse que l'histoire) est
           // multipliée par la puissance de la musique au moment où la crête est née à droite.
           const u = i / N, e = env(u, sh), ph = 6.2832 * (3 * u + t / 0.55), cr = Math.pow(0.5 + 0.5 * Math.sin(ph + 0.5 * Math.sin(ph)), 1.6), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
-          crest[i] = cr * e;
-          ys.push(H * lev - cr * e * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
+          crest[i] = cr * e * vg;
+          ys.push(H * lev - cr * e * vg * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
         for (let pass = 0; pass < 1; pass++) { // vagues arrondies, sans dents de histogramme
           const o = ys.slice();
@@ -436,7 +438,7 @@ const wave = (() => {
       }
       g.stroke();
       // Le petit bonhomme.
-      const hy = sand(hx) - 2 * k, near = env(hx / W, 4), jump = Math.max(0, near - 0.55) * H * 0.3, u = Math.max(k, H / 70);
+      const hy = sand(hx) - 2 * k, near = env(hx / W, 4) * vg, jump = Math.max(0, near - 0.55) * H * 0.3, u = Math.max(k, H / 70);
       g.fillStyle = '#14325c'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
       g.fillStyle = '#2f8fd6'; g.fillRect(hx - 3 * u, hy - jump - 4 * u, 2.4 * u, 4 * u); g.fillRect(hx + 0.6 * u, hy - jump - 4 * u, 2.4 * u, 4 * u);
       g.fillStyle = '#dfe7f5'; g.fillRect(hx + 3 * u, hy - jump - 12 * u, 1.2 * u, 8 * u);
