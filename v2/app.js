@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 21h50';
+const APP_VERSION = '15/11/2026 · 22h20';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -70,6 +70,7 @@ const DEFAULTS = {
   breathPattern: 'coherence', // rythme (voir breath.js) ; « aucun » = pas de respiration guidée
   breathSound: true, // trois sons : aigu = inspire, moyen = retiens, grave = expire
   breathVol: 60, // volume de ces sons (%)
+  waveStyle: 'vagues', // onde de la radio : vagues | posees
   breathShow: 'none', // la respiration se voit par : none | word | colors | both | veil
   breathLabels: true, // écrire « inspire / retiens / expire » sous le temps
   breathInspireColor: '#8fd3ff', // bleu ciel
@@ -125,6 +126,7 @@ function sanitize(raw0) {
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
   r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
+  r.waveStyle = pick(r.waveStyle, ['vagues', 'posees'], DEFAULTS.waveStyle);
   r.breathShow = pick(r.breathShow, ['none', 'word', 'colors', 'both', 'veil'], DEFAULTS.breathShow);
   r.breakMusic = pick(r.breakMusic, ['radio', 'silence', 'calme'], DEFAULTS.breakMusic);
   r.breathVol = num(r.breathVol, 0, 100, DEFAULTS.breathVol);
@@ -331,18 +333,34 @@ const wave = (() => {
     // Barres en gélule (bouts ronds), avec un halo rond autour.
     const pill = (x, y, w, hh) => { g.beginPath(); g.roundRect(x, y, w, hh, w / 2); g.fill(); };
     // Une seule teinte (15/11, demande de l'utilisateur : l'arc-en-ciel ne lui plaît plus) : la couleur du texte du
-    // moment (noir, ou blanc quand le fond est foncé), posée franchement ; les barres les plus hautes sont un peu plus
-    // opaques. Plus de halo : l'onde est aussi plus légère à dessiner.
+    // moment (noir, ou blanc quand le fond est foncé). Deux styles au choix (Paramètres → Musiques et sons) :
+    // « vagues » (trois courbes translucides superposées, choisi par l'utilisateur) et « posées » (barres fines
+    // accrochées en bas). Pas de halo : l'onde est aussi plus légère à dessiner.
     if (!(++inkAge % 60)) ink = getComputedStyle(document.body).getPropertyValue('--fg').trim() || '#111';
     g.fillStyle = ink;
-    for (let i = 0; i < n; i++) {
-      const a = h[i], loud = Math.min(1, a / (mid * 0.6));
-      g.globalAlpha = 0.55 + 0.4 * loud;
-      pill(i * step + (step - bw) / 2, mid - a, bw, 2 * a);
+    const lv = (i, m) => Math.min(1, 1.5 * h[Math.floor(i * n / m)] / mid);
+    if (S.waveStyle === 'posees') {
+      const st = 9 * k, w = 5 * k, m = Math.floor(W / st);
+      for (let i = 0; i < m; i++) {
+        const l = lv(i, m), a = Math.max(w, l * H * 0.85);
+        g.globalAlpha = 0.5 + 0.4 * l;
+        pill(i * st + (st - w) / 2, H - a - 4 * k, w, a);
+      }
+    } else {
+      const t = performance.now() / 1000, m = 200, base = mid + H * 0.22;
+      for (let j = 0; j < 3; j++) {
+        g.globalAlpha = 0.22 + 0.1 * j;
+        g.beginPath();
+        g.moveTo(0, H);
+        for (let i = 0; i <= m; i++) {
+          const f = i / m, l = lv(Math.min(i, m - 1), m);
+          g.lineTo(f * W, base - l * mid * (0.55 + 0.2 * j) * (1 + 0.35 * Math.sin(f * 7 + t * (1.4 + j * 0.6) + j)));
+        }
+        g.lineTo(W, H);
+        g.closePath();
+        g.fill();
+      }
     }
-    // Ligne du milieu
-    g.globalAlpha = 0.25;
-    g.fillRect(0, mid - 0.5 * k, W, k);
     g.globalAlpha = 1;
   }
 
