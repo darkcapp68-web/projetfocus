@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 19h57';
+const APP_VERSION = '15/11/2026 · 19h59';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -360,7 +360,7 @@ const wave = (() => {
       }
     } else if (S.waveKind === 'vagues') {
       const t = performance.now() / 1000, m = 200, base = H - 4 * k;
-      const cols = ['#2c3f8f', '#6a4bb0', '#e0735c'];
+      const cols = ['#14325c', '#2f8fd6', '#1f9d9a'];
       for (let j = 0; j < 3; j++) {
         g.globalAlpha = 0.45;
         g.fillStyle = cols[j];
@@ -379,11 +379,11 @@ const wave = (() => {
       // par la droite. La puissance du moment naît au bord droit sous forme d'une vague, qui traverse l'écran jusqu'au
       // sable (petite puissance, petite vague ; grosse puissance, grosse vague, les unes après les autres). Les vagues
       // s'arrêtent au bonhomme, qui saute quand l'une d'elles lui arrive aux pieds. Écume corail sur les crêtes, sable
-      // mouillé là où l'eau est montée.
+      // mouillé là où l'eau est montée. Couleurs (demande de l'utilisateur) : bleu sombre, azur, bleu-vert, écume claire ; pas de corail.
       const t = performance.now() / 1000, Sx = W * 0.16, N = 150, hx = Sx * 0.5;
       const sand = (x) => H * 0.42 + H * 0.58 * Math.pow(Math.max(0, Math.min(1, x / Sx)), 1.5);
       const env = (u, sh) => hist[HM - 1 - Math.min(HM - 1, Math.max(0, Math.round((1 - u) * (HM - 1)) + sh))];
-      const lay = [['#2c3f8f', 0.9, 0.56, 0.55, 0], ['#6a4bb0', 0.85, 0.65, 0.8, 4], ['#2c3f8f', 0.55, 0.73, 1, 9]];
+      const lay = [['#14325c', 0.92, 0.56, 0.55, 0], ['#2f8fd6', 0.85, 0.65, 0.8, 4], ['#1f9d9a', 0.6, 0.73, 1, 9]];
       lay.forEach(([col, al, lev, amp, sh], j) => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
@@ -395,7 +395,7 @@ const wave = (() => {
         for (let i = 0; i <= N; i++) if (i / N * W >= hx) g.lineTo(i / N * W, ys[i]);
         g.lineTo(W, H); g.closePath(); g.fill();
         if (j > 0) {
-          g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = '#f3a08e'; g.lineWidth = Math.max(2, H / 34);
+          g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = '#eaf6fb'; g.lineWidth = Math.max(2, H / 34);
           for (let i = 0; i < N; i++) {
             const e = env(i / N, sh);
             if (e > 0.4 && i / N * W >= hx) { g.globalAlpha = Math.min(1, (e - 0.4) * 2); g.beginPath(); g.moveTo(i / N * W, ys[i]); g.lineTo((i + 1) / N * W, ys[i + 1]); g.stroke(); }
@@ -419,8 +419,8 @@ const wave = (() => {
       g.stroke();
       // Le petit bonhomme.
       const hy = sand(hx) - 2 * k, near = env(hx / W, 4), jump = Math.max(0, near - 0.35) * H * 0.2, u = Math.max(k, H / 70);
-      g.fillStyle = '#1b2f5e'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
-      g.fillStyle = '#e0735c'; g.fillRect(hx - 3 * u, hy - jump - 4 * u, 2.4 * u, 4 * u); g.fillRect(hx + 0.6 * u, hy - jump - 4 * u, 2.4 * u, 4 * u);
+      g.fillStyle = '#14325c'; g.fillRect(hx - 3 * u, hy - jump - 9 * u, 6 * u, 5 * u); g.fillRect(hx - 2 * u, hy - jump - 13 * u, 4 * u, 4 * u);
+      g.fillStyle = '#2f8fd6'; g.fillRect(hx - 3 * u, hy - jump - 4 * u, 2.4 * u, 4 * u); g.fillRect(hx + 0.6 * u, hy - jump - 4 * u, 2.4 * u, 4 * u);
       g.fillStyle = '#dfe7f5'; g.fillRect(hx + 3 * u, hy - jump - 12 * u, 1.2 * u, 8 * u);
     }
     g.globalAlpha = 1;
