@@ -124,16 +124,17 @@ export function createMail({ getClientId }) {
     // Une seule fenêtre Google pour les deux ; renvoie ce qui a été accordé.
     async connect() { await getToken(); return { ...granted }; },
 
-    // Les 7 derniers messages, tous sans distinction (15/11, demande de l'utilisateur), du plus récent au plus ancien
-    // (c'est l'ordre de Gmail) : [{ from, subject, unread }]. Spam et corbeille ne sont jamais renvoyés par Gmail.
+    // Les 7 derniers mails reçus (15/11, demande de l'utilisateur) : tous, quelle que soit leur étiquette (même rangés hors de la
+    // boîte de réception par un filtre), mais pas les envoyés ni les brouillons. Sans étiquette imposée on prend 20 messages, on
+    // écarte les sortants, on garde 7 : [{ from, subject, unread }]. Spam et corbeille ne sont jamais renvoyés par Gmail.
     async lastMails() {
       await getToken();
       if (!granted.mail) throw new Error('accès aux mails non accordé : reconnecte-toi et coche la case');
-      const list = await api(`${MAIL_API}?maxResults=7`, 'Gmail');
+      const list = await api(`${MAIL_API}?maxResults=20`, 'Gmail');
       const ids = (list.messages || []).map((m) => m.id);
       const hdr = 'metadataHeaders=From&metadataHeaders=Subject';
       const msgs = await Promise.all(ids.map((id) => api(`${MAIL_API}/${id}?format=metadata&${hdr}`, 'Gmail')));
-      return msgs.map((m) => {
+      return msgs.filter((m) => !(m.labelIds || []).some((l) => l === 'SENT' || l === 'DRAFT')).slice(0, 7).map((m) => {
         const h = Object.fromEntries((m.payload?.headers || []).map((x) => [x.name.toLowerCase(), x.value]));
         return { from: sender(h.from), subject: (h.subject || '').trim() || '(sans objet)', unread: (m.labelIds || []).includes('UNREAD') };
       });
