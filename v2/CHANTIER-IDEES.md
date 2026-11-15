@@ -21,6 +21,97 @@ la page.
 
 ---
 
+## Audit sur la tablette (15/11) : ce qui marche, et les questions à trancher
+
+Tout l'écran a été essayé **sur la tablette** (Samsung SM-T550, Android 7.1.1, Chrome 101, appli
+installée, version 15h23) avec de vrais touchers (`adb`), plus des mesures dans la page.
+
+### Ce qui marche (vérifié sur la tablette)
+- **Boutons** : ▶ (démarre ; actif au repos seulement), ✕ (arrête ; actif pendant une séance),
+  trois lignes (Paramètres), « Focus normal / concentré » (se choisit au repos et pendant le
+  focus), « Pause maintenant » (grisé au repos), « Reprendre » **seul** en pause.
+- **Horloge** : préréglages 25/50/90, geste sur le cadran (un tour = 90 min en focus, 20 en pause,
+  sens inverse des aiguilles), bascule « focus / pause » du réglage.
+- **Déroulé** : focus → pause maintenant → reprendre ; la **pause qui arrive à son terme relance le
+  focus toute seule** ; le focus qui arrive à son terme **retourne au repos** ; un rechargement de la
+  page en plein focus **garde le décompte**.
+- **Couleurs** : fond bleu pastel ; dégradé **rouge** (concentré) et **orange** (rdv) du haut jusqu'aux
+  2/3 ; rien en focus normal, ni en pause, ni au repos.
+- **Agenda et mails** : ▶ actualise sans fenêtre visible (connexion déjà accordée) ; le rdv en cours
+  s'affiche au-dessus de l'agenda avec son type ; « il y a N min » puis « · touche ↻ » en gras.
+- **Paramètres** : les 4 sections s'ouvrent (la fenêtre défile quand elle est longue), les trois
+  couleurs se règlent. Aucune erreur JavaScript relevée ; les deux 404 (`calme.mp3` et le manifeste
+  des sons de respiration) sont des fichiers pas encore fournis.
+- **Mémoire** : Chrome 78 Mo, il reste 440 Mo libres : confortable.
+
+### À régler / à décider (les questions)
+
+**Comportement du minuteur**
+1. **Fin de focus.** Aujourd'hui : retour silencieux au repos, rien ne sonne. Le cahier des charges
+   voulait un signal les 10 dernières secondes, puis « On fait une pause ? » (pause si tu réponds ;
+   si pas de réponse en 15 s, le focus repart). **On le fait ? Quel son ? 10 ou 15 secondes ?**
+2. **Focus concentré** ne fait que changer le dégradé. **Que doit-il faire de plus ?** Masquer les
+   mails ? Couper les autres sons ? Mettre l'indicateur « pas dérangeable » (point 10) ?
+3. **« Pause maintenant » au repos** est grisé. Doit-il lancer une pause directement ?
+4. **Pendant la pause**, la carte du rdv reste affichée (et l'agenda). On la garde, on la masque, ou on
+   n'affiche que « Reprendre » à l'écran ?
+5. **Orange « rdv »** : il s'allume dès qu'un rdv commence **avant la fin du focus** (même dans 40
+   minutes) ou quand il est **en cours** ? Aujourd'hui : les deux. Seulement « en cours » ?
+6. **Focus concentré et rdv en même temps** : le rouge l'emporte. Correct ?
+7. **Adaptations au rdv** (couper la musique en visio, message « En rdv · Meet », bouton « Rejoindre »,
+   etc.) : voir la liste A à K plus bas, **à cocher**.
+8. **« Reprendre »** : un simple toucher (comme aujourd'hui) ou un toucher maintenu 3 s (réglage
+   existant, désactivé) pour ne pas écourter une pause par erreur ?
+
+**Agenda et mails**
+9. **Mails** : on affiche toute la boîte (les promotions de Fnac, LinkedIn…). On ne garde que
+   l'onglet **« Principale »** (mails de vraies personnes) ?
+10. **Agenda** : seulement l'agenda principal. Les évènements **refusés** ou **annulés** par toi
+    doivent-ils disparaître ? Un autre agenda (famille, partagé) ?
+11. **Compte pro** : on essaie la connexion avec le compte pro (mails + agenda) ? L'administrateur peut
+    refuser. **Attention** : la tablette est en Android 7 (plus de correctifs de sécurité depuis 2017) :
+    est-ce acceptable d'y mettre des données pro ?
+12. **Vie privée** : la tablette est visible des voisins (objets de mails, titres de rdv). Un mode
+    « discret » (compteurs seulement) pour le compte pro ?
+13. **Actualisation automatique** : l'appui sur ▶ suffit, ou on prépare le relais Apps Script ?
+
+**Écran et utilisation**
+14. **Téléphone / portrait** : la mise en page est faite pour la tablette en paysage. Sur un
+    téléphone (390 px), les 3 boutons dépassent à droite et l'agenda / les mails n'apparaissent pas.
+    **On abandonne le téléphone**, ou on prévoit une vue simplifiée ?
+15. **Fluidité** : au repos 60 images/s ; avec radio + onde, 36 ; **en focus avec radio, onde et
+    listes, 22 images/s** (saccadé, 80 images lentes sur 5 s). On **allège l'onde** (moins d'images,
+    plus petite, ou fixe pendant le focus) ?
+16. **Tailles tactiles** : le bouton ↻ fait 36 px, les cases à cocher 24 px (le reste ≥ 44 px). On
+    agrandit ?
+17. **Icônes** : ▶ et trois lignes te conviennent ? (le triangle ▶ a un trait un peu épais à gauche)
+18. **L'heure s'efface** pendant le focus (fondu de 31 s, hérité de la 1.0) et le dégradé rend le
+    cadran plus lisible. On garde le fondu de l'heure ?
+
+**Son**
+19. **Musique calme de la pause** (`calme.mp3`) et **sons d'inspire / retiens / expire** : fichiers
+    toujours attendus (Suno). Où en es-tu ?
+20. **Sons de respiration cochés par défaut** : OK ? (à l'oreille, je ne peux pas juger)
+21. **Radio** : elle ne repart pas toute seule après un rechargement (le navigateur l'interdit) ; au
+    démarrage, elle se relance seulement si elle jouait la dernière fois. C'est le comportement voulu ?
+
+**Données et maintenance**
+22. **Sauvegarde Google Drive** : jamais faite depuis cette tablette. À faire maintenant ? (elle
+    demande une autorisation à part de celle des mails et de l'agenda : on peut les **fusionner**.)
+23. **Mises à jour** : « Mettre à jour l'appli » demande parfois **deux essais** (cache de GitHub). On
+    la rend plus fiable (vérification, nouvel essai automatique) ?
+24. **Outil de diagnostic** `__agendaDiag` laissé dans la page (liste ce que l'appli a reconnu, sans le
+    contenu) : on le retire ?
+25. **Écran toujours allumé** : non prouvé (la tablette ne se met pas en veille même sans focus, avec
+    une veille de 15 s). **Test à faire par toi** : veille à 30 s, un focus lancé, ne rien toucher
+    2 minutes, l'écran reste-t-il allumé ? La tablette est-elle toujours sur secteur ?
+
+**Priorités du chantier**
+26. Dans la liste d'idées plus bas : **qu'est-ce qu'on fait ensuite** ? (journal et carte de chaleur,
+    monde qui pousse, tâche liée au rdv, rappels de santé, bruits en fichiers…)
+
+---
+
 ## Vue d'ensemble (tout d'un coup d'œil)
 
 | # | Idée | Facilité | Statut |
