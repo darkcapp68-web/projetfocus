@@ -7,6 +7,22 @@ et prévaut sur lui quand ils diffèrent. État d'avancement et actions en atten
 
 ---
 
+## 0. Depuis le 15/11/2026 : la 2.0 est la version courante
+
+- **Adresse habituelle** (`https://darkcapp68-web.github.io/projetfocus/`, téléphone, PC, QR code, raccourcis) : elle
+  **ouvre la 2.0** (la racine redirige vers `v2/`). Pas de nouvelle adresse à retenir ni à reconfigurer.
+- **La 1.0 est archivée** dans `v1/` (ouvrable à `…/projetfocus/v1/`, état figé aussi par l'étiquette git `v1`).
+  Ses réglages (`projetfocus.*`) restent séparés de ceux de la 2.0 (`projetfocus2.*`).
+- **Service worker de la racine** : `sw.js` est un « pont » qui efface les caches de la 1.0 (`projetfocus-*`) chez
+  les appareils qui l'avaient installée et laisse tout passer par le réseau ; la 2.0 a le sien, limité à `v2/`.
+- **Port local : 8417** (celui déjà autorisé chez Google Cloud, avec `https://darkcapp68-web.github.io`) : le serveur de
+  test (`.claude/launch.json`, noms `projetfocus` ou `projetfocus-v2`) sert le dossier `v2/` sur
+  `http://127.0.0.1:8417`, donc la connexion Google et le Drive marchent aussi en local. La 1.0 archivée a son
+  serveur à part (`projetfocus-v1-archive`, port 8416). Le reste de ce fichier décrit la 1.0 ; pour la 2.0, voir
+  `v2/CHANTIER.md` et `v2/CHANTIER-IDEES.md`.
+
+---
+
 ## 1. Principes
 
 - PWA en HTML / CSS / JavaScript **sans framework ni build** : le dossier se publie tel quel

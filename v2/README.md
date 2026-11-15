@@ -7,7 +7,7 @@ dépôt, en ligne telle quelle (étiquette git `v1`).
 - Réglages enregistrés sous des clés `projetfocus2.*` (séparés de la 1.0).
 - Service worker propre à `v2/`.
 - Serveur local : configuration `projetfocus-v2` de `.claude/launch.json`
-  (http://127.0.0.1:8418, sert le dossier `v2/` seul ; la 1.0 reste sur le port 8417).
+  (http://127.0.0.1:8417, sert le dossier `v2/` seul ; depuis le 15/11/2026 la 1.0 est archivée dans `v1/`).
 - Fichiers : `index.html`, `style.css`, `app.js` (version `APP_VERSION` à changer à chaque
   envoi avec la vraie heure du PC), `sw.js` (changer `CACHE` si la liste des fichiers change),
   `manifest.webmanifest`, `icons/` (copiées de la 1.0).

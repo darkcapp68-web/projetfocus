@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <!-- Pas de zoom (pincement, double toucher) : la page zoomée coupait le bas et la droite. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>projetfocus</title>
+  <meta name="description" content="Minuteur de focus et de pause, avec musique et coach, qui suit l'heure de la journée.">
+  <meta name="theme-color" content="#1c1a4d">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="projetfocus">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="ui phase-idle">
+  <div id="pulse" aria-hidden="true"></div>
+  <canvas id="crack-fx" aria-hidden="true"></canvas>
+
+  <header id="topbar">
+    <div id="top-left">
+    <!-- Affichage du cadran (style et forme du mode Rythme), à portée de main ; les mêmes
+         réglages restent dans Paramètres → Apparence. -->
+    <select id="sel-look" class="ctl" aria-label="Affichage du cadran" title="Affichage du cadran"></select>
+    <div id="quick" class="ctl">
+      <!-- Pendant le focus, à la place des préréglages : lancer la pause soi-même -->
+      <button type="button" id="btn-break-now" class="primary">Pause maintenant</button>
+      <button type="button" data-preset="25/5">25/5</button>
+      <button type="button" data-preset="50/10">50/10</button>
+      <span class="cycles">
+        <button type="button" id="cyc-minus" class="round" aria-label="Un cycle de moins">−</button>
+        <span id="cyc-val">4 cycles</span>
+        <button type="button" id="cyc-plus" class="round" aria-label="Un cycle de plus">+</button>
+      </span>
+    </div>
+    </div>
+    <button type="button" id="btn-settings" class="ctl link">Paramètres</button>
+  </header>
+
+  <main id="stage">
+    <div id="dial-wrap">
+      <svg id="dial" viewBox="0 0 300 300" role="slider" tabindex="0" aria-label="Durée en minutes"
+           aria-valuemin="1" aria-valuemax="60" aria-valuenow="25">
+        <defs>
+          <clipPath id="dial-clip"><circle cx="150" cy="150" r="125.5"/></clipPath>
+          <!-- Mode rêveur : voile sombre transparent, le centre garde la couleur du fond -->
+          <radialGradient id="orb-veil">
+            <stop offset="0" stop-color="#000" stop-opacity="0.12"/>
+            <stop offset="0.9" stop-color="#000" stop-opacity="0.38"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0.45"/>
+          </radialGradient>
+        </defs>
+        <circle class="track" cx="150" cy="150" r="128"/>
+        <!-- Mode rêveur, pause : le cadran se vide comme un verre -->
+        <g id="liquid" clip-path="url(#dial-clip)">
+          <g id="liquid-level">
+            <g class="wave">
+              <path class="w1" d="M-140 0 q35 -9 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V 330 H -140 Z"/>
+              <path class="w2" d="M-140 5 q35 9 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 V 330 H -140 Z"/>
+            </g>
+          </g>
+        </g>
+        <!-- Mode rêveur, focus : un petit système solaire ; la comète atteint le soleil à la fin -->
+        <g id="solar" clip-path="url(#dial-clip)">
+          <defs>
+            <radialGradient id="sun-glow">
+              <stop offset="0" stop-color="#fff3c4"/>
+              <stop offset="0.3" stop-color="#ffd27a" stop-opacity="0.9"/>
+              <stop offset="1" stop-color="#ffb347" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <g id="solar-orbits"></g>
+          <g id="solar-back"></g>
+          <circle cx="150" cy="150" r="30" fill="url(#sun-glow)"/>
+          <circle cx="150" cy="150" r="9" fill="#ffe7a3"/>
+          <g id="solar-front"></g>
+          <g id="comet"><path id="comet-tail" fill="rgba(255,255,255,0.45)"/><circle id="comet-head" r="2.6"/></g>
+        </g>
+        <g id="ticks"></g>
+        <circle id="arc" cx="150" cy="150" r="128" transform="rotate(-90 150 150)"/>
+        <circle id="knob" cx="150" cy="22" r="7"/>
+      </svg>
+      <!-- Mode rêveur : cadre en engrenages autour du cadran (image générée, sans personnage) -->
+      <img id="dial-frame" src="img/cadre-reveur.webp" alt="" aria-hidden="true">
+      <!-- Mode rythme : effets dessinés autour du cercle, au rythme de la musique -->
+      <canvas id="rhythm-fx" aria-hidden="true"></canvas>
+      <div id="center">
+        <div id="time">25:00</div>
+        <div id="sub">focus</div>
+        <div id="breath" aria-live="off"></div>
+      </div>
+    </div>
+
+    <!-- Paysage sur téléphone : ce bloc passe à droite du cadran (ailleurs, il ne change rien). -->
+    <div id="side">
+    <!-- Paysage : la barre du temps, qui avance vers la droite -->
+    <canvas id="wave-fx" aria-hidden="true"></canvas>
+    <div id="timebar" aria-hidden="true"><div class="track"><div class="fill"></div><div class="head"></div></div><span class="left"></span></div>
+
+    <div id="setup" class="ctl">
+      <button type="button" id="edit-focus" class="seg on">focus <b id="v-focus">25</b> min</button>
+      <button type="button" id="edit-break" class="seg">pause <b id="v-break">5</b> min</button>
+    </div>
+
+    <p id="mini-time" aria-hidden="true"></p>
+    <p id="message" aria-live="polite"></p>
+
+    <div id="break-actions" class="ctl">
+      <button type="button" id="btn-hold"><span class="fill"></span><span class="lbl">maintenir pour reprendre</span></button>
+      <button type="button" id="btn-done" class="primary">Fait, je reprends</button>
+      <button type="button" id="btn-stop-break">Arrêter</button>
+    </div>
+
+    <div id="actions" class="ctl">
+      <button type="button" id="btn-start" class="primary">Démarrer</button>
+      <button type="button" id="btn-skip">Passer à la pause</button>
+      <button type="button" id="btn-stop">Arrêter</button>
+      <!-- Fin du focus : « On active la pause ? » (sans réponse en 10 s, la pause commence) -->
+      <button type="button" id="btn-ask-yes" class="primary">Oui, pause</button>
+      <button type="button" id="btn-ask-no">Non, encore <span id="ask-min">25</span> min</button>
+    </div>
+
+    <ul id="coach-list" class="ctl" aria-label="Autres idées pour la pause"></ul>
+    </div>
+  </main>
+
+  <footer>
+    <div id="player" class="ctl">
+      <div class="group">
+        <button type="button" id="btn-music" class="round play" aria-label="Lancer la radio">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
+        </button>
+        <select id="sel-station" aria-label="Musique du focus"></select>
+        <select id="sel-pause" aria-label="Musique de la pause"></select>
+        <input type="range" id="vol-music" min="0" max="100" aria-label="Volume de la musique">
+      </div>
+      <div class="group">
+        <button type="button" id="btn-noise" class="round play" aria-label="Lancer le bruit de fond">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-play" d="M5 3.5v9l7-4.5z"/><path class="i-pause" d="M4.5 3.5h2.5v9H4.5zM9 3.5h2.5v9H9z"/></svg>
+        </button>
+        <select id="sel-noise" aria-label="Bruit de fond"></select>
+        <input type="range" id="vol-noise" min="0" max="100" aria-label="Volume du bruit de fond">
+      </div>
+      <div id="now-playing" aria-live="polite"></div>
+    </div>
+    <div id="info"></div>
+  </footer>
+
+  <aside id="settings" aria-label="Paramètres" inert>
+    <div class="sheet-head">
+      <h1>Paramètres</h1>
+      <button type="button" id="btn-close" class="link">Fermer</button>
+    </div>
+
+    <details class="sec">
+      <summary>Temps <small>focus, pause, cycles, reprise</small></summary>
+      <label>Focus (minutes)<input type="number" min="1" max="60" data-k="focusMin"></label>
+      <label>Pause (minutes)<input type="number" min="1" max="60" data-k="breakMin"></label>
+      <label>Nombre de cycles <small>0 = sans fin</small><input type="number" min="0" max="20" data-k="cycles"></label>
+      <label>Pause longue<input type="checkbox" data-k="longBreakOn"></label>
+      <label data-if="longBreakOn">… après combien de cycles<input type="number" min="1" max="12" data-k="longBreakEvery"></label>
+      <label data-if="longBreakOn">… durée (minutes)<input type="number" min="1" max="60" data-k="longBreakMin"></label>
+      <label>Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
+      <label data-if="autoChain">… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>
+      <details class="more">
+        <summary>Réglages avancés <small>dings, compte à rebours</small></summary>
+        <label>« Ding » à la fin de la pause<input type="number" min="1" max="5" data-k="endDings"></label>
+        <label>Compte à rebours sonore, 10 dernières secondes de la pause<input type="checkbox" data-k="countdownBreak"></label>
+        <label>… et du focus<input type="checkbox" data-k="countdownFocus"></label>
+        <label data-if="countdownBreak|countdownFocus">Son du compte à rebours<select data-k="countdownSound"><option value="tictac">Tic-tac</option><option value="ding">Ding</option></select></label>
+      </details>
+    </details>
+
+    <details class="sec">
+      <summary>Pause <small>respiration, coach</small></summary>
+      <label>Respiration guidée (l'écran respire)<input type="checkbox" data-k="pulseOn"></label>
+      <label data-if="pulseOn">Rythme<select data-k="breathPattern" id="sel-breath"></select></label>
+      <label data-if="pulseOn breathPattern=simple">Une respiration toutes les (s)<span class="rng"><input type="range" min="1" max="12" step="0.5" data-k="pulseSeconds"><output></output></span></label>
+      <label data-if="pulseOn breathPattern!=simple">La respiration se voit par<select data-k="breathShow"><option value="word">le mot (il grandit, l'écran ne bouge pas)</option><option value="colors">les couleurs (le mot garde sa taille)</option><option value="both">le mot et les couleurs</option><option value="veil">un voile sombre (sans couleurs)</option></select></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de l'inspiration<input type="color" data-k="breathInspireColor"></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
+      <label data-if="pulseOn breathPattern!=simple breathShow=colors|breathShow=both">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
+      <label>Coach<select data-k="coachMode"><option value="one">Une action à la fois</option><option value="none">Aucune action</option></select></label>
+      <details class="more">
+        <summary>Réglages avancés <small>consignes, plein écran, notification, coach</small></summary>
+        <label data-if="pulseOn breathPattern!=simple breathShow!=word">Afficher « inspire / expire »<input type="checkbox" data-k="breathLabels"></label>
+        <label data-if="pulseOn breathShow=veil|breathPattern=simple">Assombrissement sans couleurs (%)<span class="rng"><input type="range" min="5" max="70" step="5" data-k="pulseIntensity"><output></output></span></label>
+        <label>Plein écran au début de la pause<input type="checkbox" data-k="fullscreenOnBreak"></label>
+        <label>Maintenir pour reprendre (secondes)<input type="number" min="1" max="10" data-k="holdSeconds"></label>
+        <label>Notification si la fenêtre est cachée<input type="checkbox" data-k="notifyOn"></label>
+        <label class="block" data-if="coachMode=one">Actions du coach <small>une par ligne : ajoute, modifie ou supprime</small><textarea data-k="coachActions" data-list rows="8"></textarea></label>
+      </details>
+    </details>
+
+    <details class="sec">
+      <summary>Musiques et sons <small>volumes, pause, menu, hors ligne</small></summary>
+      <label>Musique par défaut<select data-k="defaultRadio" id="sel-default-radio"></select></label>
+      <label>Musique pendant le travail (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolWork"><output></output></span></label>
+      <label>Musique de la pause<select data-k="breakMusic" id="sel-pause-default"></select></label>
+      <label data-if="breakMusic!=silence">Musique pendant la pause (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="musicVolBreak"><output></output></span></label>
+      <label>Bruit de fond par défaut<select data-k="defaultNoise" id="sel-default-noise"></select></label>
+      <label>Volume du bruit de fond (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="noiseVol"><output></output></span></label>
+      <details class="more">
+        <summary>Musiques du menu <small>décoche ce qui ne te plaît pas</small></summary>
+        <div id="station-picks"></div>
+      </details>
+      <details class="more">
+        <summary>Réglages avancés <small>démarrage, reprise, signal, hors ligne, mes liens</small></summary>
+        <label>Lancer le son en démarrant le focus<input type="checkbox" data-k="autoStartAudio"></label>
+        <label>Baisser aussi le bruit de fond en pause<input type="checkbox" data-k="duckNoise"></label>
+        <label>Reprise d'une radio après une pause<select data-k="radioResume"><option value="direct">en direct</option><option value="continuer">là où elle s'était arrêtée</option></select></label>
+        <label>Signal de changement de phase<span class="pair"><select data-k="chime" id="sel-chime"></select><button type="button" id="btn-test-chime" class="link">Écouter</button></span></label>
+        <label data-if="chime!=none">Volume du signal (%)<span class="rng"><input type="range" min="0" max="100" step="5" data-k="chimeVol"><output></output></span></label>
+        <p class="pick-group">Bibliothèque hors ligne</p>
+        <p class="note">Les morceaux écoutés restent sur l'appareil. Télécharge une playlist entière pour l'avoir sans Internet, ou retire-la pour libérer de la place.</p>
+        <div id="library"></div>
+      </details>
+    </details>
+
+    <details class="sec">
+      <summary>Messages <small>pendant le focus</small></summary>
+      <label>Afficher un message<input type="checkbox" data-k="messagesOn"></label>
+      <div data-if="messagesOn">
+        <label>Changer de message toutes les (minutes)<input type="number" min="1" max="60" data-k="messageEveryMin"></label>
+        <details class="more">
+          <summary>Réglages avancés <small>catégories, « tard », textes</small></summary>
+          <label>« Tard » à partir de (heure)<input type="number" min="0" max="23" data-k="lateHour"></label>
+          <div id="msg-cats"></div>
+          <div id="msg-pools"></div>
+        </details>
+      </div>
+    </details>
+
+    <details class="sec">
+      <summary>Apparence <small>cadran, couleurs, écran</small></summary>
+      <label>Style du cadran<select data-k="dialStyle"><option value="standard">Normal</option><option value="reveur">Rêveur (système solaire en focus, vague en pause)</option><option value="rythme">Rythme (le cercle réagit à la musique)</option><!-- Brisure : mis de côté le 31/10 (décision de l'utilisateur), code gardé dans js/app.js --></select></label>
+      <label data-if="dialStyle=rythme">Forme du mode Rythme<select data-k="rhythmForm"><option value="barres">Barres</option><option value="onde">Onde</option><option value="goutte">Goutte</option><option value="sonar">Sonar</option><option value="etincelles">Étincelles</option><option value="anneaux">Anneaux (arc-en-ciel de puissance)</option><option value="jauge">Jauge arc-en-ciel (monte du bas selon la puissance)</option><option value="heros">Petit héros (idle : il court, combat, ramasse)</option><option value="horizon">Onde horizontale (part de l'horloge, en paysage)</option></select></label>
+      <label data-if="dialStyle=rythme rhythmForm=heros">Héros<select data-k="heroClass"><option value="hasard">Au hasard (un autre à chaque focus)</option><option value="chevalier">Chevalier (frappe fort les boss)</option><option value="mage">Mage (boule de feu, touche de loin)</option><option value="voleur">Voleur (plus de pièces)</option></select></label>
+      <details class="more">
+        <summary>Affichages du menu <small>en haut à gauche ; décoche ceux que tu n'utilises pas</small></summary>
+        <div id="look-picks"></div>
+      </details>
+      <label data-if="dialStyle=brisure">Aspect<select data-k="crackLook"><option value="eclair">Éclair</option><option value="fissure">Fissure</option></select></label>
+      <label data-if="dialStyle=brisure">Teinte du tracé<select data-k="crackShade"><option value="sombre">Noire</option><option value="clair">Claire (néon blanc)</option><option value="faille">Faille (elle s'ouvre sur un ciel étoilé)</option></select></label>
+      <label data-if="dialStyle=brisure">Épaisseur des traits<select data-k="crackWidth"><option value="0.6">Fine</option><option value="1">Normale</option><option value="1.8">Épaisse</option><option value="3">Très épaisse</option></select></label>
+      <label data-if="dialStyle=brisure">Vitesse<select data-k="crackSpeed"><option value="1">Normale (au bout à la fin du focus)</option><option value="0.5">Lente</option><option value="0.3">Très lente</option></select></label>
+      <label data-if="dialStyle=standard">Fondu lent du cadran pendant le focus<input type="checkbox" data-k="slowGlow"></label>
+      <label>Couleur qui suit l'heure (24 h)<input type="checkbox" data-k="dayGradient"></label>
+      <div class="buttons" data-if="dayGradient"><button type="button" id="btn-day-demo">Voir la journée en accéléré (30 s)</button></div>
+      <label data-if="!dayGradient">Couleur fixe<input type="color" data-k="fixedColor"></label>
+      <label>Couleur de la pause au hasard<input type="checkbox" data-k="breakColorRandom"></label>
+      <label data-if="!breakColorRandom">Couleur de la pause<input type="color" data-k="breakColor"></label>
+      <details class="more">
+        <summary>Réglages avancés <small>couleurs, format, contrôles, écran</small></summary>
+        <label>Couleur du cadran<input type="color" data-k="dialColor"></label>
+        <label>Couleur du texte<input type="color" data-k="textColor"></label>
+        <label>Format du temps<select data-k="timeFormat"><option value="mmss">mm:ss</option><option value="min">minutes seules</option></select></label>
+        <label>Info discrète en bas (moment, phase, cycle)<input type="checkbox" data-k="showInfo"></label>
+        <label>Les contrôles s'effacent après (secondes)<input type="number" min="2" max="60" data-k="controlsDelay"></label>
+        <label>Garder l'écran allumé pendant une série<input type="checkbox" data-k="keepAwake"></label>
+        <div data-if="dayGradient">
+          <p class="pick-group">Couleurs et heures de la journée</p>
+          <div id="day-colors"></div>
+        </div>
+      </details>
+    </details>
+
+    <details class="sec">
+      <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
+      <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus-parametres.json ») ; « Reprendre » les ramène sur un autre appareil.</p>
+      <div class="buttons">
+        <button type="button" id="btn-sync-save">Sauvegarder mes paramètres</button>
+        <button type="button" id="btn-sync-load">Reprendre mes paramètres</button>
+        <button type="button" id="btn-undo-sync" class="link" hidden>Remettre mes réglages d’avant</button>
+        <button type="button" id="btn-sync-out" class="link" hidden>Se déconnecter de Google</button>
+      </div>
+      <p id="sync-status" class="note" aria-live="polite"></p>
+      <details class="more">
+        <summary>Réglages avancés <small>fichier, valeurs par défaut, ID Google</small></summary>
+        <div class="buttons">
+          <button type="button" id="btn-export">Exporter (JSON)</button>
+          <button type="button" id="btn-import">Importer</button>
+          <input type="file" id="file-import" accept="application/json,.json" hidden>
+          <button type="button" id="btn-reset">Revenir aux valeurs par défaut</button>
+        </div>
+        <label class="block">ID client Google <small>déjà réglé ; à changer seulement pour un autre projet Google (voir le README)</small><input type="text" data-k="syncClientId" placeholder="123456-abc.apps.googleusercontent.com" spellcheck="false" autocomplete="off"></label>
+      </details>
+      <p id="save-note" class="note" aria-live="polite">Tout est enregistré sur cet appareil.</p>
+    </details>
+
+    <div class="app-version">
+      <span id="app-version" class="note"></span>
+      <button type="button" id="btn-update" class="link">Mettre à jour l’appli</button>
+    </div>
+
+  </aside>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
