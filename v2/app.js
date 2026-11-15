@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h04';
+const APP_VERSION = '15/11/2026 · 20h07';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -284,7 +284,7 @@ const wave = (() => {
   // tablette de bureau, l'onde seule prenait 16 ms par image et faisait tomber l'ensemble à 25 images/s,
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
-  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, pAvg = 0.4, nextPulse = 0;
+  let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, prevB = -60, lastOn = 0;
   const pulses = [];
   const HM = 260, hist = new Float32Array(HM).fill(0.05); // la puissance des ~8 dernières secondes (plage)
   const wetLine = [];
@@ -311,23 +311,26 @@ const wave = (() => {
       for (let i = 1; i < 200; i++) top = Math.max(top, freq[i]);
       peak = Math.max(top, peak - 0.04 * df); // redescend doucement : une musique calme bouge aussi
       level = (i) => Math.min(1, Math.max(0, (freq[i] - (peak - 42)) / 42));
-      // Puissance globale du moment (graves surtout, un peu de médiums) pour la plage : 0 à 1.
-      let bass = 0, mids = 0;
-      for (let i = 2; i < 30; i++) bass += level(i);
-      for (let i = 30; i < 120; i++) mids += level(i);
-      // Une seule vague à la fois, dont le sommet est tiré au hasard (demande de l'utilisateur, 15/11) : toutes les 1 à 2,5 s
-      // une vague naît à droite ; sa hauteur est aléatoire, un peu plus haute quand la musique est plus forte que d'habitude.
-      const x = 0.65 * bass / 28 + 0.35 * mids / 90;
-      pAvg += (x - pAvg) * Math.min(1, 0.02 * df);
-      const tn = performance.now() / 1000;
-      if (tn > nextPulse) {
-        const gain = Math.min(1.2, Math.max(0.6, 0.8 + (x - pAvg) * 6));
-        pulses.push({ tb: tn, h: (0.3 + 0.7 * Math.random()) * gain });
-        nextPulse = tn + 1 + Math.random() * 1.5;
+      // Une seule vague à la fois, calée sur le rythme (15/11, demande de l'utilisateur : « avec la techno, ça ne passe pas
+      // bien » : des vagues tirées au hasard n'allaient pas avec les basses). Un coup de basse (la grosse caisse) est repéré
+      // quand le niveau des graves dépasse sa moyenne récente de plus d'un écart-type ; il lance une vague, au plus une
+      // toutes les 0,8 s, dont la hauteur suit la force du coup (avec un peu de hasard sur le sommet). Sans coup de basse
+      // pendant 2,5 s (musique calme), une petite vague est lancée quand même.
+      let b = 0;
+      for (let i = 1; i < 6; i++) b += freq[i];
+      b /= 5;
+      bm += (b - bm) * Math.min(1, 0.03 * df);
+      bv += (((b - bm) ** 2) - bv) * Math.min(1, 0.03 * df);
+      const z = (b - bm) / (Math.sqrt(bv) + 0.5), tn = performance.now() / 1000;
+      if ((z > 1 && b > prevB && tn - lastOn > 0.8) || tn - lastOn > 2.5) {
+        const strong = z > 1;
+        pulses.push({ tb: tn, h: (strong ? 0.4 + 0.6 * Math.min(1, z / 2.5) : 0.3 + 0.2 * Math.random()) * (0.75 + 0.25 * Math.random()) });
+        lastOn = tn;
       }
+      prevB = b;
       pNow = 0.05;
       for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.5;
+        const d = (tn - pulses[q].tb) / 0.35;
         if (d > 4) { pulses.splice(q, 1); continue; }
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
