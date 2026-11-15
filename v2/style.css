@@ -625,3 +625,10 @@ body.test-mode #sub::after { content: " · essai 10 s"; }
   #btn-go { display: none; }
   body #btn-go2 { display: grid; width: 56px; height: 56px; margin-top: 6px; }
 }
+
+/* L'anneau ne bouge plus d'une phase à l'autre (15/11, constaté en mode essai : il montait de ~24 px quand la question de fin de focus
+   ou « Reprendre » apparaissait) : on réserve sous l'anneau la place de ces boutons. */
+@media (orientation: landscape) and (min-width: 900px), (orientation: landscape) and (max-height: 600px) {
+  #controls { min-height: 48px; justify-content: center; }
+}
+@media (orientation: landscape) and (max-height: 600px) { #controls { min-height: 38px; } #ask button { min-height: 36px; padding: 0 14px; font-size: 13px; } }
