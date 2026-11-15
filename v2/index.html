@@ -135,6 +135,14 @@
         <h2>Paramètres</h2>
         <button id="btn-close" type="button" aria-label="Fermer">✕</button>
       </div>
+      <!-- Version et mise à jour tout en haut (demande de l'utilisateur, 15/11) : visibles dès l'ouverture. -->
+      <div class="version-row">
+        <div class="version-text">
+          <p class="version">Version <span id="version"></span></p>
+          <p id="update-info" class="hint"></p>
+        </div>
+        <button id="btn-update" type="button" class="wide">Mettre à jour</button>
+      </div>
       <details class="sec">
         <summary>Musiques et sons <small>radio, bruit de fond</small></summary>
         <label>Musique par défaut<select id="sel-radio"></select></label>
@@ -210,9 +218,6 @@
         <p id="save-note" class="note" aria-live="polite">Tout est enregistré sur cet appareil.</p>
       </details>
 
-      <p class="version">Version <span id="version"></span></p>
-      <p id="update-info" class="hint"></p>
-      <button id="btn-update" type="button" class="wide">Mettre à jour l'appli</button>
     </div>
   </dialog>
 

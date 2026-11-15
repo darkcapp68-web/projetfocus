@@ -578,3 +578,10 @@ body.running #btn-go2 .i-stop { display: block; }
 .radio-row:active { transform: scale(0.99); }
 .radio-row.on { background: var(--accent); color: #fff; font-weight: 600; }
 .radio-row.on::after { content: ""; margin-left: auto; width: 6px; height: 12px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(45deg) translateY(-2px); }
+
+/* Version + bouton de mise à jour en haut des Paramètres. */
+.version-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 6px; padding: 10px 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.55); box-shadow: 0 0 0 1px rgba(20, 33, 61, 0.06); }
+.version-text { min-width: 0; }
+.version-row .version, .version-row .hint { margin: 0; }
+.version-row .hint { font-size: 13px; min-height: 0; }
+.version-row .wide { width: auto; flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; }
