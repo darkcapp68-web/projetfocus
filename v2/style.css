@@ -457,4 +457,10 @@ header, main, footer { position: relative; z-index: 1; }
 
 /* Focus concentré : titre « Ne pas déranger » au centre en haut, entre les icônes ; style B choisi le 15/11 : capitales espacées (15/11). */
 #dnd { display: none; position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 3; max-width: calc(100vw - 300px); padding: 4px 8px; text-align: center; font-size: clamp(20px, 3vw, 32px); line-height: 1.2; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg); pointer-events: none; white-space: nowrap; }
-body.absolute #dnd { display: block; }
+body.absolute #dnd { display: block; will-change: transform; animation: dnd-pulse 3.2s ease-in-out infinite; }
+/* Le titre pulse en boucle, de sa taille normale vers 20 % plus grand puis retour (15/11, demande de l'utilisateur ;
+   voulu même si l'appareil demande de réduire les animations, comme le reste de l'appli). */
+@keyframes dnd-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.2); }
+}
