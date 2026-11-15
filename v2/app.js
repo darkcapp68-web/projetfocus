@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h10';
+const APP_VERSION = '15/11/2026 · 20h30';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -894,7 +894,7 @@ const timer = (() => {
 })();
 
 // Grand bouton sous l'anneau : démarre au repos, arrête pendant une séance (comme les icônes du coin).
-$('#btn-go').addEventListener('click', () => (document.body.classList.contains('running') ? $('#btn-stop') : $('#btn-start')).click());
+for (const g of [$('#btn-go'), $('#btn-go2')]) g.addEventListener('click', () => (document.body.classList.contains('running') ? $('#btn-stop') : $('#btn-start')).click());
 $('#btn-normal').addEventListener('click', () => timer.setAbsolute(false));
 $('#btn-conc').addEventListener('click', () => timer.setAbsolute(true));
 

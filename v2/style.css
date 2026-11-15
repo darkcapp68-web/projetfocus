@@ -534,7 +534,8 @@ body.phase-break #btn-go { display: none; }
   .dur { width: 40px; height: 40px; font-size: 14px; }
   .rail-cap { min-height: 18px; }
   .rail-cap:not(:first-child) { margin-top: 4px; }
-  #btn-go { width: 56px; height: 56px; }
+  #btn-go { display: none; }
+  body #btn-go2 { display: grid; width: 48px; height: 48px; margin-top: 4px; }
   #controls { gap: 8px; }
   #side { gap: 8px; width: min(420px, 40vw); padding-top: 80px; } /* la place de l'encadré du rdv est réservée : rien ne bouge quand il apparaît */
   #rdv { top: 0; bottom: auto; }
@@ -543,3 +544,11 @@ body.phase-break #btn-go { display: none; }
   #btn-radio { width: 48px; height: 48px; }
   header { top: 4px; right: 8px; }
 }
+
+/* Démarrer / Arrêter dans la colonne de gauche (téléphone couché seulement, voir plus haut). */
+#btn-go2 { display: none; border: 0; border-radius: 50%; background: var(--fg); color: var(--on-fg); place-items: center; padding: 0; }
+#btn-go2 svg { width: 24px; height: 24px; fill: currentColor; stroke: none; }
+#btn-go2 .i-stop { display: none; }
+body.running #btn-go2 .i-play { display: none; }
+body.running #btn-go2 .i-stop { display: block; }
+#btn-go2:active { transform: scale(0.95); }
