@@ -110,6 +110,17 @@
       </details>
 
       <details class="sec">
+        <summary>Mails <small>essai : les 10 derniers</small></summary>
+        <p class="note">Affiche l'expéditeur et l'objet des 10 derniers mails de la boîte de réception (jamais le contenu). Rien n'est gardé sur l'appareil.</p>
+        <div class="buttons">
+          <button type="button" id="btn-mail">Afficher mes 10 derniers mails</button>
+          <button type="button" id="btn-mail-clear" class="link" hidden>Effacer la liste</button>
+        </div>
+        <p id="mail-status" class="note" aria-live="polite"></p>
+        <ol id="mail-list"></ol>
+      </details>
+
+      <details class="sec">
         <summary>Sauvegarde <small>Google Drive, exporter, importer</small></summary>
         <p class="note">« Sauvegarder » envoie les réglages de cet appareil dans ton Google Drive (fichier « projetfocus2-parametres.json », à part de celui de la 1.0) ; « Reprendre » les ramène sur un autre appareil.</p>
         <div class="buttons">

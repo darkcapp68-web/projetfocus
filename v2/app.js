@@ -2,9 +2,10 @@
 import { STATIONS, SHOWN_STATIONS, CLIENT_ID } from './stations.js';
 import { NOISES, createNoise } from './noise.js';
 import { createSync } from './sync.js';
+import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 13h57';
+const APP_VERSION = '15/11/2026 · 14h04';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1055,6 +1056,40 @@ undoBtn.addEventListener('click', () => {
   note('Réglages d’avant remis sur cet appareil.');
 });
 
+// Mails (essai, 15/11) : les 10 derniers, en liste de texte (expéditeur, objet), sans lien.
+const mail = createMail({ getClientId: () => S.syncClientId });
+const mailList = $('#mail-list'), mailStatus = $('#mail-status'), mailClear = $('#btn-mail-clear');
+function mailReset(text = '') {
+  mailList.textContent = '';
+  mailStatus.textContent = text;
+  mailStatus.dataset.kind = '';
+  mailClear.hidden = true;
+}
+$('#btn-mail').addEventListener('click', async () => {
+  mailReset('Connexion à Google…');
+  try {
+    const items = await mail.last10();
+    mailList.textContent = '';
+    for (const m of items) {
+      const li = document.createElement('li');
+      if (m.unread) li.className = 'unread';
+      const from = document.createElement('span'); from.className = 'from'; from.textContent = m.from;
+      const subject = document.createElement('span'); subject.className = 'subject'; subject.textContent = m.subject;
+      li.append(from, subject);
+      mailList.append(li);
+    }
+    mailStatus.textContent = items.length ? `${items.length} derniers mails de la boîte de réception.` : 'Boîte de réception vide.';
+    mailStatus.dataset.kind = 'ok';
+    mailClear.hidden = false;
+  } catch (e) {
+    mailReset(e.message === 'sans identifiant'
+      ? 'Ajoute d’abord l’ID client Google (voir Sauvegarde).'
+      : `Mails indisponibles (${e.message}).`);
+    mailStatus.dataset.kind = 'warn';
+  }
+});
+mailClear.addEventListener('click', () => { mail.forget(); mailReset('Liste effacée, jeton oublié.'); });
+
 // Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
 $('#btn-export').addEventListener('click', () => {
   const blob = new Blob([JSON.stringify({ ...collect(), savedAt: Date.now() }, null, 2)], { type: 'application/json' });
@@ -1096,7 +1131,7 @@ sync.start();
 /* ---------- Mise à jour ---------- */
 // L'appli relit la version publiée ; si elle a changé, un point bleu s'allume sur
 // « Paramètres ». Jamais de rechargement tout seul.
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'stations.js', 'noise.js', 'breath.js', 'sync.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'stations.js', 'noise.js', 'breath.js', 'sync.js', 'mail.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 let lastCheck = 0;
 
 async function checkUpdate() {

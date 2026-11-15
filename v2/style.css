@@ -395,3 +395,10 @@ body.ink-dark #dial .track { stroke: rgba(0, 0, 0, 0.25); fill: rgba(0, 0, 0, 0.
   #player .radio { grid-area: radio; }
   #volume { grid-area: vol; }
 }
+
+/* Mails (essai) : une liste de texte, sans lien. */
+#mail-list { margin: 8px 0; padding-left: 22px; }
+#mail-list li { margin: 8px 0; line-height: 1.3; }
+#mail-list .from { font-weight: 600; }
+#mail-list li.unread .from::before { content: "● "; color: var(--accent); }
+#mail-list .subject { display: block; color: var(--soft); font-size: 14px; overflow-wrap: anywhere; }
