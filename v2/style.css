@@ -616,7 +616,11 @@ body.absolute #agenda, body.absolute #mails { display: none; }
 #ask[hidden] { display: none; }
 #ask button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--glass-strong); color: var(--fg); font: inherit; font-weight: 600; }
 #ask #ask-yes { background: var(--fg); color: var(--on-fg); }
-body.asking #center { animation: none; opacity: 1; } /* pendant la question de fin de focus, le décompte reste bien visible (pas de fondu de l'heure) */
+/* Pendant la question de fin de focus, le décompte reste bien visible (pas de fondu de l'heure). Sélecteur plus précis que celui du
+   fondu (sinon il ne gagnait pas : constaté en mode essai, l'heure restait à 10 % pendant la question). */
+body.running.asking:not(.awake) #center { animation: none; opacity: 1; }
+/* Mode essai (phases de 10 s) : le fondu de l'heure passe de 31 s à 10 s pour qu'on le voie en entier à chaque phase. */
+body.test-mode.running:not(.awake) #center { animation-duration: 10s; }
 body.test-mode #sub::after { content: " · essai 10 s"; }
 
 /* Tablette aussi (15/11, demande de l'utilisateur) : Démarrer / Arrêter à gauche de l'anneau, sous la Pause, comme sur le téléphone couché ;
