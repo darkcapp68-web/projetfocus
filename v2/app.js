@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h07';
+const APP_VERSION = '15/11/2026 · 20h09';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -314,7 +314,7 @@ const wave = (() => {
       // Une seule vague à la fois, calée sur le rythme (15/11, demande de l'utilisateur : « avec la techno, ça ne passe pas
       // bien » : des vagues tirées au hasard n'allaient pas avec les basses). Un coup de basse (la grosse caisse) est repéré
       // quand le niveau des graves dépasse sa moyenne récente de plus d'un écart-type ; il lance une vague, au plus une
-      // toutes les 0,8 s, dont la hauteur suit la force du coup (avec un peu de hasard sur le sommet). Sans coup de basse
+      // toutes les 0,5 s, dont la hauteur suit la force du coup (avec un peu de hasard sur le sommet). Sans coup de basse
       // pendant 2,5 s (musique calme), une petite vague est lancée quand même.
       let b = 0;
       for (let i = 1; i < 6; i++) b += freq[i];
@@ -322,7 +322,7 @@ const wave = (() => {
       bm += (b - bm) * Math.min(1, 0.03 * df);
       bv += (((b - bm) ** 2) - bv) * Math.min(1, 0.03 * df);
       const z = (b - bm) / (Math.sqrt(bv) + 0.5), tn = performance.now() / 1000;
-      if ((z > 1 && b > prevB && tn - lastOn > 0.8) || tn - lastOn > 2.5) {
+      if ((z > 1 && b > prevB && tn - lastOn > 0.5) || tn - lastOn > 2) {
         const strong = z > 1;
         pulses.push({ tb: tn, h: (strong ? 0.4 + 0.6 * Math.min(1, z / 2.5) : 0.3 + 0.2 * Math.random()) * (0.75 + 0.25 * Math.random()) });
         lastOn = tn;
@@ -330,7 +330,7 @@ const wave = (() => {
       prevB = b;
       pNow = 0.05;
       for (let q = pulses.length - 1; q >= 0; q--) {
-        const d = (tn - pulses[q].tb) / 0.6;
+        const d = (tn - pulses[q].tb) / 0.45;
         if (d > 4) { pulses.splice(q, 1); continue; }
         pNow = Math.max(pNow, pulses[q].h * Math.exp(-d * d));
       }
@@ -402,10 +402,10 @@ const wave = (() => {
       lay.forEach(([col, al, lev, amp, sh, dy], j) => {
         const ys = [];
         for (let i = 0; i <= N; i++) {
-          const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
-          ys.push(H * lev - e * amp * H * 0.31 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
+          const u = i / N, e = env(u, sh), rip = Math.sin(u * 40 - t * 3 + j) * 0.02;
+          ys.push(H * lev - e * amp * H * 0.46 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
-        for (let pass = 0; pass < 2; pass++) { // vagues arrondies, sans dents de histogramme
+        for (let pass = 0; pass < 1; pass++) { // vagues arrondies, sans dents de histogramme
           const o = ys.slice();
           for (let i = 1; i < N; i++) o[i] = 0.25 * ys[i - 1] + 0.5 * ys[i] + 0.25 * ys[i + 1];
           for (let i = 0; i <= N; i++) ys[i] = o[i];
