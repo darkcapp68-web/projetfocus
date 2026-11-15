@@ -519,6 +519,13 @@ soi-même.
   description). Prochaine étape : couper la musique selon le type (règles du point 0).
   **Décision du 15/11 : 3 prochains rdv et 7 mails** (au lieu de 5 et 10) : « l'idéal, ça règle les
   besoins » ; l'écran est plus léger. Constantes `AGENDA_MAX` (app.js) et `maxResults` (mail.js).
+  **Actualisation (15/11)** : Google n'ouvre sa fenêtre de connexion que sur un vrai toucher
+  (vérifié sur la tablette : sans geste, « popup_failed_to_open »), donc pas de mise à jour
+  vraiment automatique avec cette méthode. Fait : l'appui sur ▶ actualise l'agenda et les mails
+  (si la connexion a déjà été accordée sur l'appareil et si les listes ont plus de 2 minutes) ; le
+  texte devient « il y a N min » (mis à jour toutes les 20 s) et, après 10 minutes, « · touche ↻ »
+  en gras. Pour du vraiment automatique : un relais Apps Script à l'utilisateur (option B, pas
+  encore fait ; à tester : appels depuis Chrome 101 vers un script Google).
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil

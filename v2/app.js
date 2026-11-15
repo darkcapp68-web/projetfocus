@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 15h06';
+const APP_VERSION = '15/11/2026 · 15h13';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1157,6 +1157,23 @@ for (const id of ['#btn-start', '#btn-stop', '#btn-break', '#btn-resume']) $(id)
 // Diagnostic (15/11) : ce que l'appli a reconnu pour chaque évènement, sans leur contenu.
 window.__agendaDiag = () => (agendaItems || []).map((e) => ({ titre: e.title, type: e.kind, indices: e.diag }));
 
+// Fraîcheur des listes (15/11) : « il y a N min » à la place d'une heure fixe, qui se met à jour
+// toute seule ; au-delà de 10 minutes, rappel plus foncé : « touche ↻ ».
+let agendaAt = 0, mailsAt = 0;
+const STALE_MIN = 10;
+function ageText(t) {
+  const min = Math.floor((Date.now() - t) / 60000);
+  return min < 1 ? 'à jour à l’instant' : `il y a ${min} min` + (min >= STALE_MIN ? ' · touche ↻' : '');
+}
+function renderAges() {
+  for (const [at, el] of [[agendaAt, agendaStatus], [mailsAt, mailStatus]]) {
+    if (!at) continue;
+    el.textContent = ageText(at);
+    el.dataset.kind = (Date.now() - at) / 60000 >= STALE_MIN ? 'stale' : '';
+  }
+}
+setInterval(renderAges, 20000);
+
 const problem = (e) => (e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`);
 let mailBusy = false;
 async function refreshGoogle() {
@@ -1173,19 +1190,27 @@ async function refreshGoogle() {
     return;
   }
   const [mails, agenda] = await Promise.allSettled([mail.lastMails(), mail.today()]);
-  const at = hhmm(new Date());
-  if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); updateRdv(); setStatus(agendaStatus, 'à jour à ' + at); }
+  agendaAt = mailsAt = 0;
+  if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); updateRdv(); agendaAt = Date.now(); }
   else setStatus(agendaStatus, problem(agenda.reason), 'warn');
   if (mails.status === 'fulfilled') {
     mailList.textContent = '';
     for (const m of mails.value) mailList.append(line(m.unread ? 'unread' : '', ['from', m.from], ['subject', m.subject]));
     if (!mails.value.length) emptyNote(mailList, 'Boîte de réception vide.');
-    setStatus(mailStatus, 'à jour à ' + at);
+    mailsAt = Date.now();
   } else setStatus(mailStatus, problem(mails.reason), 'warn');
+  renderAges();
   mailBusy = false;
   mailBtn.disabled = false;
 }
 mailBtn.addEventListener('click', refreshGoogle);
+// Quand on appuie sur ▶ (un vrai geste : la fenêtre Google a le droit de s'ouvrir), on actualise aussi,
+// si la connexion a déjà été accordée sur cet appareil et si les listes ont plus de 2 minutes.
+$('#btn-start').addEventListener('click', () => {
+  if (!localStorage.getItem('projetfocus2.googleOk')) return; // jamais connecté : on ne surprend pas
+  if (Date.now() - Math.max(agendaAt, mailsAt) < 120000) return;
+  refreshGoogle();
+});
 
 // Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
 $('#btn-export').addEventListener('click', () => {
