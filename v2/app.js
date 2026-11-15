@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h26';
+const APP_VERSION = '15/11/2026 · 20h30';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -285,9 +285,10 @@ const wave = (() => {
   // par à-coups. `df` = nombre d'images de 60 Hz écoulées depuis le dernier dessin : les retombées et
   // l'adaptation de sensibilité gardent la même vitesse réelle.
   let lastDraw = 0, ink = '#111', inkAge = -1, pNow = 0.05, bm = -60, bv = 25, pS = 0.3;
+  let prevB = -60, lastOn = 0, spT = 1, spd = 1, spAcc = 0, lastT = 0, cphase = 0; // vitesse des vagues liée au tempo (plage)
+  const iois = []; // les derniers écarts entre deux coups de basse (s)
   const HM = 100, hist = new Float32Array(HM).fill(0.05); // la puissance des ~3 dernières secondes : une vague traverse l'écran en ~3 s, au rythme de la techno (plage)
   const wetLine = [];
-  let histT = performance.now() / 1000;
   function frame(t) {
     raf = 0;
     const live = wantOn && !player.paused && an && !document.hidden;
@@ -323,12 +324,38 @@ const wave = (() => {
       pS += (Math.min(1, Math.max(0.12, 0.45 + 0.28 * z)) - pS) * Math.min(1, 0.6 * df);
       if (!isFinite(pS) || !isFinite(bm) || !isFinite(bv)) { pS = 0.3; bm = b; bv = 25; }
       pNow = pS;
-    } else pNow = 0.05;
+      // Vitesse des vagues liée au tempo (15/11, demande de l'utilisateur : « une vitesse moyenne entre le classique, lent, et
+      // la techno, rapide ») : on mesure l'écart entre les coups de basse ; s'il est régulier, le tempo (ramené entre 70 et 170
+      // BPM) règle la vitesse entre 0,85 (80 BPM) et 1,25 (150 BPM) ; sans battement net (classique), vitesse lente, 0,75.
+      const tn = performance.now() / 1000;
+      if (z > 1 && b > prevB && tn - lastOn > 0.3) {
+        if (lastOn && tn - lastOn < 1.5) { iois.push(tn - lastOn); if (iois.length > 14) iois.shift(); }
+        lastOn = tn;
+      }
+      prevB = b;
+      spT = 0.75;
+      if (iois.length >= 6) {
+        const srt = [...iois].sort((x, y) => x - y), med = srt[srt.length >> 1];
+        const mad = srt.map((x) => Math.abs(x - med)).sort((x, y) => x - y)[srt.length >> 1];
+        if (mad < 0.2 * med) {
+          let bpm = 60 / med;
+          while (bpm < 70) bpm *= 2;
+          while (bpm > 170) bpm /= 2;
+          spT = 0.85 + 0.4 * Math.min(1, Math.max(0, (bpm - 80) / 70));
+        }
+      }
+    } else { pNow = 0.05; spT = 1; }
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
-    const tH = performance.now() / 1000, nRaw = Math.floor((tH - histT) * 60), nH = Math.min(HM, nRaw);
+    // La vitesse (1 = 60 échantillons par seconde) suit le tempo, adoucie ; la forme des crêtes avance à la même vitesse.
+    const tH = performance.now() / 1000, dtR = Math.min(0.2, Math.max(0, tH - lastT));
+    lastT = tH;
+    spd += (spT - spd) * Math.min(1, 0.04 * df);
+    spAcc += dtR * 60 * spd;
+    const nH = Math.min(HM, Math.floor(spAcc));
+    spAcc -= nH;
     for (let q = 0; q < nH; q++) { hist.copyWithin(0, 1); hist[HM - 1] = pNow; }
-    if (nRaw > HM) histT = tH; else if (nH > 0) histT += nH / 60; // longue absence (onglet caché) : on repart de maintenant
+    cphase = (cphase + dtR * spd / 0.55) % 1;
     const mid = H / 2, step = 7 * k, bw = 3.4 * k, n = Math.floor(W / step);
     g.clearRect(0, 0, W, H);
     // Hauteur de chaque barre (demi-hauteur), puis lissage entre voisines : la silhouette
@@ -399,7 +426,7 @@ const wave = (() => {
         for (let i = 0; i <= N; i++) {
           // Trois vagues sur la longueur : la forme (3 crêtes qui glissent vers la plage, à la même vitesse que l'histoire) est
           // multipliée par la puissance de la musique au moment où la crête est née à droite.
-          const u = i / N, e = env(u, sh), ph = 6.2832 * (3 * u + t / 0.55), cr = Math.pow(0.5 + 0.5 * Math.sin(ph + 0.5 * Math.sin(ph)), 1.6), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
+          const u = i / N, e = env(u, sh), ph = 6.2832 * (3 * u + cphase), cr = Math.pow(0.5 + 0.5 * Math.sin(ph + 0.5 * Math.sin(ph)), 1.6), rip = Math.sin(u * 40 - t * 3 + j) * 0.012;
           crest[i] = cr * e * vg;
           ys.push(H * lev - cr * e * vg * amp * H * 0.72 * (1 - 0.25 * (1 - u)) - rip * H * (0.3 + e) + dy);
         }
@@ -455,9 +482,9 @@ const wave = (() => {
 
   addEventListener('resize', () => { if (!raf) draw(false); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden && wantOn) start(); });
-  return { listen, draw, settle, start, hist };
+  return { listen, draw, settle, start, hist, dbg: () => ({ spd, spT, iois: iois.map((x) => +x.toFixed(2)) }) };
 })();
-wave.draw(false);
+wave.draw(false); window.__wave = wave; // TEMP
 
 /* ---------- Volume ---------- */
 volume.value = store.get('volume', 70);
