@@ -672,7 +672,7 @@ couleurs (fond, rouge, orange) se règlent dans Paramètres → Couleurs. *Malen
 centre en haut de l'écran pendant le focus concentré (pas en pause, pas au repos). Les autres
 adaptations du focus concentré restent à décider (question 2 de l'audit).
 **Style du titre : « B », capitales espacées** (choisi par l'utilisateur le 15/11 parmi 6 propositions : A gras, B capitales espacées, C plaque noire, D cadre, E cloche barrée + texte, F fin et grand). Un choix de style dans les Paramètres reste possible.
-**Le titre pulse** (15/11, demande de l'utilisateur) : de sa taille normale vers 20 % plus grand, puis retour, en boucle de 3,2 s ; réglable dans `style.css` (`dnd-pulse`).
+**Le titre pulse** (15/11, demande de l'utilisateur) : de sa taille normale vers 50 % plus grand (20 % au début, élargi sur demande), puis retour, en boucle de 3,2 s ; réglable dans `style.css` (`dnd-pulse`).
 
 **Adaptations possibles (à choisir)**
 
