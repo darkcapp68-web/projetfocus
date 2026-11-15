@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h41';
+const APP_VERSION = '15/11/2026 · 20h43';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -329,7 +329,7 @@ const wave = (() => {
       // Vitesse des vagues liée à l'activité rythmique (15/11, demande de l'utilisateur : « une vitesse moyenne entre le
       // classique, lent, et la techno, rapide »). Mesurer un vrai tempo (BPM) sur une radio en direct est peu fiable (des
       // coups de basse manqués donnent des écarts multiples) ; on compte plutôt les coups de basse par seconde sur les 8
-      // dernières secondes : peu (classique), vitesse 0,75 ; beaucoup (techno), jusqu'à 1,25 ; entre les deux, progressif.
+      // dernières secondes : peu (classique), vitesse 0,5 ; beaucoup (techno), jusqu'à 0,75 ; entre les deux, progressif.
       const tn = performance.now() / 1000;
       if (z > 1 && b > prevB && tn - lastOn > 0.3) { onsT.push(tn); lastOn = tn; }
       prevB = b;
@@ -351,8 +351,8 @@ const wave = (() => {
         bpmTxt = (best > 0.45 ? '≈ ' + Math.round(60 / bp) + ' BPM' : '— BPM') + ' · ' + rate.toFixed(1).replace('.', ',') + ' coups/s · vague ×' + spd.toFixed(2).replace('.', ',');
         bpmEl.textContent = bpmTxt;
       }
-      spT = 0.75 + 0.5 * Math.min(1, Math.max(0, (rate - 0.3) / 1.2));
-    } else { pNow = 0.05; spT = 1; if (bpmTxt) { bpmTxt = ''; bpmEl.textContent = ''; } }
+      spT = 0.5 + 0.25 * Math.min(1, Math.max(0, (rate - 0.3) / 1.2)); // de ×0,5 (calme) à ×0,75 (techno) : plage ralentie à la demande de l'utilisateur, 15/11
+    } else { pNow = 0.05; spT = 0.6; if (bpmTxt) { bpmTxt = ''; bpmEl.textContent = ''; } }
     // L'histoire avance à vitesse réelle (60 échantillons par seconde ; 15/11, demande de l'utilisateur : vitesse doublée, une vague traverse en ~1,7 s), quel que soit le nombre d'images dessinées : sur la
     // tablette, à ~10 images par seconde, les vagues traversaient 3 fois trop lentement.
     // La vitesse (1 = 60 échantillons par seconde) suit le tempo, adoucie ; la forme des crêtes avance à la même vitesse.
