@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 20h30';
+const APP_VERSION = '15/11/2026 · 20h50';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1162,8 +1162,11 @@ const AGENDA_MAX = 3; // les 3 prochains rdv (15/11, choix de l'utilisateur)
 function renderAgenda() {
   if (!agendaItems) return;
   const now = Date.now();
-  const left = agendaItems.filter((e) => e.allDay || e.end.getTime() > now);
-  if (!left.length) { emptyNote(agendaList, agendaItems.length ? 'Plus rien de prévu aujourd’hui.' : 'Rien de prévu aujourd’hui.'); return; }
+  // Téléphone couché (15/11, demande de l'utilisateur : « au pire les 2 prochaines heures ») : place réduite, on ne montre
+  // que ce qui est en cours ou commence dans les 2 heures ; ailleurs, tout le reste de la journée.
+  const court = matchMedia('(orientation: landscape) and (max-height: 600px)').matches;
+  const left = agendaItems.filter((e) => e.allDay || (e.end.getTime() > now && (!court || e.start.getTime() <= now + 2 * 3600e3)));
+  if (!left.length) { emptyNote(agendaList, court ? 'Rien dans les 2 prochaines heures.' : agendaItems.length ? 'Plus rien de prévu aujourd’hui.' : 'Rien de prévu aujourd’hui.'); return; }
   agendaList.textContent = '';
   for (const e of left.slice(0, AGENDA_MAX)) {
     const cur = !e.allDay && e.start.getTime() <= now;
@@ -1174,6 +1177,7 @@ function renderAgenda() {
   if (left.length > AGENDA_MAX) agendaList.append(line('more', ['when', ''], ['title', `+ ${left.length - AGENDA_MAX} autres`]));
 }
 setInterval(renderAgenda, 60000);
+matchMedia('(orientation: landscape) and (max-height: 600px)').addEventListener?.('change', renderAgenda);
 // Rdv qui correspond au focus (15/11, demande de l'utilisateur) : tant qu'un décompte tourne, on
 // cherche dans l'agenda un rdv en cours, ou qui commence avant la fin du décompte. S'il y en a un,
 // on l'affiche à gauche sous l'horloge et on pose des classes sur la page (rdv-now / rdv-soon,
