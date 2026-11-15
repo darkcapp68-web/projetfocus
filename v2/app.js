@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 17h36';
+const APP_VERSION = '15/11/2026 · 17h44';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -1215,12 +1215,22 @@ setInterval(renderAges, 20000);
 
 const problem = (e) => (e.message === 'sans identifiant' ? 'ID Google manquant (Sauvegarde)' : `indisponible (${e.message})`);
 let mailBusy = false;
-async function refreshGoogle() {
+// Les dernières listes sont gardées sur l'appareil (12 h au plus) : au rechargement, elles s'affichent aussitôt
+// (« il y a N min »), puis se mettent à jour sans fenêtre tant que l'autorisation Google est valable (15/11).
+const CACHE_KEY = 'projetfocus2.cache';
+let mailsData = null;
+function saveCache() {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ agenda: agendaItems && { at: agendaAt, items: agendaItems }, mails: mailsData && { at: mailsAt, items: mailsData } })); } catch { /* rien */ }
+}
+function showMails(list) {
+  mailList.textContent = '';
+  for (const m of list) mailList.append(line(m.unread ? 'unread' : '', ['from', m.from], ['subject', m.subject]));
+  if (!list.length) emptyNote(mailList, 'Boîte de réception vide.');
+}
+async function refreshGoogle(quiet = false) {
   if (mailBusy) return;
   mailBusy = true;
-  mailBtn.disabled = true;
-  setStatus(agendaStatus, 'connexion…');
-  setStatus(mailStatus, '');
+  if (!quiet) { mailBtn.disabled = true; setStatus(agendaStatus, 'connexion…'); setStatus(mailStatus, ''); }
   try {
     await mail.connect(); // une seule fenêtre Google pour les deux
   } catch (e) {
@@ -1233,24 +1243,43 @@ async function refreshGoogle() {
   if (agenda.status === 'fulfilled') { agendaItems = agenda.value; renderAgenda(); updateRdv(); agendaAt = Date.now(); }
   else setStatus(agendaStatus, problem(agenda.reason), 'warn');
   if (mails.status === 'fulfilled') {
-    mailList.textContent = '';
-    for (const m of mails.value) mailList.append(line(m.unread ? 'unread' : '', ['from', m.from], ['subject', m.subject]));
-    if (!mails.value.length) emptyNote(mailList, 'Boîte de réception vide.');
+    mailsData = mails.value;
+    showMails(mailsData);
     mailsAt = Date.now();
   } else setStatus(mailStatus, problem(mails.reason), 'warn');
   renderAges();
+  saveCache();
   mailBusy = false;
   mailBtn.disabled = false;
 }
-mailBtn.addEventListener('click', refreshGoogle);
+mailBtn.addEventListener('click', () => refreshGoogle());
 // Quand on appuie sur ▶, on actualise aussi, mais seulement si l'autorisation Google est encore valable et si les
 // listes ont plus de 2 minutes (15/11). Sans autorisation valable, ▶ ne doit rien ouvrir : la fenêtre Google fait
 // redémarrer l'appli sur la tablette (flash blanc au démarrage) ; le rappel « touche ↻ » prend le relais.
 $('#btn-start').addEventListener('click', () => {
   if (!mail.tokenValid) return;
   if (Date.now() - Math.max(agendaAt, mailsAt) < 120000) return;
-  refreshGoogle();
+  refreshGoogle(true);
 });
+// Au chargement : on remet les dernières listes, puis on les met à jour sans fenêtre si l'autorisation est valable ;
+// ensuite toutes les 5 minutes et au retour sur l'appli, tant que l'autorisation tient (1 h). Passé ce délai, il
+// reste « touche ↻ » (un geste est nécessaire pour la fenêtre Google).
+try {
+  const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+  const recent = (t) => t && Date.now() - t < 12 * 3600000;
+  if (cache?.agenda && recent(cache.agenda.at)) {
+    agendaItems = cache.agenda.items.map((e) => ({ ...e, start: e.start ? new Date(e.start) : null, end: e.end ? new Date(e.end) : null }));
+    agendaAt = cache.agenda.at;
+    renderAgenda();
+  }
+  if (cache?.mails && recent(cache.mails.at)) { mailsData = cache.mails.items; mailsAt = cache.mails.at; showMails(mailsData); }
+  renderAges();
+  updateRdv();
+} catch { /* cache illisible : on l'ignore */ }
+const staleMs = () => Date.now() - Math.max(agendaAt, mailsAt);
+if (mail.tokenValid) refreshGoogle(true);
+setInterval(() => { if (mail.tokenValid && !document.hidden && staleMs() > 270000) refreshGoogle(true); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && mail.tokenValid && staleMs() > 120000) refreshGoogle(true); });
 
 // Fichier : exporter / importer en JSON, ou revenir aux valeurs par défaut.
 $('#btn-export').addEventListener('click', () => {

@@ -617,6 +617,13 @@ soi-même.
   texte devient « il y a N min » (mis à jour toutes les 20 s) et, après 10 minutes, « · touche ↻ »
   en gras. Pour du vraiment automatique : un relais Apps Script à l'utilisateur (option B, pas
   encore fait ; à tester : appels depuis Chrome 101 vers un script Google).
+  **Actualisation sans fenêtre (15/11)** : l'autorisation Google (lecture seule, valable environ 1 h) et les
+  dernières listes (agenda, expéditeurs et objets des mails) sont **gardées sur la tablette**
+  (`localStorage`, clés `projetfocus2.gtok` et `projetfocus2.cache`, listes gardées 12 h au plus). Au
+  rechargement, les listes s'affichent aussitôt, puis se mettent à jour **sans fenêtre** tant que l'autorisation
+  tient : au chargement, à ▶ (si les listes ont plus de 2 min), au retour sur l'appli et toutes les 5 minutes. Au
+  bout d'une heure, un appui sur ↻ (un geste) est nécessaire pour la fenêtre Google. À savoir : un jeton et des
+  objets de mails sont stockés sur l'appareil ; les effacer = vider les données du site dans Chrome.
 - **11.4 Le focus lancé ailleurs s'affiche sur la tablette** (*Difficile*) : si le focus tourne
   sur le téléphone ou le poste pro, la tablette doit le savoir. Pistes : **la tablette est
   elle-même l'appareil du focus** (on démarre depuis elle : le plus simple) ; ou l'appareil

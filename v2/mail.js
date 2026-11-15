@@ -11,6 +11,7 @@ const CAL_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
 const MAIL_API = 'https://gmail.googleapis.com/gmail/v1/users/me/messages';
 const CAL_API = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
 const OK_KEY = 'projetfocus2.googleOk';
+const TOK_KEY = 'projetfocus2.gtok';
 
 // Type de rendez-vous, deviné à partir de l'évènement Google (rien du texte n'est gardé ni affiché) :
 //  - Meet : le champ officiel de visio de Google (conférence ou lien hangoutLink) ;
@@ -41,6 +42,12 @@ export function createMail({ getClientId }) {
   let token = null, tokenExp = 0, client = null, clientFor = '';
   let granted = { mail: false, agenda: false };
   let onToken = null, onTokenError = null;
+  // L'autorisation (valable environ 1 h, lecture seule) est gardée sur la tablette : un rechargement de l'appli (mise à
+  // jour, Android qui la recrée) ne force plus à rouvrir la fenêtre Google (15/11).
+  try {
+    const t = JSON.parse(localStorage.getItem(TOK_KEY) || 'null');
+    if (t?.token && t.exp > Date.now() + 60000) { token = t.token; tokenExp = t.exp; granted = t.granted || granted; }
+  } catch { /* rien */ }
 
   function loadGis() {
     if (window.google?.accounts?.oauth2) return Promise.resolve();
@@ -79,6 +86,7 @@ export function createMail({ getClientId }) {
         try { localStorage.setItem(OK_KEY, '1'); } catch { /* rien */ }
         token = r.access_token;
         tokenExp = Date.now() + Number(r.expires_in || 3600) * 1000;
+        try { localStorage.setItem(TOK_KEY, JSON.stringify({ token, exp: tokenExp, granted })); } catch { /* rien */ }
         resolve(token);
       };
       onTokenError = (e) => reject(new Error(e?.type || 'fenêtre fermée'));
@@ -88,7 +96,7 @@ export function createMail({ getClientId }) {
 
   async function api(url, name) {
     const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (r.status === 401) { token = null; throw new Error('jeton expiré, réessaie'); }
+    if (r.status === 401) { token = null; try { localStorage.removeItem(TOK_KEY); } catch { /* rien */ } throw new Error('jeton expiré, réessaie'); }
     if (!r.ok) {
       const body = await r.text().catch(() => '');
       if (/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/.test(body)) {
@@ -158,6 +166,7 @@ export function createMail({ getClientId }) {
     forget() {
       try { if (token) window.google?.accounts?.oauth2?.revoke(token, () => {}); } catch { /* rien */ }
       token = null;
+      try { localStorage.removeItem(TOK_KEY); } catch { /* rien */ }
     },
   };
 }
