@@ -11,6 +11,7 @@ Statuts : `idée` · `à faire` · `en cours` · `fait` · `écarté`. Facilité
 | # | À faire | Facilité | Statut |
 | --- | --- | --- | --- |
 | 13.1 | **Mettre le dépôt Git à jour avec la note de version** (demande de l'utilisateur, 15/11) : écrire la note de version de la 2.0 (ce qui change depuis la 1.0, en quelques lignes lisibles), la ranger dans le dépôt (par exemple `CHANGELOG.md` et le `README.md` du site), et marquer la version dans Git (étiquette et page « Release » de GitHub). Le numéro affiché dans les Paramètres reste l'heure de publication ; la note de version porte le vrai numéro de la 2.0. | Facile | **à faire** |
+| 13.2 | **Bouton « Reprendre » : une icône à la place du texte** (demande de l'utilisateur, 15/11) : pendant la pause, remplacer le bouton « Reprendre » (une pastille avec du texte sous l'anneau) par une **icône** (lecture, comme Démarrer), placée **à l'endroit du bouton Pause actuel** (colonne de gauche, sous Normal et Concentré). Garder le geste « maintenir pour reprendre » s'il est réglé. | Facile | **à faire** |
 
 ## Idée retenue
 
