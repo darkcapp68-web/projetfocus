@@ -5,7 +5,7 @@ import { createSync } from './sync.js';
 import { createMail } from './mail.js';
 import { RHYTHMS, stepsFor, stepAt, createBreath } from './breath.js';
 
-const APP_VERSION = '15/11/2026 · 18h33';
+const APP_VERSION = '15/11/2026 · 18h36';
 
 // Écran gardé allumé pendant une séance (tablette de bureau : elle ne doit pas s'éteindre).
 let wakeLock = null, wakeBusy = false;
@@ -29,6 +29,16 @@ document.addEventListener('visibilitychange', () => {
 const setAppH = () => document.documentElement.style.setProperty('--app-h', innerHeight + 'px');
 setAppH();
 addEventListener('resize', setAppH);
+
+// Téléphone : l'appli installée demande le paysage (15/11, demande de l'utilisateur : « tout en paysage, comme la tablette »).
+// Seulement sur un petit écran (le petit côté sous 600 px) et en appli installée : Chrome refuse le verrouillage dans un
+// onglet ordinaire. La tablette (déjà couchée) et le PC ne sont pas concernés.
+try {
+  const smallest = Math.min(screen.width, screen.height);
+  if (smallest < 600 && matchMedia('(display-mode: standalone)').matches && screen.orientation?.lock) {
+    screen.orientation.lock('landscape').catch(() => { /* refusé : l'appli reste dans l'orientation courante */ });
+  }
+} catch { /* rien */ }
 
 // Tout ce que la 2.0 garde sur l'appareil commence par « projetfocus2. » (séparé de la 1.0).
 const store = {
