@@ -175,6 +175,7 @@
         <label data-if="breathPattern!=aucun breathShow=colors|breathShow=both">… couleur de la retenue<input type="color" data-k="breathHoldColor"></label>
         <label data-if="breathPattern!=aucun breathShow=colors|breathShow=both">… couleur de l'expiration<input type="color" data-k="breathExpireColor"></label>
         <label>Musique de la pause<select data-k="breakMusic" id="sel-break-music"></select></label>
+        <label class="chk">Mode essai <small>focus et pause de 10 secondes, pour tester les sons et l'enchaînement ; à décocher ensuite</small><input type="checkbox" data-k="testMode"></label>
         <label class="chk">Compte à rebours sonore <small>dings de plus en plus rapprochés dans les 10 dernières secondes, avant la pause et avant le focus</small><input type="checkbox" data-k="countdown"></label>
         <label class="chk">Reprendre le focus tout seul à la fin de la pause<input type="checkbox" data-k="autoChain"></label>
         <label data-if="autoChain">… après (secondes)<input type="number" min="0" max="60" data-k="autoChainDelay"></label>

@@ -77,6 +77,7 @@ const DEFAULTS = {
   breathHoldColor: '#ffd36e', // doré
   breathExpireColor: '#000000', // noir
   pulseIntensity: 30, // assombrissement du voile (%)
+  testMode: false, // essais : focus et pause de 10 secondes
   countdown: true, // dings de plus en plus rapprochés dans les 10 dernières secondes du focus et de la pause (comme la 1.0)
   meetingMute: true, // la radio se coupe pendant un rdv Meet / Teams / Zoom (et revient après)
   autoChain: true, // le focus reprend tout seul à la fin de la pause
@@ -127,6 +128,7 @@ function sanitize(raw0) {
   r.autoChain = !!r.autoChain;
   r.meetingMute = r.meetingMute !== false;
   r.countdown = r.countdown !== false;
+  r.testMode = !!r.testMode;
   r.fullscreenOnBreak = !!r.fullscreenOnBreak;
   r.notifyOn = false; // notifications mises de côté pour le moment : jamais de demande d'autorisation
   r.breathPattern = pick(r.breathPattern, RHYTHMS.map((x) => x.id), DEFAULTS.breathPattern);
@@ -890,6 +892,7 @@ const timer = (() => {
     const b = document.body;
     const ph = run?.phase;
     b.classList.toggle('running', !!run);
+    b.classList.toggle('test-mode', !!S.testMode);
     keepAwake(!!run);
     b.classList.toggle('phase-focus', ph === 'focus');
     b.classList.toggle('phase-break', ph === 'break');
@@ -946,7 +949,7 @@ const timer = (() => {
   function begin(phase) {
     holdEnd();
     lastCount = null;
-    const total = clock.minutes(phase) * 60;
+    const total = S.testMode ? 10 : clock.minutes(phase) * 60; // mode essai : 10 s (15/11, demande de l'utilisateur)
     run = { phase, endAt: Date.now() + total * 1000, total };
     store.set('run', run);
     if (phase === 'break') {
