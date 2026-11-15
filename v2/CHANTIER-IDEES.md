@@ -54,7 +54,7 @@ la page.
 | 6.1 | Bruits de fond par fichier (fin du craquement Bluetooth) | Facile (si les fichiers sont fournis) | à définir |
 | 6.2 | Mélange d'ambiances (pluie + café + musique) | Facile | à définir |
 | 6.3 | Fin de focus en douceur (volume qui baisse) | Facile | à définir |
-| 6.4 | « Mes musiques » depuis le Drive | Difficile | à définir |
+| 6.4 | « Mes musiques » (fichiers choisis sur l'appareil / Drive) | Moyen (fichiers) / Difficile (Drive) | à définir |
 | 7.1 | Raccourci « Focus 25 min » sur l'écran d'accueil | Facile | à définir |
 | 7.2 | Notification qui reste, avec Pause / Stop | Difficile | à définir |
 | 7.3 | Ne pas déranger automatique | Difficile (APK) | à définir |
@@ -228,8 +228,39 @@ l'APK est repris, le bouton dans la notification s'ajoute.
   Bluetooth (chantier n°1 du 07/11). *Facile* une fois les fichiers libres de droits trouvés.
 - **6.2 Mélange d'ambiances** : pluie + café + musique, trois curseurs. *Facile*.
 - **6.3 Fin de focus en douceur** : le volume baisse petit à petit avant la question. *Facile*.
-- **6.4 « Mes musiques »** depuis le Drive (idée en réserve de la 1.0, MP3 de l'utilisateur).
-  *Difficile*.
+- **6.4 Playlist « Mes musiques »** depuis le Drive *(précisé le 15/11, idée en réserve de la
+  1.0 : les MP3 de l'utilisateur, achetés ou tirés de ses CD)*. *Moyen* par fichiers choisis sur
+  l'appareil, *Difficile* par le Drive.
+  - **Ce que ça donne** : une entrée « Mes musiques » dans le menu de la radio, jouée au hasard
+    ou dans l'ordre, en boucle, **hors ligne** une fois récupérée, sans publicité ni dépendance
+    à un flux en direct. Aussi utilisable comme « musique de la pause ».
+  - **Trois façons d'y mettre ses MP3**, de la plus simple à la plus complète :
+    1. **Choisir des fichiers sur l'appareil** (bouton « Ajouter mes MP3 », sélection multiple) :
+       copiés dans le stockage de l'appli, aucun compte Google. *Moyen*. Marche aussi sur le
+       poste pro si Google y est bloqué (9.2).
+    2. **Choisir dans mon Drive** par le sélecteur Google (Google Picker) : l'appli ne voit que
+       les fichiers choisis (portée `drive.file`, comme la sauvegarde des réglages). *Difficile* :
+       demande une clé d'API (publique, à restreindre à l'adresse du site) en plus de l'ID client
+       Google ; connexion à la main, jeton d'environ 1 h.
+    3. **Dossier « projetfocus-musique » du Drive**, lu en entier : exigerait une portée de
+       lecture plus large (`drive.readonly`, « restreinte » chez Google) : *à éviter* tant que
+       les deux premières suffisent.
+  - **Récupérer sur chaque appareil** : bouton « Récupérer mes musiques » à la main (téléphone,
+    PC perso, poste pro), gardées hors ligne comme les playlists embarquées de la 1.0 (cache
+    séparé, lecture par morceaux depuis le cache).
+  - **Place** : environ 5 à 10 Mo par morceau, donc 50 morceaux ≈ 250 à 500 Mo. Demander au
+    navigateur de garder le stockage (`navigator.storage.persist()`) et afficher l'espace pris,
+    avec « Retirer de cet appareil ».
+  - **Avantages** : le fichier vient de l'appli elle-même, donc l'**onde** du lecteur marche
+    sans souci de droits d'accès (CORS), et la lecture écran éteint est celle du lecteur du
+    téléphone (pas de craquement, leçon de la 1.0). Les touches de l'écran verrouillé (suivant,
+    pause) sont possibles via la « Media Session ».
+  - **Titres** : nom du fichier au départ ; lecture des balises ID3 (titre, artiste) en option.
+  - **Jamais de MP3 dans le dépôt public** (droits d'auteur) ; seul l'utilisateur envoie les
+    siens. Son Drive n'est lu que sur clic, jamais en arrière-plan.
+  - **À décider** : où sont aujourd'hui ses MP3 (disque du PC, Drive, CD à numériser) ? Une
+    seule playlist ou plusieurs (« focus », « pause ») ? Veut-il passer d'abord par le choix de
+    fichiers (plus simple) avant le Drive ?
 - Musique calme de pause et sons de respiration : en attente de l'utilisateur (`SUNO.md`).
 
 ## 7. Confort sur Android
