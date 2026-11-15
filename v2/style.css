@@ -558,6 +558,7 @@ body.phase-break #btn-go { display: none; }
   /* La plage à gauche, la radio et le volume à droite (demande de l'utilisateur, 15/11). */
   #player { padding: 2px 24px 8px; gap: 4px 20px; grid-template-columns: minmax(0, 42%) 1fr; grid-template-areas: "wave radio" "wave vol"; align-items: center; }
   #wave { height: 76px; align-self: end; }
+  #player { --rb: 48px; }
   #btn-radio { width: 48px; height: 48px; }
   header { top: 4px; right: 8px; }
 }
@@ -585,3 +586,11 @@ body.running #btn-go2 .i-stop { display: block; }
 .version-row .version, .version-row .hint { margin: 0; }
 .version-row .hint { font-size: 13px; min-height: 0; }
 .version-row .wide { width: auto; flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; }
+
+/* Centrage du lecteur (15/11, demande de l'utilisateur) : le nom de la radio, la ligne de texte dessous et le curseur de
+   volume sont centrés sur la même colonne, celle à droite du bouton lecture (--rb = largeur de ce bouton). */
+#player { --rb: 64px; }
+.radio-text { text-align: center; }
+#radio-pick { text-align: center; padding: 0 40px; }
+#radio-state { text-align: center; }
+#volume { box-sizing: border-box; margin-left: calc(var(--rb) + 14px); width: calc(100% - var(--rb) - 14px); }
