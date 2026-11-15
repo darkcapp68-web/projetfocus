@@ -16,20 +16,9 @@ android {
         applicationId = "fr.projetfocus.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
 
-        manifestPlaceholders["hostName"] = siteHost
-        manifestPlaceholders["defaultUrl"] = "https://$siteHost$sitePath"
-        // Lien de confiance avec le site (voir android/README.md, « assetlinks.json »).
-        resValue(
-            "string", "asset_statements",
-            """[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"web","site":"https://$siteHost"}}]""",
-        )
-    }
-
-    buildFeatures {
-        resValues = true
     }
 
     buildTypes {
@@ -44,6 +33,3 @@ android {
     }
 }
 
-dependencies {
-    implementation(libs.androidbrowserhelper)
-}
